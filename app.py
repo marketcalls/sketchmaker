@@ -98,11 +98,11 @@ Provide only the enhanced prompt as output, without any additional explanation o
                 "instagram_post_portrait": {"width": 1088, "height": 1344},
                 "instagram_story": {"width": 1088, "height": 1920},
                 "logo": {"width": 512, "height": 512},
-                "youtube_thumbnail": {"width": 1280, "height": 720},
+                "youtube_thumbnail": {"width": 1280, "height": 704},
                 "blog_banner": {"width": 1440, "height": 832},
                 "linkedin_post": {"width": 1216, "height": 1216},
-                "facebook_post_landscape": {"width": 960, "height": 784},
-                "twitter_header": {"width": 1504, "height": 496}
+                "facebook_post_landscape": {"width": 960, "height": 768},
+                "twitter_header": {"width": 1440, "height": 480}
             }
 
             fal_request = {
