@@ -109,7 +109,7 @@ Provide only the enhanced prompt as output, without any additional explanation o
 
             fal_request = {
                 "prompt": prompt,
-                "num_inference_steps": 28,  # Fixed value
+                "num_inference_steps": 20,  # Fixed value
                 "guidance_scale": 3.5,  # Fixed value
                 "num_images": 1,
                 "safety_tolerance": "2"  # Fixed to High
