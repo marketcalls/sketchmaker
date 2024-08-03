@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageGen - AI Image Generator</title>
+    <script src="https://cdn.tailwindcss.com/3.4.4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen py-8">
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-5xl mx-auto">
+            <h1 class="text-4xl font-bold mb-6 text-center text-gray-800">ImageGen - AI Image Generator</h1>
+            
+            <div class="mb-6">
+                <textarea id="userInput" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none" placeholder="Describe your image content...eg create a youtube thumbnail for a Topic on Our European Tour"></textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label for="imageSize" class="block text-sm font-medium text-gray-700 mb-1">Image Size</label>
+                    <select id="imageSize" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" onchange="updateImageSize()">
+                        <option value="landscape_4_3">Landscape 4:3</option>
+                        <option value="landscape_16_9">Landscape 16:9</option>
+                        <option value="portrait_4_3">Portrait 4:3</option>
+                        <option value="portrait_16_9">Portrait 16:9</option>
+                        <option value="square">Square 1:1</option>
+                        <option value="square_hd">Square HD</option>
+                        <option value="instagram_post_square">Instagram Post (Square) - 1088x1088</option>
+                        <option value="instagram_post_portrait">Instagram Post (Portrait) - 1088x1344</option>
+                        <option value="instagram_story">Instagram Story - 1088x1920</option>
+                        <option value="logo">Logo - 512x512</option>
+                        <option value="youtube_thumbnail">YouTube Thumbnail - 1280x704</option>
+                        <option value="blog_banner">Blog Banner - 1440x832</option>
+                        <option value="linkedin_post">LinkedIn Post - 1216x1216</option>
+                        <option value="facebook_post_landscape">Facebook Post (Landscape) - 960x768</option>
+                        <option value="twitter_header">Twitter Header - 1504x480</option>
+                        <option value="custom">Custom Size</option>
+                    </select>
+                </div>
+                <div id="customSizeInputs">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="customWidth" class="block text-sm font-medium text-gray-700 mb-1">Width</label>
+                            <input type="number" id="customWidth" min="256" max="1440" step="32" value="1024" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="customHeight" class="block text-sm font-medium text-gray-700 mb-1">Height</label>
+                            <input type="number" id="customHeight" min="256" max="1440" step="32" value="720" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="generatePrompt()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition duration-300 flex items-center justify-center">
+                <i class="fas fa-magic mr-2"></i> Generate Prompt
+            </button>
+            
+            <div id="loadingIndicator" class="hidden mt-6 text-center">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                <p class="mt-2 text-gray-600">Generating... This may take a moment.</p>
+            </div>
+
+            <div id="resultContainer" class="hidden mt-6">
+                <h2 class="text-2xl font-semibold mb-2 text-gray-800">Generated Prompt:</h2>
+                <p id="generatedPrompt" class="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg whitespace-pre-wrap"></p>
+                
+                <div id="promptReviewContainer" class="mb-4 flex space-x-4">
+                    <button onclick="generateImages()" class="flex-1 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300">Approve Prompt</button>
+                    <button onclick="generatePrompt(true)" class="flex-1 bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300">Regenerate Prompt</button>
+                </div>
+                
+                <div id="imageResultContainer" class="hidden mt-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Generated Thumbnails:</h2>
+                    <div id="imageContainer" class="grid grid-cols-1 gap-8"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const imageSizes = {
+            square: { width: 512, height: 512 },
+            square_hd: { width: 1024, height: 1024 },
+            portrait_4_3: { width: 768, height: 1024 },
+            portrait_16_9: { width: 576, height: 1024 },
+            landscape_4_3: { width: 1024, height: 704 },
+            landscape_16_9: { width: 1024, height: 576 },
+            instagram_post_square: { width: 1088, height: 1088 },
+            instagram_post_portrait: { width: 1088, height: 1344 },
+            instagram_story: { width: 1088, height: 1920 },
+            logo: { width: 512, height: 512 },
+            youtube_thumbnail: { width: 1280, height: 704 },
+            blog_banner: { width: 1440, height: 832 },
+            linkedin_post: { width: 1216, height: 1216 },
+            facebook_post_landscape: { width: 960, height: 768 },
+            twitter_header: { width: 1504, height: 480 },
+        };
+
+        function updateImageSize() {
+            const imageSize = document.getElementById('imageSize');
+            const customWidth = document.getElementById('customWidth');
+            const customHeight = document.getElementById('customHeight');
+
+            const size = imageSizes[imageSize.value];
+            if (size) {
+                customWidth.value = size.width;
+                customHeight.value = size.height;
+            }
+        }
+
+        async function generatePrompt(regenerate = false) {
+            const userInput = document.getElementById('userInput').value;
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const resultContainer = document.getElementById('resultContainer');
+            const promptElement = document.getElementById('generatedPrompt');
+            const imageResultContainer = document.getElementById('imageResultContainer');
+
+            loadingIndicator.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            imageResultContainer.classList.add('hidden');
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: userInput,
+                        regenerate_prompt: regenerate
+                    }),
+                });
+
+                const data = await response.json();
+                if (data.prompt) {
+                    promptElement.textContent = data.prompt;
+                    resultContainer.classList.remove('hidden');
+                } else {
+                    throw new Error('Invalid response from server');
+                }
+            } catch (error) {
+                alert('Error generating prompt: ' + error.message);
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        async function generateImages() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const imageContainer = document.getElementById('imageContainer');
+            const imageResultContainer = document.getElementById('imageResultContainer');
+
+            loadingIndicator.classList.remove('hidden');
+            imageResultContainer.classList.add('hidden');
+
+            try {
+                const imageSizeSelect = document.getElementById('imageSize');
+                const customWidth = document.getElementById('customWidth');
+                const customHeight = document.getElementById('customHeight');
+
+                let imageSize;
+                if (imageSizeSelect.value === 'custom') {
+                    imageSize = {
+                        width: parseInt(customWidth.value),
+                        height: parseInt(customHeight.value)
+                    };
+                } else {
+                    imageSize = imageSizeSelect.value;
+                }
+
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: document.getElementById('generatedPrompt').textContent,
+                        image_size: imageSize,
+                    }),
+                });
+
+                const data = await response.json();
+                if (data.image_url) {
+                    imageContainer.innerHTML = ''; // Clear previous images
+                    
+                    // Handle multiple images
+                    const imageUrls = Array.isArray(data.image_url) ? data.image_url : [data.image_url];
+                    imageUrls.forEach((url, index) => {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'relative bg-gray-100 p-4 rounded-lg shadow-lg';
+                        
+                        const imgElement = document.createElement('img');
+                        imgElement.src = url;
+                        imgElement.alt = 'Generated Thumbnail';
+                        imgElement.className = 'w-full h-auto rounded-lg shadow-md mb-4';
+                        
+                        const dimensionsElement = document.createElement('p');
+                        dimensionsElement.className = 'text-sm text-gray-600 mb-2';
+                        if (data.width && data.height) {
+                            dimensionsElement.textContent = `Dimensions: ${data.width}x${data.height}`;
+                        } else {
+                            dimensionsElement.textContent = `Size: ${imageSizeSelect.value}`;
+                        }
+                        
+                        const downloadContainer = document.createElement('div');
+                        downloadContainer.className = 'flex justify-center space-x-4';
+                        
+                        ['webp', 'png', 'jpeg'].forEach(format => {
+                            const downloadButton = document.createElement('a');
+                            downloadButton.href = `/download?url=${encodeURIComponent(url)}&format=${format}`;
+                            downloadButton.className = 'bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300';
+                            downloadButton.textContent = format.toUpperCase();
+                            downloadButton.download = `thumbnail_${index + 1}.${format}`;
+                            downloadContainer.appendChild(downloadButton);
+                        });
+                        
+                        imgContainer.appendChild(imgElement);
+                        imgContainer.appendChild(dimensionsElement);
+                        imgContainer.appendChild(downloadContainer);
+                        imageContainer.appendChild(imgContainer);
+                    });
+                    
+                    imageResultContainer.classList.remove('hidden');
+                } else {
+                    throw new Error('Invalid response from server');
+                }
+            } catch (error) {
+                alert('Error generating images: ' + error.message);
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        // Initialize image size on page load
+        updateImageSize();
+    </script>
+</body>
+</html>
