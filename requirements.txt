@@ -7,6 +7,7 @@ click==8.1.7
 distro==1.9.0
 fal_client==0.4.1
 Flask==3.0.3
+Flask-Cors==4.0.1
 h11==0.14.0
 httpcore==1.0.5
 httpx==0.27.0
