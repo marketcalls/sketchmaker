@@ -96,11 +96,17 @@ Provide only the enhanced prompt as output, without any additional explanation o
 
             # Define custom image sizes
             custom_sizes = {
+                "landscape_4_3": {"width": 1024, "height": 768},  # Fixed Landscape 4:3 ratio
+                "landscape_16_9": {"width": 1280, "height": 720},
+                "portrait_4_3": {"width": 768, "height": 1024},
+                "portrait_16_9": {"width": 720, "height": 1280},
+                "square": {"width": 1024, "height": 1024},
+                "square_hd": {"width": 1080, "height": 1080},
                 "instagram_post_square": {"width": 1088, "height": 1088},
                 "instagram_post_portrait": {"width": 1088, "height": 1344},
                 "instagram_story": {"width": 1088, "height": 1920},
                 "logo": {"width": 512, "height": 512},
-                "youtube_thumbnail": {"width": 1280, "height": 704},
+                "youtube_thumbnail": {"width": 1280, "height": 720},
                 "blog_banner": {"width": 1440, "height": 832},
                 "linkedin_post": {"width": 1216, "height": 1216},
                 "facebook_post_landscape": {"width": 960, "height": 768},
