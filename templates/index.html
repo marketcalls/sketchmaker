@@ -2,182 +2,29 @@
 <html lang="en">
 <head>
     {% include 'partials/head.html' %}
+    <title>Sketch Maker AI - Advanced Image Generator</title>
 </head>
-<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen py-8">
-    <div class="container mx-auto px-4">
-        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-5xl mx-auto">
-            <h1 class="text-4xl font-bold mb-6 text-center text-gray-800">ImageGen - AI Image Generator</h1>
-            
+<body class="min-h-screen p-4 md:p-8">
+    <div class="container mx-auto max-w-6xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-[1.5] gradient-text">Sketch Maker AI</h1>
+            <p class="text-lg text-gray-600">Advanced AI-Powered Image Creator</p>
+
+        </header>
+
+        <main class="glass-effect p-6 md:p-8">
             {% include 'partials/form.html' %}
-            
-            <div id="loadingIndicator" class="hidden mt-6 text-center">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-                <p class="mt-2 text-gray-600">Generating... This may take a moment.</p>
+
+            <div id="loadingIndicator" class="hidden mt-8 text-center">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+                <p class="mt-4 text-gray-600">Crafting your masterpiece... This might take a moment.</p>
             </div>
 
             {% include 'partials/prompt_result.html' %}
             {% include 'partials/image_result.html' %}
-        </div>
+        </main>
     </div>
 
-    <script>
-        const imageSizes = {
-            square: { width: 1024, height: 1024 },
-            square_hd: { width: 1080, height: 1080 },
-            portrait_4_3: { width: 768, height: 1024 },
-            portrait_16_9: { width: 720, height: 1280 },
-            landscape_4_3: { width: 1024, height: 768 },  // Fixed Landscape 4:3 ratio
-            landscape_16_9: { width: 1280, height: 720 },
-            instagram_post_square: { width: 1088, height: 1088 },
-            instagram_post_portrait: { width: 1088, height: 1344 },
-            instagram_story: { width: 1088, height: 1920 },
-            logo: { width: 512, height: 512 },
-            youtube_thumbnail: { width: 1280, height: 720 },
-            blog_banner: { width: 1440, height: 832 },
-            linkedin_post: { width: 1216, height: 1216 },
-            facebook_post_landscape: { width: 960, height: 768 },
-            twitter_header: { width: 1504, height: 480 },
-        };
-
-        function updateImageSize() {
-            const imageSize = document.getElementById('imageSize');
-            const customWidth = document.getElementById('customWidth');
-            const customHeight = document.getElementById('customHeight');
-
-            const size = imageSizes[imageSize.value];
-            if (size) {
-                customWidth.value = size.width;
-                customHeight.value = size.height;
-            }
-        }
-
-        async function generatePrompt(regenerate = false) {
-            const userInput = document.getElementById('userInput').value;
-            const artStyle = document.getElementById('artStyle').value;
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            const resultContainer = document.getElementById('resultContainer');
-            const promptElement = document.getElementById('generatedPrompt');
-            const imageResultContainer = document.getElementById('imageResultContainer');
-
-            loadingIndicator.classList.remove('hidden');
-            resultContainer.classList.add('hidden');
-            imageResultContainer.classList.add('hidden');
-
-            try {
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: userInput,
-                        art_style: artStyle,
-                        regenerate_prompt: regenerate
-                    }),
-                });
-
-                const data = await response.json();
-                if (data.prompt) {
-                    promptElement.textContent = data.prompt;
-                    resultContainer.classList.remove('hidden');
-                } else {
-                    throw new Error('Invalid response from server');
-                }
-            } catch (error) {
-                alert('Error generating prompt: ' + error.message);
-            } finally {
-                loadingIndicator.classList.add('hidden');
-            }
-        }
-
-        async function generateImages() {
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            const imageContainer = document.getElementById('imageContainer');
-            const imageResultContainer = document.getElementById('imageResultContainer');
-
-            loadingIndicator.classList.remove('hidden');
-            imageResultContainer.classList.add('hidden');
-
-            try {
-                const imageSizeSelect = document.getElementById('imageSize');
-                const customWidth = document.getElementById('customWidth');
-                const customHeight = document.getElementById('customHeight');
-
-                let imageSize;
-                if (imageSizeSelect.value === 'custom') {
-                    imageSize = {
-                        width: parseInt(customWidth.value),
-                        height: parseInt(customHeight.value)
-                    };
-                } else {
-                    imageSize = imageSizeSelect.value;
-                }
-
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: document.getElementById('generatedPrompt').textContent,
-                        image_size: imageSize,
-                    }),
-                });
-
-                const data = await response.json();
-                if (data.image_url) {
-                    imageContainer.innerHTML = ''; // Clear previous images
-                    
-                    // Handle multiple images
-                    const imageUrls = Array.isArray(data.image_url) ? data.image_url : [data.image_url];
-                    imageUrls.forEach((url, index) => {
-                        const imgContainer = document.createElement('div');
-                        imgContainer.className = 'relative bg-gray-100 p-4 rounded-lg shadow-lg';
-                        
-                        const imgElement = document.createElement('img');
-                        imgElement.src = url;
-                        imgElement.alt = 'Generated Thumbnail';
-                        imgElement.className = 'w-full h-auto rounded-lg shadow-md mb-4';
-                        
-                        const dimensionsElement = document.createElement('p');
-                        dimensionsElement.className = 'text-sm text-gray-600 mb-2';
-                        if (data.width && data.height) {
-                            dimensionsElement.textContent = `Dimensions: ${data.width}x${data.height}`;
-                        } else {
-                            dimensionsElement.textContent = `Size: ${imageSizeSelect.value}`;
-                        }
-                        
-                        const downloadContainer = document.createElement('div');
-                        downloadContainer.className = 'flex justify-center space-x-4';
-                        
-                        ['webp', 'png', 'jpeg'].forEach(format => {
-                            const downloadButton = document.createElement('a');
-                            downloadButton.href = `/download?url=${encodeURIComponent(url)}&format=${format}`;
-                            downloadButton.className = 'bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300';
-                            downloadButton.textContent = format.toUpperCase();
-                            downloadButton.download = `thumbnail_${index + 1}.${format}`;
-                            downloadContainer.appendChild(downloadButton);
-                        });
-                        
-                        imgContainer.appendChild(imgElement);
-                        imgContainer.appendChild(dimensionsElement);
-                        imgContainer.appendChild(downloadContainer);
-                        imageContainer.appendChild(imgContainer);
-                    });
-                    
-                    imageResultContainer.classList.remove('hidden');
-                } else {
-                    throw new Error('Invalid response from server');
-                }
-            } catch (error) {
-                alert('Error generating images: ' + error.message);
-            } finally {
-                loadingIndicator.classList.add('hidden');
-            }
-        }
-
-        // Initialize image size on page load
-        updateImageSize();
-    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

@@ -1,77 +1,131 @@
-<div class="mb-6">
-    <textarea id="userInput" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none" placeholder="Describe your image content...Create a YouTube thumbnail for a topic on our European tour"></textarea>
-</div>
+<form id="imageGenForm" class="space-y-6">
+    <div>
+        <label for="userInput" class="block text-sm font-medium text-gray-700 mb-1">Image Description</label>
+        <textarea id="userInput" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none input-focus-ring custom-scrollbar" placeholder="Describe your image content...eg create a youtube thumbnail for a Topic on Our European Tour"></textarea>
+    </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <div>
-        <label for="imageSize" class="block text-sm font-medium text-gray-700 mb-1">Image Size</label>
-        <select id="imageSize" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" onchange="updateImageSize()">
-            <option value="landscape_4_3">Landscape 4:3</option>
-            <option value="landscape_16_9">Landscape 16:9</option>
-            <option value="portrait_4_3">Portrait 4:3</option>
-            <option value="portrait_16_9">Portrait 16:9</option>
-            <option value="square">Square 1:1</option>
-            <option value="square_hd">Square HD</option>
-            <option value="instagram_post_square">Instagram Post (Square) - 1088x1088</option>
-            <option value="instagram_post_portrait">Instagram Post (Portrait) - 1088x1344</option>
-            <option value="instagram_story">Instagram Story - 1088x1920</option>
-            <option value="logo">Logo - 512x512</option>
-            <option value="youtube_thumbnail">YouTube Thumbnail - 1280x704</option>
-            <option value="blog_banner">Blog Banner - 1440x832</option>
-            <option value="linkedin_post">LinkedIn Post - 1216x1216</option>
-            <option value="facebook_post_landscape">Facebook Post (Landscape) - 960x768</option>
-            <option value="twitter_header">Twitter Header - 1440x480</option>
-            <option value="custom">Custom Size</option>
-        </select>
-    </div>
-    <div>
-        <label for="artStyle" class="block text-sm font-medium text-gray-700 mb-1">Artistic Style</label>
-        <select id="artStyle" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
-            <option value="None">None</option>
-            <option value="Impressionism">Impressionism</option>
-            <option value="Surrealism">Surrealism</option>
-            <option value="Pop Art">Pop Art</option>
-            <option value="Abstract Expressionism">Abstract Expressionism</option>
-            <option value="Cubism">Cubism</option>
-            <option value="Fantasy Art">Fantasy Art</option>
-            <option value="Manga">Manga</option>
-            <option value="Anime">Anime</option>
-            <option value="Street Art">Street Art</option>
-            <option value="Graffiti Art">Graffiti Art</option>
-            <option value="Digital Art">Digital Art</option>
-            <option value="Pixel Art">Pixel Art</option>
-            <option value="Steampunk Art">Steampunk Art</option>
-            <option value="Minimalism">Minimalism</option>
-            <option value="Vintage">Vintage</option>
-            <option value="Renaissance">Renaissance</option>
-            <option value="Romanticism">Romanticism</option>
-            <option value="Expressionism">Expressionism</option>
-            <option value="Art Nouveau">Art Nouveau</option>
-            <option value="Watercolor Painting">Watercolor Painting</option>
-            <option value="Oil Painting">Oil Painting</option>
-            <option value="Pencil Art">Pencil Art</option>
-            <option value="Cinematic Art">Cinematic Art</option>
-            <option value="Charcoal Drawing">Charcoal Drawing</option>
-            <option value="Pastel Drawing">Pastel Drawing</option>
-            <option value="Ink Wash Painting">Ink Wash Painting</option>
-            <option value="Fantasy Illustration">Fantasy Illustration</option>
-            <option value="Children’s Book Illustration">Children’s Book Illustration</option>
-            <option value="Comic Book Art">Comic Book Art</option>
-        </select>
-    </div>
-    <div id="customSizeInputs">
-        <div class="grid grid-cols-2 gap-2">
-            <div>
-                <label for="customWidth" class="block text-sm font-medium text-gray-700 mb-1">Width</label>
-                <input type="number" id="customWidth" min="256" max="1440" step="32" value="1024" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
-            </div>
-            <div>
-                <label for="customHeight" class="block text-sm font-medium text-gray-700 mb-1">Height</label>
-                <input type="number" id="customHeight" min="256" max="1440" step="32" value="720" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
-            </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+            <label for="imageSize" class="block text-sm font-medium text-gray-700 mb-1">Image Size</label>
+            <select id="imageSize" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent input-focus-ring" onchange="updateImageSize()">
+                <option value="landscape_4_3">Landscape 4:3</option>
+                <option value="landscape_16_9">Landscape 16:9</option>
+                <option value="portrait_4_3">Portrait 4:3</option>
+                <option value="portrait_16_9">Portrait 16:9</option>
+                <option value="square">Square 1:1</option>
+                <option value="square_hd">Square HD</option>
+                <option value="instagram_post_square">Instagram Post (Square) - 1088x1088</option>
+                <option value="instagram_post_portrait">Instagram Post (Portrait) - 1088x1344</option>
+                <option value="instagram_story">Instagram Story - 1088x1920</option>
+                <option value="logo">Logo - 512x512</option>
+                <option value="youtube_thumbnail">YouTube Thumbnail - 1280x704</option>
+                <option value="blog_banner">Blog Banner - 1440x832</option>
+                <option value="linkedin_post">LinkedIn Post - 1216x1216</option>
+                <option value="facebook_post_landscape">Facebook Post (Landscape) - 960x768</option>
+                <option value="twitter_header">Twitter Header - 1440x480</option>
+                <option value="custom">Custom Size</option>
+            </select>
+        </div>
+        <div>
+            <label for="artStyle" class="block text-sm font-medium text-gray-700 mb-1">Artistic Style</label>
+            <select id="artStyle" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent input-focus-ring">
+                <option value="None">None</option>
+                <option value="Impressionism">Impressionism</option>
+                <option value="Surrealism">Surrealism</option>
+                <option value="Pop Art">Pop Art</option>
+                <option value="Abstract Expressionism">Abstract Expressionism</option>
+                <option value="Cubism">Cubism</option>
+                <option value="Fantasy Art">Fantasy Art</option>
+                <option value="Manga">Manga</option>
+                <option value="Anime">Anime</option>
+                <option value="Street Art">Street Art</option>
+                <option value="Graffiti Art">Graffiti Art</option>
+                <option value="Digital Art">Digital Art</option>
+                <option value="Pixel Art">Pixel Art</option>
+                <option value="Steampunk Art">Steampunk Art</option>
+                <option value="Minimalism">Minimalism</option>
+                <option value="Vintage">Vintage</option>
+                <option value="Renaissance">Renaissance</option>
+                <option value="Romanticism">Romanticism</option>
+                <option value="Expressionism">Expressionism</option>
+                <option value="Art Nouveau">Art Nouveau</option>
+                <option value="Watercolor Painting">Watercolor Painting</option>
+                <option value="Oil Painting">Oil Painting</option>
+                <option value="Pencil Art">Pencil Art</option>
+                <option value="Cinematic Art">Cinematic Art</option>
+                <option value="Charcoal Drawing">Charcoal Drawing</option>
+                <option value="Pastel Drawing">Pastel Drawing</option>
+                <option value="Ink Wash Painting">Ink Wash Painting</option>
+                <option value="Fantasy Illustration">Fantasy Illustration</option>
+                <option value="Children's Book Illustration">Children's Book Illustration</option>
+                <option value="Comic Book Art">Comic Book Art</option>
+            </select>
+        </div>
+        <div>
+            <label for="colorScheme" class="block text-sm font-medium text-gray-700 mb-1">Color Scheme</label>
+            <select id="colorScheme" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent input-focus-ring">
+                <option value="None">None</option>
+                <option value="Warm">Warm</option>
+                <option value="Cool">Cool</option>
+                <option value="Pastel">Pastel</option>
+                <option value="Monochrome">Monochrome</option>
+            </select>
+        </div>
+        <div>
+            <label for="lightingMood" class="block text-sm font-medium text-gray-700 mb-1">Lighting and Mood</label>
+            <select id="lightingMood" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent input-focus-ring">
+                <option value="None">None</option>
+                <option value="Natural Light">Natural Light</option>
+                <option value="Studio Light">Studio Light</option>
+                <option value="Backlight">Backlight</option>
+                <option value="Dramatic">Dramatic</option>
+                <option value="Serene">Serene</option>
+                <option value="Energetic">Energetic</option>
+            </select>
+        </div>
+        <div>
+            <label for="subjectFocus" class="block text-sm font-medium text-gray-700 mb-1">Subject Focus</label>
+            <select id="subjectFocus" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent input-focus-ring">
+                <option value="None">None</option>
+                <option value="People">People</option>
+                <option value="Objects">Objects</option>
+                <option value="Scenery">Scenery</option>
+            </select>
+        </div>
+        <div>
+            <label for="backgroundStyle" class="block text-sm font-medium text-gray-700 mb-1">Background Style</label>
+            <select id="backgroundStyle" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent input-focus-ring">
+                <option value="None">None</option>
+                <option value="Plain">Plain</option>
+                <option value="Gradient">Gradient</option>
+                <option value="Textured">Textured</option>
+                <option value="Patterned">Patterned</option>
+            </select>
+        </div>
+        <div>
+            <label for="effectsFilters" class="block text-sm font-medium text-gray-700 mb-1">Effects and Filters</label>
+            <select id="effectsFilters" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent input-focus-ring">
+                <option value="None">None</option>
+                <option value="Sepia">Sepia</option>
+                <option value="Black and White">Black and White</option>
+                <option value="Vintage">Vintage</option>
+                <option value="HDR">HDR</option>
+            </select>
         </div>
     </div>
-</div>
-<button onclick="generatePrompt()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition duration-300 flex items-center justify-center">
-    <i class="fas fa-magic mr-2"></i> Generate Prompt
-</button>
+
+    <div id="customSizeInputs" class="grid grid-cols-2 gap-4 hidden">
+        <div>
+            <label for="customWidth" class="block text-sm font-medium text-gray-700 mb-1">Width</label>
+            <input type="number" id="customWidth" min="256" max="1440" step="32" value="1024" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent input-focus-ring">
+        </div>
+        <div>
+            <label for="customHeight" class="block text-sm font-medium text-gray-700 mb-1">Height</label>
+            <input type="number" id="customHeight" min="256" max="1440" step="32" value="768" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent input-focus-ring">
+        </div>
+    </div>
+
+    <button type="submit" class="w-full gradient-bg text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition duration-300 flex items-center justify-center">
+        <i class="fas fa-magic mr-2"></i> Enhance Image Prompt
+    </button>
+</form>
