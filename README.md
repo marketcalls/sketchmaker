@@ -34,7 +34,7 @@ SketchMaker AI is an advanced AI-powered image generation tool that creates cust
    pip install -r requirements.txt
    ```
 
-3. Set up environment variables:
+3. Set up environment variables: (rename .sample.env file to .env file)
    Create a `.env` file in the root directory and add your API keys:
    ```
    OPENAI_API_KEY=your_openai_api_key
