@@ -2,6 +2,8 @@
 
 SketchMaker AI is an advanced AI-powered image generation tool that creates custom images based on user descriptions and preferences. It's designed to produce high-quality, tailored images for various purposes such as social media content, blog posts, and more.
 
+![SketchMaker AI Preview](https://www.marketcalls.in/wp-content/uploads/2024/08/sketchmaker.png)
+
 ## Features
 
 - **AI-Powered Image Generation**: Generate unique images based on textual descriptions.
