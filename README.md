@@ -14,6 +14,8 @@ SketchMaker AI is an advanced AI-powered image generation tool that creates cust
 - **Multi-Format Downloads**: Download your images in WebP, PNG, and JPEG formats.
 - **User-Friendly Interface**: Easy-to-use web interface built with modern design principles.
 
+![SketchMaker Generated Image](https://www.marketcalls.in/wp-content/uploads/2024/08/Traders-Reading-News-and-Freaking-out.png)
+
 ## Getting Started
 
 ### Prerequisites
