@@ -12,6 +12,7 @@ SketchMaker AI is an advanced AI-powered image generation tool that creates cust
 - **Color Scheme Options**: Select from different color palettes to match your needs.
 - **Lighting and Mood Control**: Adjust the lighting and overall mood of the generated images.
 - **Multi-Format Downloads**: Download your images in WebP, PNG, and JPEG formats.
+- **Image Gallery**: Browse your generated images.
 - **User-Friendly Interface**: Easy-to-use web interface built with modern design principles.
 
 ![SketchMaker Generated Image](https://www.marketcalls.in/wp-content/uploads/2024/08/Traders-Reading-News-and-Freaking-out.png)
