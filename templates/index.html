@@ -1,30 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% include 'partials/head.html' %}
-    <title>Sketch Maker AI - Advanced Image Generator</title>
-</head>
-<body class="min-h-screen p-4 md:p-8">
-    <div class="container mx-auto max-w-6xl">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-[1.5] gradient-text">Sketch Maker AI</h1>
-            <p class="text-lg text-gray-600">Advanced AI-Powered Image Creator</p>
+{% extends "base.html" %}
 
-        </header>
+{% block title %}Sketch Maker AI - Advanced Image Generator{% endblock %}
 
-        <main class="glass-effect p-6 md:p-8">
-            {% include 'partials/form.html' %}
-
-            <div id="loadingIndicator" class="hidden mt-8 text-center">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-                <p class="mt-4 text-gray-600">Crafting your masterpiece... This might take a moment.</p>
-            </div>
-
-            {% include 'partials/prompt_result.html' %}
-            {% include 'partials/image_result.html' %}
-        </main>
+{% block content %}
+<form id="imageGenForm" class="space-y-8">
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Image Description</h2>
+        <textarea id="userInput" name="message" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none" placeholder="Describe your image content... e.g., 'Create a YouTube thumbnail with a hand-drawn sketch style showing a vibrant cityscape for a travel vlog'"></textarea>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
+            <label for="imageSize" class="block text-sm font-medium text-gray-700 mb-1">Image Size</label>
+            <select id="imageSize" name="image_size" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                <option value="youtube_thumbnail">YouTube Thumbnail - 1280x704</option>
+                <option value="landscape_4_3">Landscape 4:3</option>
+                <option value="landscape_16_9">Landscape 16:9</option>
+                <option value="portrait_4_3">Portrait 4:3</option>
+                <option value="portrait_16_9">Portrait 16:9</option>
+                <option value="square">Square 1:1</option>
+                <option value="square_hd">Square HD</option>
+                <option value="instagram_post_square">Instagram Post (Square)</option>
+                <option value="instagram_post_portrait">Instagram Post (Portrait)</option>
+                <option value="instagram_story">Instagram Story</option>
+                <option value="logo">Logo</option>
+                <option value="blog_banner">Blog Banner</option>
+                <option value="linkedin_post">LinkedIn Post</option>
+                <option value="facebook_post_landscape">Facebook Post (Landscape)</option>
+                <option value="twitter_header">Twitter Header</option>
+            </select>
+        </div>
+        <div>
+            <label for="artStyle" class="block text-sm font-medium text-gray-700 mb-1">Artistic Style</label>
+            <select id="artStyle" name="art_style" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                <option value="None">None</option>
+                <option value="Impressionism">Impressionism</option>
+                <option value="Surrealism">Surrealism</option>
+                <option value="Pop Art">Pop Art</option>
+                <option value="Abstract Expressionism">Abstract Expressionism</option>
+                <option value="Cubism">Cubism</option>
+                <option value="Fantasy Art">Fantasy Art</option>
+                <option value="Manga">Manga</option>
+                <option value="Anime">Anime</option>
+                <option value="Street Art">Street Art</option>
+                <option value="Digital Art">Digital Art</option>
+                <option value="Minimalism">Minimalism</option>
+                <option value="Watercolor Painting">Watercolor Painting</option>
+                <option value="Oil Painting">Oil Painting</option>
+                <option value="Pencil Art">Pencil Art</option>
+                <option value="Charcoal Drawing">Charcoal Drawing</option>
+            </select>
+        </div>
+        <div>
+            <label for="colorScheme" class="block text-sm font-medium text-gray-700 mb-1">Color Scheme</label>
+            <select id="colorScheme" name="color_scheme" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                <option value="None">None</option>
+                <option value="Warm">Warm</option>
+                <option value="Cool">Cool</option>
+                <option value="Pastel">Pastel</option>
+                <option value="Monochrome">Monochrome</option>
+                <option value="Vibrant">Vibrant</option>
+                <option value="Earthy">Earthy</option>
+                <option value="Neon">Neon</option>
+            </select>
+        </div>
+        <div>
+            <label for="lightingMood" class="block text-sm font-medium text-gray-700 mb-1">Lighting and Mood</label>
+            <select id="lightingMood" name="lighting_mood" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                <option value="None">None</option>
+                <option value="Natural Light">Natural Light</option>
+                <option value="Studio Light">Studio Light</option>
+                <option value="Dramatic">Dramatic</option>
+                <option value="Soft">Soft</option>
+                <option value="High Contrast">High Contrast</option>
+                <option value="Low Key">Low Key</option>
+                <option value="High Key">High Key</option>
+            </select>
+        </div>
+        <div>
+            <label for="subjectFocus" class="block text-sm font-medium text-gray-700 mb-1">Subject Focus</label>
+            <select id="subjectFocus" name="subject_focus" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                <option value="None">None</option>
+                <option value="People">People</option>
+                <option value="Nature">Nature</option>
+                <option value="Animals">Animals</option>
+                <option value="Architecture">Architecture</option>
+                <option value="Objects">Objects</option>
+                <option value="Abstract">Abstract</option>
+            </select>
+        </div>
+        <div>
+            <label for="backgroundStyle" class="block text-sm font-medium text-gray-700 mb-1">Background Style</label>
+            <select id="backgroundStyle" name="background_style" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                <option value="None">None</option>
+                <option value="Plain">Plain</option>
+                <option value="Gradient">Gradient</option>
+                <option value="Textured">Textured</option>
+                <option value="Patterned">Patterned</option>
+                <option value="Blurred">Blurred</option>
+                <option value="Environmental">Environmental</option>
+            </select>
+        </div>
+        <div>
+            <label for="effectsFilters" class="block text-sm font-medium text-gray-700 mb-1">Effects and Filters</label>
+            <select id="effectsFilters" name="effects_filters" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                <option value="None">None</option>
+                <option value="Vintage">Vintage</option>
+                <option value="Black and White">Black and White</option>
+                <option value="Sepia">Sepia</option>
+                <option value="HDR">HDR</option>
+                <option value="Vignette">Vignette</option>
+                <option value="Grain">Grain</option>
+                <option value="Blur">Blur</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button type="submit" id="enhancePrompt" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-full hover:opacity-90 transition duration-300 flex items-center justify-center mx-auto">
+            <i class="fas fa-magic mr-2"></i> Enhance Image Prompt
+        </button>
+    </div>
+</form>
+
+<div id="loadingIndicator" class="hidden mt-8 text-center">
+    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+    <p class="mt-4 text-gray-600">Crafting your masterpiece... This might take a moment.</p>
+</div>
+
+<div id="resultContainer" class="hidden mt-8">
+    <h2 class="text-2xl font-semibold mb-4 gradient-text">Generated Prompt</h2>
+    <p id="generatedPrompt" class="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg whitespace-pre-wrap"></p>
+    
+    <div id="promptReviewContainer" class="mb-4 flex space-x-4">
+        <button onclick="generateImages()" class="flex-1 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300">Approve Prompt</button>
+        <button onclick="generatePrompt(true)" class="flex-1 bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300">Regenerate Prompt</button>
+    </div>
+</div>
+
+<div id="imageResultContainer" class="hidden mt-12">
+    <h2 class="text-2xl font-semibold mb-6 gradient-text">Generated Image</h2>
+    <div id="imageContainer" class="max-w-4xl mx-auto"></div>
+</div>
+
+<div class="text-center mt-8">
+    <a href="{{ url_for('gallery.gallery') }}" class="text-purple-600 hover:text-purple-800 font-semibold">View Image Gallery</a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
-</html>
+{% endblock %}

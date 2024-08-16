@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Image Gallery - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="animate-fadeIn">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-bold text-center">Inspiring Creations</h2>
+        <!-- Home Button -->
+        <a href="{{ url_for('core.index') }}" class="btn-primary">
+            <i class="fas fa-home mr-2"></i> Home Page
+        </a>
+    </div>
+    <div class="gallery-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for image in images %}
+        <div class="gallery-item animate-slideUp" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+            <a href="{{ url_for('gallery.image', filename=image) }}" class="block">
+                <img src="{{ url_for('static', filename='images/' + image) }}" alt="Generated image" class="w-full h-64 object-cover">
+                <div class="gallery-item-overlay">
+                    <span>View Full Screen</span>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

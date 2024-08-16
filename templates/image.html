@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Full Screen Image - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div id="image-container" class="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-between z-50">
+    <!-- Image Area -->
+    <div class="max-w-4xl w-full mx-4 flex justify-center flex-grow items-center">
+        <!-- Image is restricted to 70% of the screen height -->
+        <img id="full-screen-image" src="{{ url_for('static', filename='images/' + filename) }}" alt="Full-screen image" 
+             class="full-screen-image max-h-[70vh] object-contain opacity-0">
+    </div>
+    <!-- Buttons Area: Always Visible Below the Image -->
+    <div class="w-full max-w-4xl mx-4 flex justify-between items-center py-4">
+        <a href="{{ url_for('gallery.gallery') }}" class="btn-primary">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Gallery
+        </a>
+        <a href="{{ url_for('core.index') }}" class="btn-primary ml-auto">
+            <i class="fas fa-home mr-2"></i> Home Page
+        </a>
+        <a href="{{ url_for('static', filename='images/' + filename) }}" download class="btn-primary ml-4">
+            <i class="fas fa-download mr-2"></i> Download Image
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const fullScreenImage = document.getElementById('full-screen-image');
+        
+        // Ensure the image is fully loaded before displaying it with animation
+        fullScreenImage.addEventListener('load', () => {
+            // Fade in the image smoothly without affecting the layout
+            gsap.to(fullScreenImage, { duration: 0.5, opacity: 1, ease: 'power2.out' });
+            // Fade in the buttons immediately after the image starts to fade in
+            gsap.from('.btn-primary', { duration: 0.5, opacity: 0, ease: 'power2.out', stagger: 0.1 });
+        });
+
+        // Fallback for cached images (if the image is already loaded)
+        if (fullScreenImage.complete) {
+            fullScreenImage.dispatchEvent(new Event('load'));
+        }
+    });
+</script>
+{% endblock %}

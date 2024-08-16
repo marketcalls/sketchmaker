@@ -1,8 +1,10 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from openai import OpenAI
 import os
 import fal_client
 import json
+import requests
+import uuid
 
 generate_bp = Blueprint('generate', __name__)
 
@@ -152,7 +154,19 @@ Provide only the enhanced prompt as output, without any additional explanation o
                 handler = fal_client.submit(FLUX_PRO_MODEL, arguments=fal_request)
                 result = handler.get()
                 
-                image_urls = [img['url'] for img in result['images']]
+                image_urls = []
+                for img in result['images']:
+                    # Generate a unique filename
+                    filename = f"{uuid.uuid4()}.png"
+                    filepath = os.path.join(current_app.root_path, 'static', 'images', filename)
+                    
+                    # Download and save the image
+                    response = requests.get(img['url'])
+                    with open(filepath, 'wb') as f:
+                        f.write(response.content)
+                    
+                    # Add the local URL to the list
+                    image_urls.append(f"/static/images/{filename}")
 
                 return jsonify({
                     "prompt": prompt,
