@@ -172,9 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Attach event listeners to the Approve and Regenerate buttons
-    document.querySelector('button[onclick="generateImages()"]').addEventListener('click', generateImages);
-    document.querySelector('button[onclick="generatePrompt(true)"]').addEventListener('click', () => generatePrompt(true));
-});
+    document.getElementById('approve-prompt').addEventListener('click', generateImages);
+    document.getElementById('regenerate-prompt').addEventListener('click', () => generatePrompt(true));
+    });
 
 // Function to update image size (if needed)
 function updateImageSize() {
