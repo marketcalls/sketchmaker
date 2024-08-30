@@ -30,26 +30,37 @@
                 <option value="twitter_header">Twitter Header</option>
             </select>
         </div>
-        <div>
+        <div class="relative">
             <label for="artStyle" class="block text-sm font-medium text-gray-700 mb-1">Artistic Style</label>
-            <select id="artStyle" name="art_style" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+            <select id="artStyle" name="art_style" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" onchange="showArtStyleDescription()">
                 <option value="None">None</option>
                 <option value="Impressionism">Impressionism</option>
-                <option value="Surrealism">Surrealism</option>
-                <option value="Pop Art">Pop Art</option>
-                <option value="Abstract Expressionism">Abstract Expressionism</option>
                 <option value="Cubism">Cubism</option>
-                <option value="Fantasy Art">Fantasy Art</option>
-                <option value="Manga">Manga</option>
-                <option value="Anime">Anime</option>
-                <option value="Street Art">Street Art</option>
-                <option value="Digital Art">Digital Art</option>
+                <option value="Surrealism">Surrealism</option>
+                <option value="Abstract Expressionism">Abstract Expressionism</option>
+                <option value="Fauvism">Fauvism</option>
+                <option value="Art Nouveau">Art Nouveau</option>
+                <option value="Baroque">Baroque</option>
+                <option value="Renaissance">Renaissance</option>
+                <option value="Gothic">Gothic</option>
+                <option value="Pop Art">Pop Art</option>
                 <option value="Minimalism">Minimalism</option>
-                <option value="Watercolor Painting">Watercolor Painting</option>
-                <option value="Oil Painting">Oil Painting</option>
-                <option value="Pencil Art">Pencil Art</option>
-                <option value="Charcoal Drawing">Charcoal Drawing</option>
+                <option value="Post-Impressionism">Post-Impressionism</option>
+                <option value="Romanticism">Romanticism</option>
+                <option value="Realism">Realism</option>
+                <option value="Symbolism">Symbolism</option>
+                <option value="Expressionism">Expressionism</option>
+                <option value="Neo-Classical">Neo-Classical</option>
+                <option value="Constructivism">Constructivism</option>
+                <option value="Futurism">Futurism</option>
+                <option value="Dadaism">Dadaism</option>
+                <option value="Art Deco">Art Deco</option>
+                <option value="Op Art">Op Art</option>
+                <option value="Photorealism">Photorealism</option>
+                <option value="Bauhaus">Bauhaus</option>
+                <option value="Illustrative">Illustrative</option>
             </select>
+            <div id="artStyleTooltip" class="hidden absolute z-10 w-64 p-2 mt-1 text-sm text-white bg-gray-800 rounded-lg shadow-lg"></div>
         </div>
         <div>
             <label for="colorScheme" class="block text-sm font-medium text-gray-700 mb-1">Color Scheme</label>
@@ -150,4 +161,61 @@
 
 {% block extra_js %}
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+    <script>
+        function showArtStyleDescription() {
+            const artStyle = document.getElementById('artStyle').value;
+            const tooltipElement = document.getElementById('artStyleTooltip');
+            const descriptions = {
+                'Impressionism': 'Captures light and color, focusing on moments of time.',
+                'Cubism': 'Depicts objects from multiple angles, abstracted into geometric forms.',
+                'Surrealism': 'Merges dreamlike elements with reality, emphasizing the unconscious mind.',
+                'Abstract Expressionism': 'Focuses on spontaneous, abstract forms to express emotions.',
+                'Fauvism': 'Known for bold, vibrant colors and simple, exaggerated forms.',
+                'Art Nouveau': 'Features flowing lines and organic shapes inspired by nature.',
+                'Baroque': 'Ornate and dramatic, emphasizing movement, contrast, and detail.',
+                'Renaissance': 'Revival of classical themes, focusing on realism and proportion.',
+                'Gothic': 'Characterized by dark, intricate designs and dramatic elements.',
+                'Pop Art': 'Incorporates imagery from popular culture, often in a bold, graphic style.',
+                'Minimalism': 'Reduces art to its essential forms, focusing on simplicity.',
+                'Post-Impressionism': 'Builds on Impressionism, with more emphasis on structure and form.',
+                'Romanticism': 'Emphasizes emotion, nature, and individualism, often with dramatic scenes.',
+                'Realism': 'Depicts subjects truthfully, without idealization or exaggeration.',
+                'Symbolism': 'Uses symbolic imagery to convey deeper meanings and emotions.',
+                'Expressionism': 'Focuses on intense emotions through distorted forms and bold colors.',
+                'Neo-Classical': 'Inspired by classical antiquity, emphasizing harmony and order.',
+                'Constructivism': 'Geometric abstraction using industrial materials, focusing on function.',
+                'Futurism': 'Celebrates speed, technology, and dynamic movement.',
+                'Dadaism': 'An anti-art movement emphasizing absurdity and randomness.',
+                'Art Deco': 'Combines geometric patterns with bold colors and luxurious materials.',
+                'Op Art': 'Creates visual effects and illusions through patterns and colors.',
+                'Photorealism': 'Paintings that are extremely detailed, resembling photographs.',
+                'Bauhaus': 'Integrates art, craft, and technology, focusing on simplicity and function.',
+                'Illustrative': 'Detailed and narrative-driven, often used in books, comics, and advertising.'
+            };
+            
+            if (descriptions[artStyle]) {
+                tooltipElement.textContent = descriptions[artStyle];
+                tooltipElement.classList.remove('hidden');
+            } else {
+                tooltipElement.classList.add('hidden');
+            }
+        }
+
+        // Hide tooltip when clicking outside
+        document.addEventListener('click', function(event) {
+            const tooltipElement = document.getElementById('artStyleTooltip');
+            const artStyleSelect = document.getElementById('artStyle');
+            if (event.target !== artStyleSelect && event.target !== tooltipElement) {
+                tooltipElement.classList.add('hidden');
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    #artStyleTooltip {
+        transition: opacity 0.3s ease-in-out;
+    }
+</style>
 {% endblock %}
