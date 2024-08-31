@@ -8,7 +8,7 @@ from .clients import FLUX_PRO_MODEL
 def generate_image(prompt, image_size):
     fal_request = {
         "prompt": prompt,
-        "num_inference_steps": 20,
+        "num_inference_steps": 28,
         "guidance_scale": 3.5,
         "num_images": 1,
         "safety_tolerance": "2",

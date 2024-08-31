@@ -45,6 +45,7 @@ def generate_prompt(enhanced_prompt):
 
 General Guidelines for other Formats:
 - Blend relevant imagery with the content's topic or main message.
+- If the Prompt contains uppercase words, retain the same words in uppercase for the enhanced prompt and image generation.
 - Aim for a style that's slightly exaggerated or dramatized, but still appropriate for the intended use.
 - Consider the target audience and tailor the imagery accordingly.
 - Incorporate trending visual styles when appropriate.
