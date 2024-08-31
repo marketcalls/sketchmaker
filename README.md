@@ -1,21 +1,43 @@
 # SketchMaker AI
 
-SketchMaker AI is an advanced AI-powered image generation tool that creates custom images based on user descriptions and preferences. It's designed to produce high-quality, tailored images for various purposes such as social media content, blog posts, and more.
+SketchMaker AI is an advanced AI-powered image generation tool that creates custom images based on user descriptions and preferences. It's designed to produce high-quality, tailored images for various purposes such as social media content, blog posts, marketing materials, and more.
 
 ![SketchMaker AI Preview](https://www.marketcalls.in/wp-content/uploads/2024/08/sketchmaker.png)
 
 ## Features
 
 - **AI-Powered Image Generation**: Generate unique images based on textual descriptions.
-- **Customizable Image Sizes**: Choose from preset sizes or specify custom dimensions.
+- **Multiple AI Models**: Choose from various AI models including Flux Pro, Flux Lora, Flux Dev, and Flux Realism.
+- **Customizable Image Sizes**: Choose from a wide range of preset sizes or specify custom dimensions.
 - **Artistic Style Selection**: Apply various artistic styles to your generated images.
 - **Color Scheme Options**: Select from different color palettes to match your needs.
 - **Lighting and Mood Control**: Adjust the lighting and overall mood of the generated images.
+- **Subject Focus**: Specify the main subject of your image for more accurate results.
+- **Background Style**: Choose from various background styles to complement your image.
+- **Effects and Filters**: Apply different effects and filters to enhance your image.
+- **Advanced Parameters**: Fine-tune your image generation with adjustable inference steps, guidance scale, and seed value.
+- **LoRA Support**: Use custom LoRA models for even more specialized image generation (available with Flux Lora model).
+- **Enhanced Prompt Generation**: Automatically enhance your input prompts for better image results.
 - **Multi-Format Downloads**: Download your images in WebP, PNG, and JPEG formats.
 - **Image Gallery**: Browse your generated images.
 - **User-Friendly Interface**: Easy-to-use web interface built with modern design principles.
 
 ![SketchMaker Generated Image](https://www.marketcalls.in/wp-content/uploads/2024/08/Traders-Reading-News-and-Freaking-out.png)
+
+## Capabilities and Use Cases
+
+SketchMaker AI is a versatile tool that can be used in various scenarios:
+
+1. **Marketing and Advertising**: Create eye-catching visuals for social media posts, ads, and marketing campaigns.
+2. **Content Creation**: Generate unique illustrations for blog posts, articles, and e-books.
+3. **Product Design**: Visualize product concepts and create mockups quickly.
+4. **Branding**: Design logos, brand assets, and visual identity elements.
+5. **Education**: Produce educational materials, infographics, and visual aids.
+6. **Gaming and Entertainment**: Create character concepts, environment designs, and promotional artwork.
+7. **Web Design**: Generate custom graphics, icons, and UI elements for websites and apps.
+8. **Personal Projects**: Bring your creative ideas to life, from digital art to personalized gifts.
+
+SketchMaker AI's ability to combine detailed prompts with various artistic styles and parameters allows users to create highly customized images that match their specific needs. The LoRA support further extends this capability, enabling fine-tuned models for specialized use cases.
 
 ## Getting Started
 
@@ -39,14 +61,19 @@ SketchMaker AI is an advanced AI-powered image generation tool that creates cust
    pip install -r requirements.txt
    ```
 
-3. Set up environment variables: (rename .sample.env file to .env file)
-   Create a `.env` file in the root directory and add your API keys:
+3. Set up environment variables:
+   Rename the `.env.sample` file to `.env` and add your API keys:
    ```
    OPENAI_API_KEY=your_openai_api_key
    FAL_KEY=your_fal_api_key
    OPENAI_MODEL=your_preferred_openai_model
-   FLUX_PRO_MODEL=your_preferred_flux_pro_model
    ```
+
+   To generate the FAL API key:
+   - Go to https://fal.ai/dashboard
+   - Click on "Keys" in the sidebar
+   - Click "Create new key" to generate a new API key
+   - Copy the generated key and paste it into your `.env` file
 
 4. Run the application:
    ```
@@ -58,11 +85,41 @@ SketchMaker AI is an advanced AI-powered image generation tool that creates cust
 ## Usage
 
 1. Enter a detailed description of the image you want to generate in the text area.
-2. Select the desired image size, or enter custom dimensions.
-3. Choose artistic style, color scheme, and lighting options as needed.
-4. Click "Enhance Image Prompt" to generate an AI-enhanced prompt.
-5. Review the generated prompt and click "Approve Prompt" to create the image.
-6. Once the image is generated, you can download it in your preferred format.
+2. Select the desired AI model for image generation.
+3. Choose from a variety of image sizes or enter custom dimensions.
+4. Select artistic style, color scheme, lighting options, subject focus, and background style as needed.
+5. Adjust advanced parameters like inference steps, guidance scale, and seed if desired.
+6. For Flux Lora model, provide a LoRA path and scale if using custom LoRA models.
+7. Click "Enhance Image Prompt" to generate an AI-enhanced prompt.
+8. Review and edit the enhanced prompt if needed.
+9. Click "Generate Image" to create the image based on your specifications.
+10. Once the image is generated, you can download it in your preferred format.
+
+For a detailed tutorial on how to fine-tune your images faster using Fal AI, watch this video:
+[How to Fine Tune your images faster using Fal AI](https://www.youtube.com/watch?v=rKs2o1gBw3Y)
+
+### Fine-Tuning with Flux Lora Fast Training
+
+To create custom LoRA models for specialized image generation:
+
+1. Visit the [Flux Lora Fast Training model page](https://fal.ai/models/fal-ai/flux-lora-fast-training)
+2. Follow the instructions to fine-tune the model with your specific dataset
+3. Once fine-tuning is complete, save your model to Hugging Face or copy the safetensors URL
+4. In SketchMaker AI, select the Flux Lora model and paste your custom LoRA URL in the LoRA path field
+5. Use your fine-tuned model to generate images tailored to your specific style or domain
+
+This feature allows you to create innovative and creative digital assets that are uniquely suited to your brand, products, or artistic vision.
+
+## New Features and Changes
+
+- Added support for multiple AI models (Flux Pro, Flux Lora, Flux Dev, Flux Realism).
+- Expanded image size options to include various social media and common use case dimensions.
+- Introduced subject focus and background style options for more precise image generation.
+- Added effects and filters selection for image enhancement.
+- Implemented advanced parameter controls (inference steps, guidance scale, seed).
+- Added LoRA support for the Flux Lora model.
+- Enhanced the prompt generation process with editable results.
+- Improved the user interface for a more intuitive image generation workflow.
 
 ## Contributing
 
