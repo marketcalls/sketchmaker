@@ -56,7 +56,7 @@ Provide only the enhanced prompt as output, without any additional explanation o
             {"role": "user", "content": enhanced_prompt}
         ],
         temperature=0.7,
-        max_tokens=500,
+        max_tokens=1000,
         top_p=0.9,
         frequency_penalty=0.2,
         presence_penalty=0.2
