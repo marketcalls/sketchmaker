@@ -18,7 +18,7 @@ def generate():
 
     # Enhance prompt if requested
     if data.get('enhance_prompt', False):
-        enhanced_prompt = enhance_prompt(user_input, data)
+        enhanced_prompt = generate_prompt(user_input)
     else:
         enhanced_prompt = user_input
 
@@ -39,14 +39,26 @@ def generate():
 
     # Handle image size
     image_size = data.get('image_size')
-    if isinstance(image_size, dict):
-        fal_request["image_size"] = image_size
-    elif image_size == 'landscape_16_9':
-        fal_request["image_size"] = {"width": 1280, "height": 720}
-    elif image_size == 'square':
-        fal_request["image_size"] = {"width": 1024, "height": 1024}
-    elif image_size == 'portrait_4_3':
-        fal_request["image_size"] = {"width": 768, "height": 1024}
+    custom_sizes = {
+        "youtube_thumbnail": {"width": 1280, "height": 704},
+        "landscape_4_3": {"width": 1024, "height": 768},
+        "landscape_16_9": {"width": 1280, "height": 720},
+        "portrait_4_3": {"width": 768, "height": 1024},
+        "portrait_16_9": {"width": 720, "height": 1280},
+        "square": {"width": 1024, "height": 1024},
+        "square_hd": {"width": 1080, "height": 1080},
+        "instagram_post_square": {"width": 1088, "height": 1088},
+        "instagram_post_portrait": {"width": 1088, "height": 1344},
+        "instagram_story": {"width": 1088, "height": 1920},
+        "logo": {"width": 512, "height": 512},
+        "blog_banner": {"width": 1440, "height": 832},
+        "linkedin_post": {"width": 1216, "height": 1216},
+        "facebook_post_landscape": {"width": 960, "height": 768},
+        "twitter_header": {"width": 1504, "height": 480}
+    }
+
+    if image_size in custom_sizes:
+        fal_request["image_size"] = custom_sizes[image_size]
     else:
         fal_request["image_size"] = {"width": 1024, "height": 1024}  # Default size
 
@@ -87,32 +99,6 @@ def generate():
 
     except Exception as e:
         return jsonify({"error": f"Error: {str(e)}"}), 500
-
-def enhance_prompt(user_input, data):
-    art_style = data.get('art_style', 'None')
-    color_scheme = data.get('color_scheme', 'None')
-    lighting_mood = data.get('lighting_mood', 'None')
-    subject_focus = data.get('subject_focus', 'None')
-    background_style = data.get('background_style', 'None')
-    effects_filters = data.get('effects_filters', 'None')
-
-    # Construct the enhanced prompt
-    enhanced_prompt = user_input
-    if art_style != 'None':
-        enhanced_prompt += f' in the style of {art_style}'
-    if color_scheme != 'None':
-        enhanced_prompt += f' with a {color_scheme} color scheme'
-    if lighting_mood != 'None':
-        enhanced_prompt += f' featuring {lighting_mood} lighting and mood'
-    if subject_focus != 'None':
-        enhanced_prompt += f' focusing on {subject_focus}'
-    if background_style != 'None':
-        enhanced_prompt += f' with a {background_style} background'
-    if effects_filters != 'None':
-        enhanced_prompt += f' applying {effects_filters} effects'
-
-    # Use the generate_prompt function from prompt_generator.py
-    return generate_prompt(enhanced_prompt)
 
 def save_image_to_gallery(image_url):
     response = requests.get(image_url)
