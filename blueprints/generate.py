@@ -1,7 +1,9 @@
-from flask import Blueprint, request, jsonify
-from .prompt_generator import generate_prompt
-from .image_generator import generate_image
+from flask import Blueprint, request, jsonify, current_app
 import fal_client
+import os
+import uuid
+import requests
+from .prompt_generator import generate_prompt
 
 generate_bp = Blueprint('generate', __name__)
 
@@ -9,15 +11,90 @@ generate_bp = Blueprint('generate', __name__)
 def generate():
     data = request.json
     user_input = data.get('message')
+    model = data.get('model')
+    
+    if not user_input:
+        return jsonify({"error": "No message provided"}), 400
+
+    # Enhance prompt if requested
+    if data.get('enhance_prompt', False):
+        enhanced_prompt = enhance_prompt(user_input, data)
+    else:
+        enhanced_prompt = user_input
+
+    # If only prompt enhancement is requested, return the enhanced prompt
+    if data.get('enhance_prompt_only', False):
+        return jsonify({"prompt": enhanced_prompt})
+
+    if not model:
+        return jsonify({"error": "No model provided"}), 400
+
+    # Common parameters
+    fal_request = {
+        "prompt": enhanced_prompt,
+        "num_inference_steps": data.get('num_inference_steps', 28),
+        "guidance_scale": data.get('guidance_scale', 3.5),
+        "num_images": 1,
+    }
+
+    # Handle image size
+    image_size = data.get('image_size')
+    if isinstance(image_size, dict):
+        fal_request["image_size"] = image_size
+    elif image_size == 'landscape_16_9':
+        fal_request["image_size"] = {"width": 1280, "height": 720}
+    elif image_size == 'square':
+        fal_request["image_size"] = {"width": 1024, "height": 1024}
+    elif image_size == 'portrait_4_3':
+        fal_request["image_size"] = {"width": 768, "height": 1024}
+    else:
+        fal_request["image_size"] = {"width": 1024, "height": 1024}  # Default size
+
+    # Add seed if provided
+    if 'seed' in data:
+        fal_request["seed"] = data['seed']
+
+    # Model-specific parameters
+    if model == "fal-ai/flux-pro":
+        fal_request["safety_tolerance"] = data.get('safety_tolerance', "2")
+    elif model == "fal-ai/flux/dev" or model == "fal-ai/flux-realism":
+        fal_request["enable_safety_checker"] = data.get('enable_safety_checker', True)
+        if model == "fal-ai/flux-realism":
+            fal_request["strength"] = data.get('strength', 1)
+    elif model == "fal-ai/flux-lora":
+        fal_request["enable_safety_checker"] = data.get('enable_safety_checker', True)
+        fal_request["output_format"] = data.get('output_format', "jpeg")
+        if 'lora_path' in data:
+            fal_request["loras"] = [{
+                "path": data['lora_path'],
+                "scale": data.get('lora_scale', 1)
+            }]
+
+    try:
+        handler = fal_client.submit(model, arguments=fal_request)
+        result = handler.get()
+        
+        # Save the image to the gallery
+        image_url = result['images'][0]['url']
+        local_image_path = save_image_to_gallery(image_url)
+        
+        return jsonify({
+            "prompt": enhanced_prompt,
+            "image_url": f"/static/images/{os.path.basename(local_image_path)}",
+            "width": fal_request["image_size"]["width"],
+            "height": fal_request["image_size"]["height"]
+        })
+
+    except Exception as e:
+        return jsonify({"error": f"Error: {str(e)}"}), 500
+
+def enhance_prompt(user_input, data):
     art_style = data.get('art_style', 'None')
     color_scheme = data.get('color_scheme', 'None')
     lighting_mood = data.get('lighting_mood', 'None')
     subject_focus = data.get('subject_focus', 'None')
     background_style = data.get('background_style', 'None')
     effects_filters = data.get('effects_filters', 'None')
-
-    if not user_input:
-        return jsonify({"error": "No message provided"}), 400
 
     # Construct the enhanced prompt
     enhanced_prompt = user_input
@@ -34,54 +111,16 @@ def generate():
     if effects_filters != 'None':
         enhanced_prompt += f' applying {effects_filters} effects'
 
-    try:
-        # If the request is for prompt generation
-        if 'regenerate_prompt' in data:
-            prompt = generate_prompt(enhanced_prompt)
-            return jsonify({"prompt": prompt})
+    # Use the generate_prompt function from prompt_generator.py
+    return generate_prompt(enhanced_prompt)
 
-        # If the request is for image generation
-        else:
-            prompt = enhanced_prompt
-            image_size = data.get('image_size')
-
-            # Define custom image sizes
-            custom_sizes = {
-                "landscape_4_3": {"width": 1024, "height": 768},
-                "landscape_16_9": {"width": 1280, "height": 720},
-                "portrait_4_3": {"width": 768, "height": 1024},
-                "portrait_16_9": {"width": 720, "height": 1280},
-                "square": {"width": 1024, "height": 1024},
-                "square_hd": {"width": 1080, "height": 1080},
-                "instagram_post_square": {"width": 1088, "height": 1088},
-                "instagram_post_portrait": {"width": 1088, "height": 1344},
-                "instagram_story": {"width": 1088, "height": 1920},
-                "logo": {"width": 512, "height": 512},
-                "youtube_thumbnail": {"width": 1280, "height": 720},
-                "blog_banner": {"width": 1440, "height": 832},
-                "linkedin_post": {"width": 1216, "height": 1216},
-                "facebook_post_landscape": {"width": 960, "height": 768},
-                "twitter_header": {"width": 1504, "height": 480}
-            }
-
-            if isinstance(image_size, dict):
-                width = image_size.get('width', 1024)
-                height = image_size.get('height', 1024)
-                width = max(256, min(1440, (width // 32) * 32))
-                height = max(256, min(1440, (height // 32) * 32))
-                image_size = {"width": width, "height": height}
-            elif image_size in custom_sizes:
-                image_size = custom_sizes[image_size]
-            else:
-                image_size = {"width": 1024, "height": 1024}
-
-            result = generate_image(prompt, image_size)
-            return jsonify({
-                "prompt": prompt,
-                **result
-            })
-
-    except fal_client.FalServerException as e:
-        return jsonify({"error": f"FAL API Error: {str(e)}"}), 422
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+def save_image_to_gallery(image_url):
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        filename = f"{uuid.uuid4()}.png"
+        filepath = os.path.join(current_app.root_path, 'static', 'images', filename)
+        with open(filepath, 'wb') as f:
+            f.write(response.content)
+        return filepath
+    else:
+        raise Exception("Failed to download image from URL")

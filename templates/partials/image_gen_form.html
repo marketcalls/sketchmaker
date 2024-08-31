@@ -6,6 +6,15 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div>
+            <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+            <select id="model" name="model" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                <option value="fal-ai/flux-pro">Flux Pro</option>
+                <option value="fal-ai/flux-lora">Flux Lora</option>
+                <option value="fal-ai/flux/dev">Flux Dev</option>
+                <option value="fal-ai/flux-realism">Flux Realism</option>
+            </select>
+        </div>
+        <div>
             <label for="imageSize" class="block text-sm font-medium text-gray-700 mb-1">Image Size</label>
             <select id="imageSize" name="image_size" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
                 <option value="youtube_thumbnail">YouTube Thumbnail - 1280x704</option>
@@ -120,11 +129,47 @@
                 <option value="Blur">Blur</option>
             </select>
         </div>
+        <div>
+            <label for="numInferenceSteps" class="block text-sm font-medium text-gray-700 mb-1">Number of Inference Steps</label>
+            <input type="number" id="numInferenceSteps" name="num_inference_steps" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" value="28" min="1" max="50">
+        </div>
+        <div>
+            <label for="guidanceScale" class="block text-sm font-medium text-gray-700 mb-1">Guidance Scale</label>
+            <input type="number" id="guidanceScale" name="guidance_scale" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" value="3.5" min="0" max="20" step="0.1">
+        </div>
+        <div>
+            <label for="seed" class="block text-sm font-medium text-gray-700 mb-1">Seed (optional)</label>
+            <input type="number" id="seed" name="seed" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" min="0">
+        </div>
+    </div>
+
+    <div id="loraInputs" class="hidden">
+        <div>
+            <label for="loraPath" class="block text-sm font-medium text-gray-700 mb-1">LoRA Path (safetensors)</label>
+            <input type="text" id="loraPath" name="lora_path" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+        </div>
+        <div>
+            <label for="loraScale" class="block text-sm font-medium text-gray-700 mb-1">LoRA Scale</label>
+            <input type="number" id="loraScale" name="lora_scale" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" value="1" min="0" max="1" step="0.1">
+        </div>
     </div>
 
     <div class="text-center">
-        <button type="submit" id="enhancePrompt" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-full hover:opacity-90 transition duration-300 flex items-center justify-center mx-auto">
+        <button type="button" id="enhancePrompt" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-full hover:opacity-90 transition duration-300 flex items-center justify-center mx-auto">
             <i class="fas fa-magic mr-2"></i> Enhance Image Prompt
         </button>
     </div>
 </form>
+
+<div id="enhancedPromptContainer" class="mt-8 hidden">
+    <h3 class="text-xl font-semibold mb-4">Enhanced Prompt</h3>
+    <textarea id="enhancedPromptText" class="w-full p-4 bg-gray-100 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-vertical" rows="10"></textarea>
+    <div class="text-center mt-4">
+        <button type="button" id="reEnhancePrompt" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-600 transition duration-300 mr-4">
+            Re-Enhance Prompt
+        </button>
+        <button type="button" id="generateImage" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-full hover:opacity-90 transition duration-300">
+            Generate Image
+        </button>
+    </div>
+</div>
