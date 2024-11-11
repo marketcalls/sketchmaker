@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,6 +14,14 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    screens: {
+                        'xs': '375px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px',
                     },
                 },
             },
@@ -122,10 +130,39 @@
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             letter-spacing: -0.025em;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         h1, h2, h3, h4, h5, h6 {
             font-weight: 600;
             letter-spacing: -0.025em;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .navbar {
+                padding: 0.5rem 1rem;
+            }
+            .btn {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .card {
+                margin-left: -1rem;
+                margin-right: -1rem;
+                border-radius: 0;
+            }
+            .text-4xl {
+                font-size: 2rem;
+            }
+            .text-3xl {
+                font-size: 1.75rem;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
