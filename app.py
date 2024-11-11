@@ -7,14 +7,24 @@ from blueprints.generate import generate_bp
 from blueprints.gallery import gallery_bp
 from blueprints.download import download_bp
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def create_app():
     app = Flask(__name__)
     
     # Configuration
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sketchmaker.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Ensure required environment variables are set
+    required_vars = ['SECRET_KEY', 'OPENAI_API_KEY', 'FAL_KEY', 'OPENAI_MODEL', 'FLUX_PRO_MODEL']
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    if missing_vars:
+        raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
     
     # Initialize extensions
     db.init_app(app)
