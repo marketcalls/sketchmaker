@@ -1,33 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sketch Maker AI{% endblock %}</title>
+    <title>{% block title %}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
-    {% block extra_head %}{% endblock %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            daisyui: {
+                themes: [
+                    {
+                        dark: {
+                            "primary": "#8b5cf6",
+                            "primary-focus": "#7c3aed",
+                            "primary-content": "#ffffff",
+                            "secondary": "#f472b6",
+                            "secondary-focus": "#ec4899",
+                            "secondary-content": "#ffffff",
+                            "accent": "#37cdbe",
+                            "accent-focus": "#2aa79b",
+                            "accent-content": "#ffffff",
+                            "neutral": "#2a2e37",
+                            "neutral-focus": "#16181d",
+                            "neutral-content": "#ffffff",
+                            "base-100": "#12141c",
+                            "base-200": "#1c1f2c",
+                            "base-300": "#262b3c",
+                            "base-content": "#ebecf0",
+                            "info": "#66c6ff",
+                            "success": "#87d039",
+                            "warning": "#e2d562",
+                            "error": "#ff6f6f"
+                        }
+                    }
+                ],
+                darkTheme: "dark",
+            },
+        }
+    </script>
+    {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-gray-100 min-h-screen font-poppins">
-    <div class="container mx-auto px-4 py-8">
-        <header class="text-center mb-12">
-            <h1 class="text-6xl font-bold mb-4 text-gradient">Sketch Maker AI</h1>
-            <p class="text-xl text-gray-600">Advanced AI-Powered Image Creator</p>
-        </header>
-
-        <main class="bg-white rounded-3xl p-8 shadow-xl">
-            {% block content %}{% endblock %}
-        </main>
-
-        <footer class="mt-12 text-center text-sm text-gray-500">
-            <p>&copy; 2024 Sketch Maker AI. All rights reserved.</p>
-        </footer>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-    <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+<body class="min-h-screen bg-base-100 text-base-content">
+    {% block content %}{% endblock %}
     {% block extra_js %}{% endblock %}
 </body>
 </html>

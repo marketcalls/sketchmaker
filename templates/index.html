@@ -1,81 +1,105 @@
 {% extends "base.html" %}
 
-{% block title %}Sketch Maker AI - Advanced Image Generator{% endblock %}
+{% block title %}Sketch Maker AI - Turn Your Ideas Into Art{% endblock %}
 
 {% block content %}
-{% include "partials/image_gen_form.html" %}
+<div class="min-h-screen bg-gradient-to-br from-base-100 via-base-300 to-primary/10">
+    <!-- Navigation -->
+    <nav class="container mx-auto px-4 py-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span class="text-xl font-bold">Sketch Maker AI</span>
+            </div>
+            <div class="flex items-center space-x-8">
+                <a href="#features" class="link link-hover">Features</a>
+                <a href="#gallery" class="link link-hover">Gallery</a>
+                <a href="#about" class="link link-hover">About</a>
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<div id="loadingIndicator" class="hidden mt-8 text-center">
-    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-    <p class="mt-4 text-gray-600">Crafting your masterpiece... This might take a moment.</p>
+    <!-- Hero Section -->
+    <div class="container mx-auto px-4 py-20">
+        <div class="flex flex-col lg:flex-row items-center gap-12">
+            <div class="lg:w-1/2">
+                <h1 class="text-6xl font-bold mb-6">Transform Text Into Art</h1>
+                <p class="text-xl text-base-content/70 mb-8">
+                    Harness the power of AI to turn your descriptions into stunning visual masterpieces. Choose from 25+ artistic styles and create unique, professional artwork instantly.
+                </p>
+                <div class="flex items-center gap-4">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Start Creating</a>
+                    <a href="#gallery" class="btn btn-ghost btn-lg">View Gallery</a>
+                </div>
+            </div>
+            <div class="lg:w-1/2">
+                <div class="mockup-browser border bg-base-300">
+                    <div class="mockup-browser-toolbar">
+                        <div class="input">sketchmaker.app</div>
+                    </div>
+                    <div class="flex justify-center px-4 py-16 bg-base-200">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="card bg-base-100 shadow-xl">
+                                <div class="card-body p-4">
+                                    <div class="w-full h-32 bg-primary/10 rounded-lg animate-pulse"></div>
+                                </div>
+                            </div>
+                            <div class="card bg-base-100 shadow-xl">
+                                <div class="card-body p-4">
+                                    <div class="w-full h-32 bg-secondary/10 rounded-lg animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="container mx-auto px-4 py-20">
+        <h2 class="text-4xl font-bold text-center mb-12">Key Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h3 class="card-title">AI-Powered Generation</h3>
+                    <p>Transform text descriptions into stunning artwork using advanced AI models.</p>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h3 class="card-title">25+ Art Styles</h3>
+                    <p>Choose from a wide range of artistic styles, from Renaissance to Modern Art.</p>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h3 class="card-title">Multiple Formats</h3>
+                    <p>Download your artwork in WebP, PNG, or JPEG formats for any use case.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content rounded">
+        <nav>
+            <div class="grid grid-flow-col gap-4">
+                <a class="link link-hover">About</a>
+                <a class="link link-hover">Contact</a>
+                <a class="link link-hover">Terms</a>
+                <a class="link link-hover">Privacy</a>
+            </div>
+        </nav>
+        <aside>
+            <p>© 2024 Sketch Maker AI - All rights reserved</p>
+        </aside>
+    </footer>
 </div>
-
-{% include "partials/result_container.html" %}
-
-{% include "partials/image_result_container.html" %}
-
-<div class="text-center mt-8">
-    <a href="{{ url_for('gallery.gallery') }}" class="text-purple-600 hover:text-purple-800 font-semibold">View Image Gallery</a>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <script>
-        function showArtStyleDescription() {
-            const artStyle = document.getElementById('artStyle').value;
-            const tooltipElement = document.getElementById('artStyleTooltip');
-            const descriptions = {
-                'Impressionism': 'Captures light and color, focusing on moments of time.',
-                'Cubism': 'Depicts objects from multiple angles, abstracted into geometric forms.',
-                'Surrealism': 'Merges dreamlike elements with reality, emphasizing the unconscious mind.',
-                'Abstract Expressionism': 'Focuses on spontaneous, abstract forms to express emotions.',
-                'Fauvism': 'Known for bold, vibrant colors and simple, exaggerated forms.',
-                'Art Nouveau': 'Features flowing lines and organic shapes inspired by nature.',
-                'Baroque': 'Ornate and dramatic, emphasizing movement, contrast, and detail.',
-                'Renaissance': 'Revival of classical themes, focusing on realism and proportion.',
-                'Gothic': 'Characterized by dark, intricate designs and dramatic elements.',
-                'Pop Art': 'Incorporates imagery from popular culture, often in a bold, graphic style.',
-                'Minimalism': 'Reduces art to its essential forms, focusing on simplicity.',
-                'Post-Impressionism': 'Builds on Impressionism, with more emphasis on structure and form.',
-                'Romanticism': 'Emphasizes emotion, nature, and individualism, often with dramatic scenes.',
-                'Realism': 'Depicts subjects truthfully, without idealization or exaggeration.',
-                'Symbolism': 'Uses symbolic imagery to convey deeper meanings and emotions.',
-                'Expressionism': 'Focuses on intense emotions through distorted forms and bold colors.',
-                'Neo-Classical': 'Inspired by classical antiquity, emphasizing harmony and order.',
-                'Constructivism': 'Geometric abstraction using industrial materials, focusing on function.',
-                'Futurism': 'Celebrates speed, technology, and dynamic movement.',
-                'Dadaism': 'An anti-art movement emphasizing absurdity and randomness.',
-                'Art Deco': 'Combines geometric patterns with bold colors and luxurious materials.',
-                'Op Art': 'Creates visual effects and illusions through patterns and colors.',
-                'Photorealism': 'Paintings that are extremely detailed, resembling photographs.',
-                'Bauhaus': 'Integrates art, craft, and technology, focusing on simplicity and function.',
-                'Illustrative': 'Detailed and narrative-driven, often used in books, comics, and advertising.'
-            };
-            
-            if (descriptions[artStyle]) {
-                tooltipElement.textContent = descriptions[artStyle];
-                tooltipElement.classList.remove('hidden');
-            } else {
-                tooltipElement.classList.add('hidden');
-            }
-        }
-
-        // Hide tooltip when clicking outside
-        document.addEventListener('click', function(event) {
-            const tooltipElement = document.getElementById('artStyleTooltip');
-            const artStyleSelect = document.getElementById('artStyle');
-            if (event.target !== artStyleSelect && event.target !== tooltipElement) {
-                tooltipElement.classList.add('hidden');
-            }
-        });
-    </script>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    #artStyleTooltip {
-        transition: opacity 0.3s ease-in-out;
-    }
-</style>
 {% endblock %}

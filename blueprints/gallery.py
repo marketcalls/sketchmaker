@@ -1,14 +1,17 @@
-from flask import Blueprint, render_template, current_app
-import os
+from flask import Blueprint, render_template
+from flask_login import login_required, current_user
+from models import Image
 
 gallery_bp = Blueprint('gallery', __name__)
 
 @gallery_bp.route('/gallery')
+@login_required
 def gallery():
-    image_folder = os.path.join(current_app.root_path, 'static', 'images')
-    images = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))]
+    # Get all images for the current user
+    images = Image.query.filter_by(user_id=current_user.id).order_by(Image.created_at.desc()).all()
+    
+    # Ensure dimensions are loaded for each image
+    for image in images:
+        image.get_dimensions()
+    
     return render_template('gallery.html', images=images)
-
-@gallery_bp.route('/image/<filename>')
-def image(filename):
-    return render_template('image.html', filename=filename)

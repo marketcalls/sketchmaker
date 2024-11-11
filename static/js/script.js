@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const IMAGE_SIZES = {
+        'youtube_thumbnail': { width: 1280, height: 704 },
+        'landscape_4_3': { width: 1280, height: 960 },
+        'landscape_16_9': { width: 1280, height: 720 },
+        'portrait_4_3': { width: 960, height: 1280 },
+        'portrait_16_9': { width: 720, height: 1280 },
+        'square': { width: 1024, height: 1024 },
+        'square_hd': { width: 1280, height: 1280 },
+        'instagram_post_square': { width: 1080, height: 1080 },
+        'instagram_post_portrait': { width: 1080, height: 1360 },
+        'instagram_story': { width: 1080, height: 1920 },
+        'logo': { width: 512, height: 512 },
+        'blog_banner': { width: 1280, height: 640 },
+        'linkedin_post': { width: 1200, height: 628 },
+        'facebook_post_landscape': { width: 1200, height: 628 },
+        'twitter_header': { width: 1500, height: 500 }
+    };
+
     const form = document.getElementById('imageGenForm');
     const loadingIndicator = document.getElementById('loadingIndicator');
     const imageResultContainer = document.getElementById('imageResultContainer');
@@ -16,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     gsap.from('main', { duration: 1, y: 50, opacity: 0, ease: 'power3.out', delay: 0.3 });
 
     // Toggle LoRA inputs visibility
-    modelSelect.addEventListener('change', (e) => {
+    modelSelect?.addEventListener('change', (e) => {
         if (e.target.value === 'fal-ai/flux-lora') {
             loraInputs.classList.remove('hidden');
         } else {
@@ -30,35 +48,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Re-enhance prompt button handler
-    reEnhancePromptButton.addEventListener('click', async () => {
+    reEnhancePromptButton?.addEventListener('click', async () => {
         await enhancePrompt(true);
     });
 
     // Generate image button handler
-    generateImageButton.addEventListener('click', async () => {
+    generateImageButton?.addEventListener('click', async () => {
         await generateImage();
     });
 
     async function enhancePrompt(reEnhance = false) {
+        const userInput = document.getElementById('userInput');
+        if (!userInput.value.trim()) {
+            alert('Please enter a prompt to enhance');
+            return;
+        }
+
         showLoading(loadingIndicator);
         enhancedPromptContainer.classList.add('hidden');
 
-        const formData = getFormData();
-        formData.enhance_prompt = true;
-        formData.enhance_prompt_only = true;
-
-        if (reEnhance) {
-            formData.message = enhancedPromptText.value;
-        }
-
         try {
-            const response = await fetch('/generate', {
+            const response = await fetch('/generate/prompt', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    topic: reEnhance ? enhancedPromptText.value : userInput.value
+                }),
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
             const data = await response.json();
             if (data.prompt) {
@@ -88,20 +110,28 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading(loadingIndicator);
         imageResultContainer.classList.add('hidden');
 
-        const formData = getFormData();
-        formData.message = enhancedPromptText.value;
+        const imageSizeKey = document.getElementById('imageSize').value;
+        const dimensions = IMAGE_SIZES[imageSizeKey] || IMAGE_SIZES.square;
 
         try {
-            const response = await fetch('/generate', {
+            const response = await fetch('/generate/image', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    prompt: enhancedPromptText.value,
+                    art_style: document.getElementById('artStyle').value,
+                    image_size: dimensions
+                }),
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
-            if (data.image_url) {
+            if (data.images && data.images.length > 0) {
                 displayGeneratedImage(data);
             } else {
                 throw new Error(data.error || 'Invalid response from server');
@@ -114,34 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function getFormData() {
-        const formData = {
-            message: document.getElementById('userInput').value,
-            model: modelSelect.value,
-            image_size: document.getElementById('imageSize').value,
-            art_style: document.getElementById('artStyle').value,
-            color_scheme: document.getElementById('colorScheme').value,
-            lighting_mood: document.getElementById('lightingMood').value,
-            subject_focus: document.getElementById('subjectFocus').value,
-            background_style: document.getElementById('backgroundStyle').value,
-            effects_filters: document.getElementById('effectsFilters').value,
-            num_inference_steps: parseInt(document.getElementById('numInferenceSteps').value),
-            guidance_scale: parseFloat(document.getElementById('guidanceScale').value),
-        };
-
-        const seedValue = document.getElementById('seed').value;
-        if (seedValue) {
-            formData.seed = parseInt(seedValue);
-        }
-
-        if (modelSelect.value === 'fal-ai/flux-lora') {
-            formData.lora_path = document.getElementById('loraPath').value;
-            formData.lora_scale = parseFloat(document.getElementById('loraScale').value);
-        }
-
-        return formData;
-    }
-
     function showLoading(loadingIndicator) {
         loadingIndicator.classList.remove('hidden');
     }
@@ -152,48 +154,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayGeneratedImage(data) {
         imageContainer.innerHTML = '';
-        const imgContainer = document.createElement('div');
-        imgContainer.className = 'bg-white rounded-lg shadow-lg overflow-hidden mb-8';
         
-        const imgWrapper = document.createElement('div');
-        imgWrapper.className = 'relative';
-        
-        const imgElement = document.createElement('img');
-        imgElement.src = data.image_url;
-        imgElement.alt = 'Generated Image';
-        imgElement.className = 'w-full h-auto';
-        
-        imgWrapper.appendChild(imgElement);
-        imgContainer.appendChild(imgWrapper);
-        
-        const infoContainer = document.createElement('div');
-        infoContainer.className = 'p-4';
-        
-        const promptElement = document.createElement('p');
-        promptElement.className = 'text-sm text-gray-600 mb-2';
-        promptElement.textContent = `Prompt: ${data.prompt}`;
-        infoContainer.appendChild(promptElement);
+        data.images.forEach(image => {
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'card bg-base-100 shadow-xl mb-8';
+            
+            const imgWrapper = document.createElement('figure');
+            
+            const imgElement = document.createElement('img');
+            imgElement.src = image.image_url;
+            imgElement.alt = 'Generated Image';
+            imgElement.className = 'w-full h-auto';
+            
+            imgWrapper.appendChild(imgElement);
+            imgContainer.appendChild(imgWrapper);
+            
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+            
+            const promptElement = document.createElement('p');
+            promptElement.className = 'text-sm text-base-content/70';
+            promptElement.textContent = data.prompt;
+            cardBody.appendChild(promptElement);
 
-        const dimensionsElement = document.createElement('p');
-        dimensionsElement.className = 'text-sm text-gray-600 mb-4';
-        dimensionsElement.textContent = `Dimensions: ${data.width}x${data.height}`;
-        infoContainer.appendChild(dimensionsElement);
-        
-        const downloadContainer = document.createElement('div');
-        downloadContainer.className = 'flex justify-center space-x-4';
-        
-        ['webp', 'png', 'jpeg'].forEach(format => {
-            const downloadButton = document.createElement('a');
-            downloadButton.href = `/download?url=${encodeURIComponent(data.image_url)}&format=${format}`;
-            downloadButton.className = 'bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 text-sm font-medium';
-            downloadButton.textContent = format.toUpperCase();
-            downloadButton.download = `generated_image.${format}`;
-            downloadContainer.appendChild(downloadButton);
+            if (data.art_style) {
+                const styleElement = document.createElement('div');
+                styleElement.className = 'badge badge-secondary';
+                styleElement.textContent = data.art_style;
+                cardBody.appendChild(styleElement);
+            }
+            
+            const downloadContainer = document.createElement('div');
+            downloadContainer.className = 'card-actions justify-end mt-4';
+            
+            ['webp', 'png', 'jpeg'].forEach(format => {
+                const downloadButton = document.createElement('a');
+                downloadButton.href = image[`${format}_url`];
+                downloadButton.className = 'btn btn-primary btn-sm';
+                downloadButton.textContent = format.toUpperCase();
+                downloadButton.download = `generated_image.${format}`;
+                downloadContainer.appendChild(downloadButton);
+            });
+            
+            cardBody.appendChild(downloadContainer);
+            imgContainer.appendChild(cardBody);
+            imageContainer.appendChild(imgContainer);
         });
-        
-        infoContainer.appendChild(downloadContainer);
-        imgContainer.appendChild(infoContainer);
-        imageContainer.appendChild(imgContainer);
         
         imageResultContainer.classList.remove('hidden');
         window.scrollTo({
@@ -244,11 +250,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    artStyleSelect.addEventListener('change', showArtStyleDescription);
+    artStyleSelect?.addEventListener('change', showArtStyleDescription);
 
     // Hide tooltip when clicking outside
     document.addEventListener('click', function(event) {
-        if (event.target !== artStyleSelect && event.target !== artStyleTooltip) {
+        if (artStyleTooltip && event.target !== artStyleSelect && event.target !== artStyleTooltip) {
             artStyleTooltip.classList.add('hidden');
         }
     });

@@ -1,9 +1,12 @@
 from flask import Flask, jsonify, render_template
-from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_login import LoginManager
+from dotenv import load_dotenv
 import os
+
+from models import db, User
 
 # Load environment variables from .env file
 load_dotenv()
@@ -12,7 +15,24 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Initialize rate limiter with global rate limits
+# Configure SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sketchmaker.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')
+
+# Initialize SQLAlchemy
+db.init_app(app)
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Initialize rate limiter
 limiter = Limiter(
     get_remote_address,
     app=app,
@@ -35,11 +55,17 @@ from blueprints.generate import generate_bp
 from blueprints.download import download_bp
 from blueprints.core import core_bp
 from blueprints.gallery import gallery_bp
+from blueprints.auth import auth_bp
 
 app.register_blueprint(generate_bp)
 app.register_blueprint(download_bp)
 app.register_blueprint(core_bp)
 app.register_blueprint(gallery_bp)
+app.register_blueprint(auth_bp)
+
+# Create database tables
+with app.app_context():
+    db.create_all()
 
 # Custom 404 error handler
 @app.errorhandler(404)
