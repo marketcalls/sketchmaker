@@ -1,105 +1,143 @@
 {% extends "base.html" %}
 
-{% block title %}Sketch Maker AI - Turn Your Ideas Into Art{% endblock %}
+{% block title %}Sketch Maker AI - Transform Text Into Art{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-base-100 via-base-300 to-primary/10">
-    <!-- Navigation -->
-    <nav class="container mx-auto px-4 py-6">
-        <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span class="text-xl font-bold">Sketch Maker AI</span>
-            </div>
-            <div class="flex items-center space-x-8">
-                <a href="#features" class="link link-hover">Features</a>
-                <a href="#gallery" class="link link-hover">Gallery</a>
-                <a href="#about" class="link link-hover">About</a>
-                <div class="flex items-center space-x-4">
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Login</a>
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started</a>
+<div class="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300">
+    <!-- Navbar -->
+    <nav class="navbar bg-base-200/50 backdrop-blur-lg border-b border-base-content/10">
+        <div class="container mx-auto px-4">
+            <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-xl font-bold">Sketch Maker AI</span>
                 </div>
+            </div>
+            <div class="flex-none gap-2">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost btn-sm">Dashboard</a>
+                    <a href="{{ url_for('gallery.gallery') }}" class="btn btn-ghost btn-sm">Gallery</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-sm text-error">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-sm">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Get Started</a>
+                {% endif %}
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <div class="container mx-auto px-4 py-20">
-        <div class="flex flex-col lg:flex-row items-center gap-12">
-            <div class="lg:w-1/2">
-                <h1 class="text-6xl font-bold mb-6">Transform Text Into Art</h1>
-                <p class="text-xl text-base-content/70 mb-8">
-                    Harness the power of AI to turn your descriptions into stunning visual masterpieces. Choose from 25+ artistic styles and create unique, professional artwork instantly.
-                </p>
-                <div class="flex items-center gap-4">
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Start Creating</a>
-                    <a href="#gallery" class="btn btn-ghost btn-lg">View Gallery</a>
-                </div>
-            </div>
-            <div class="lg:w-1/2">
-                <div class="mockup-browser border bg-base-300">
-                    <div class="mockup-browser-toolbar">
-                        <div class="input">sketchmaker.app</div>
+    <section class="py-12 md:py-24">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-8 md:gap-16">
+                <div class="flex-1 text-center md:text-left">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                        Transform Text Into Art
+                    </h1>
+                    <p class="text-lg md:text-xl text-base-content/80 mb-8 max-w-2xl">
+                        Harness the power of AI to turn your descriptions into stunning visual masterpieces. Choose from 25+ artistic styles and create unique, professional artwork instantly.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-lg">
+                                Go to Dashboard
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                                Start Creating
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('gallery.gallery') }}" class="btn btn-ghost btn-lg">
+                            View Gallery
+                        </a>
                     </div>
-                    <div class="flex justify-center px-4 py-16 bg-base-200">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="card bg-base-100 shadow-xl">
-                                <div class="card-body p-4">
-                                    <div class="w-full h-32 bg-primary/10 rounded-lg animate-pulse"></div>
-                                </div>
-                            </div>
-                            <div class="card bg-base-100 shadow-xl">
-                                <div class="card-body p-4">
-                                    <div class="w-full h-32 bg-secondary/10 rounded-lg animate-pulse"></div>
-                                </div>
-                            </div>
+                </div>
+                <div class="flex-1 max-w-lg">
+                    <div class="mockup-browser border border-base-300 bg-base-200">
+                        <div class="mockup-browser-toolbar">
+                            <div class="input bg-base-300">sketchmaker.app</div>
+                        </div>
+                        <div class="flex flex-col gap-4 p-4 bg-base-300 relative overflow-hidden">
+                            <div class="animate-pulse bg-base-content/5 h-32 rounded-lg"></div>
+                            <div class="animate-pulse bg-base-content/5 h-4 w-3/4 rounded"></div>
+                            <div class="animate-pulse bg-base-content/5 h-4 w-1/2 rounded"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Features Section -->
-    <div id="features" class="container mx-auto px-4 py-20">
-        <h2 class="text-4xl font-bold text-center mb-12">Key Features</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="card bg-base-100 shadow-xl">
-                <div class="card-body">
-                    <h3 class="card-title">AI-Powered Generation</h3>
-                    <p>Transform text descriptions into stunning artwork using advanced AI models.</p>
+    <section class="py-12 md:py-24 bg-base-200/50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Key Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- AI-Powered Generation -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <h3 class="card-title text-xl mb-2">AI-Powered Generation</h3>
+                        <p class="text-base-content/70">Transform your text descriptions into stunning visual artwork using advanced AI technology.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="card bg-base-100 shadow-xl">
-                <div class="card-body">
-                    <h3 class="card-title">25+ Art Styles</h3>
-                    <p>Choose from a wide range of artistic styles, from Renaissance to Modern Art.</p>
+
+                <!-- Multiple Styles -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <h3 class="card-title text-xl mb-2">25+ Artistic Styles</h3>
+                        <p class="text-base-content/70">Choose from a wide range of artistic styles to create unique and personalized artwork.</p>
+                    </div>
                 </div>
-            </div>
-            <div class="card bg-base-100 shadow-xl">
-                <div class="card-body">
-                    <h3 class="card-title">Multiple Formats</h3>
-                    <p>Download your artwork in WebP, PNG, or JPEG formats for any use case.</p>
+
+                <!-- Instant Results -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <h3 class="card-title text-xl mb-2">Instant Results</h3>
+                        <p class="text-base-content/70">Get your artwork generated within seconds, ready to download in multiple formats.</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-12 md:py-24">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Create?</h2>
+            <p class="text-lg md:text-xl text-base-content/80 mb-8 max-w-2xl mx-auto">
+                Join now and start transforming your ideas into beautiful artwork with the power of AI.
+            </p>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-lg">
+                    Go to Dashboard
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                    Get Started Now
+                </a>
+            {% endif %}
+        </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="footer footer-center p-10 bg-base-200 text-base-content rounded">
-        <nav>
-            <div class="grid grid-flow-col gap-4">
-                <a class="link link-hover">About</a>
-                <a class="link link-hover">Contact</a>
-                <a class="link link-hover">Terms</a>
-                <a class="link link-hover">Privacy</a>
-            </div>
-        </nav>
-        <aside>
-            <p>© 2024 Sketch Maker AI - All rights reserved</p>
-        </aside>
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content">
+        <div>
+            <p class="font-bold">
+                Sketch Maker AI © {{ current_year }}
+            </p>
+            <p class="text-base-content/70">Transform your ideas into art</p>
+        </div>
     </footer>
 </div>
 {% endblock %}
