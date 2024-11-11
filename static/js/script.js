@@ -8,14 +8,28 @@ document.addEventListener('DOMContentLoaded', () => {
         'square': { width: 1024, height: 1024 },
         'square_hd': { width: 1280, height: 1280 },
         'instagram_post_square': { width: 1080, height: 1080 },
-        'instagram_post_portrait': { width: 1080, height: 1360 },
+        'instagram_post_portrait': { width: 1080, height: 1350 },
         'instagram_story': { width: 1080, height: 1920 },
         'logo': { width: 512, height: 512 },
         'blog_banner': { width: 1280, height: 640 },
-        'linkedin_post': { width: 1200, height: 628 },
-        'facebook_post_landscape': { width: 1200, height: 628 },
+        'linkedin_post': { width: 1200, height: 627 },
+        'facebook_post_landscape': { width: 1200, height: 630 },
         'twitter_header': { width: 1500, height: 500 }
     };
+
+    // Theme handling
+    const themeController = document.querySelector('.theme-controller');
+    if (themeController) {
+        // Set initial state
+        themeController.checked = localStorage.getItem('theme') === 'dark';
+        
+        // Handle theme changes
+        themeController.addEventListener('change', function(e) {
+            const theme = e.target.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        });
+    }
 
     const form = document.getElementById('imageGenForm');
     const loadingIndicator = document.getElementById('loadingIndicator');
@@ -68,14 +82,39 @@ document.addEventListener('DOMContentLoaded', () => {
         enhancedPromptContainer.classList.add('hidden');
 
         try {
+            // Get all form parameters
+            const formData = {
+                topic: reEnhance ? enhancedPromptText.value : userInput.value,
+                image_size: document.getElementById('imageSize').value,
+                art_style: document.getElementById('artStyle').value,
+                color_scheme: document.getElementById('colorScheme').value,
+                lighting_mood: document.getElementById('lightingMood').value,
+                subject_focus: document.getElementById('subjectFocus').value,
+                background_style: document.getElementById('backgroundStyle').value,
+                effects_filters: document.getElementById('effectsFilters').value,
+                model: document.getElementById('model').value,
+                num_inference_steps: parseInt(document.getElementById('numInferenceSteps').value),
+                guidance_scale: parseFloat(document.getElementById('guidanceScale').value)
+            };
+
+            // Add seed if provided
+            const seed = document.getElementById('seed').value;
+            if (seed) {
+                formData.seed = parseInt(seed);
+            }
+
+            // Add LoRA parameters if applicable
+            if (modelSelect.value === 'fal-ai/flux-lora') {
+                formData.lora_path = document.getElementById('loraPath').value;
+                formData.lora_scale = parseFloat(document.getElementById('loraScale').value);
+            }
+
             const response = await fetch('/generate/prompt', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    topic: reEnhance ? enhancedPromptText.value : userInput.value
-                }),
+                body: JSON.stringify(formData),
             });
 
             if (!response.ok) {
@@ -157,14 +196,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         data.images.forEach(image => {
             const imgContainer = document.createElement('div');
-            imgContainer.className = 'card bg-base-100 shadow-xl mb-8';
+            imgContainer.className = 'card bg-base-300/50 backdrop-blur-lg border border-base-content/10 mb-8';
             
             const imgWrapper = document.createElement('figure');
+            imgWrapper.className = 'px-4 pt-4';
             
             const imgElement = document.createElement('img');
             imgElement.src = image.image_url;
             imgElement.alt = 'Generated Image';
-            imgElement.className = 'w-full h-auto';
+            imgElement.className = 'rounded-xl w-full h-auto';
             
             imgWrapper.appendChild(imgElement);
             imgContainer.appendChild(imgWrapper);

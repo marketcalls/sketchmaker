@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_login import login_required, current_user
 from .image_generator import generate_image
 from .prompt_generator import generate_prompt
@@ -12,9 +12,7 @@ generate_bp = Blueprint('generate', __name__)
 
 def get_absolute_path(filename):
     """Get absolute path for a file in the static/images directory"""
-    static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
-    images_dir = os.path.join(static_dir, 'images')
-    return os.path.join(images_dir, filename)
+    return os.path.join(current_app.root_path, 'static', 'images', filename)
 
 @generate_bp.route('/generate/prompt', methods=['POST'])
 @login_required
@@ -23,9 +21,22 @@ def generate_prompt_route():
     if not data or 'topic' not in data:
         return jsonify({'error': 'No topic provided'}), 400
 
-    topic = data['topic']
     try:
-        prompt = generate_prompt(topic)
+        # Build enhanced prompt with all parameters
+        prompt_context = f"""
+Base Description: {data['topic']}
+
+Format: {data['image_size']}
+Artistic Style: {data['art_style'] if data['art_style'] != 'None' else 'No specific style'}
+Color Scheme: {data['color_scheme'] if data['color_scheme'] != 'None' else 'Natural colors'}
+Lighting and Mood: {data['lighting_mood'] if data['lighting_mood'] != 'None' else 'Natural lighting'}
+Subject Focus: {data['subject_focus'] if data['subject_focus'] != 'None' else 'General focus'}
+Background Style: {data['background_style'] if data['background_style'] != 'None' else 'Natural background'}
+Effects/Filters: {data['effects_filters'] if data['effects_filters'] != 'None' else 'No effects'}
+
+Please enhance this description into a detailed image generation prompt that incorporates all these aspects.
+"""
+        prompt = generate_prompt(prompt_context)
         return jsonify({'prompt': prompt})
     except Exception as e:
         print(f"Error generating prompt: {str(e)}")
@@ -45,12 +56,10 @@ def generate_image_route():
         
         # Parse image size
         try:
-            image_size_str = data.get('image_size', '1024x1024')
-            width, height = map(int, image_size_str.split('x'))
-            image_size = {
-                'width': width,
-                'height': height
-            }
+            image_size = data.get('image_size', {
+                'width': 1024,
+                'height': 1024
+            })
         except (ValueError, AttributeError):
             image_size = {
                 'width': 1024,
@@ -84,7 +93,6 @@ def generate_image_route():
                     continue
                 
                 img = PILImage.open(original_filepath)
-                width, height = img.size
                 
                 # Save PNG version
                 png_filename = f"{base_name}.png"
@@ -109,8 +117,8 @@ def generate_image_route():
                     filename=png_filename,  # Store PNG as the primary filename
                     prompt=prompt,
                     art_style=art_style,
-                    width=width,
-                    height=height,
+                    width=image_size['width'],
+                    height=image_size['height'],
                     user_id=current_user.id
                 )
                 db.session.add(new_image)
@@ -118,9 +126,7 @@ def generate_image_route():
                 saved_images.append({
                     'image_url': f'/static/images/{png_filename}',
                     'webp_url': f'/static/images/{webp_filename}',
-                    'jpeg_url': f'/static/images/{jpeg_filename}',
-                    'width': width,
-                    'height': height
+                    'jpeg_url': f'/static/images/{jpeg_filename}'
                 })
                 
                 print(f"Successfully processed image: {filename}")  # Debug log
@@ -140,7 +146,9 @@ def generate_image_route():
         return jsonify({
             'images': saved_images,
             'prompt': prompt,
-            'art_style': art_style
+            'art_style': art_style,
+            'width': image_size['width'],
+            'height': image_size['height']
         })
     except Exception as e:
         print(f"Error in generate_image_route: {str(e)}")

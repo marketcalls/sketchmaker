@@ -1,12 +1,22 @@
 <div id="resultContainer" class="hidden mt-8">
-    <div class="card bg-base-100 shadow-xl">
+    <div class="card bg-base-200/50 backdrop-blur-lg border border-base-content/10">
         <div class="card-body">
-            <h2 class="card-title">Generated Prompt</h2>
-            <p id="generatedPrompt" class="whitespace-pre-wrap bg-base-200 p-4 rounded-lg"></p>
+            <h2 class="card-title text-base-content">Generated Prompt</h2>
+            <p id="generatedPrompt" class="mb-4 p-4 bg-base-300 rounded-lg text-base-content whitespace-pre-wrap"></p>
             
-            <div class="card-actions justify-end mt-4">
-                <button id="approve-prompt" class="btn btn-success">Approve Prompt</button>
-                <button id="regenerate-prompt" class="btn btn-warning">Regenerate Prompt</button>
+            <div class="flex flex-wrap gap-4 justify-end">
+                <button id="regenerate-prompt" class="btn btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                    </svg>
+                    Regenerate Prompt
+                </button>
+                <button id="approve-prompt" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    Approve Prompt
+                </button>
             </div>
         </div>
     </div>

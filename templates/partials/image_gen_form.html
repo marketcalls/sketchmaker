@@ -1,22 +1,29 @@
 <form id="imageGenForm" class="space-y-8">
     <div class="mb-8">
         <h2 class="text-2xl font-semibold mb-4">Image Description</h2>
-        <textarea id="userInput" name="message" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none" placeholder="Describe your image content... e.g., 'Create a YouTube thumbnail with a hand-drawn sketch style showing a vibrant cityscape for a travel vlog'"></textarea>
+        <textarea id="userInput" name="message" rows="4" 
+            class="textarea textarea-bordered w-full bg-base-200 text-base-content placeholder-base-content/50" 
+            placeholder="Describe your image content... e.g., 'Create a YouTube thumbnail with a hand-drawn sketch style showing a vibrant cityscape for a travel vlog'"></textarea>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div>
-            <label for="model" class="block text-sm font-medium text-gray-700 mb-1">Model</label>
-            <select id="model" name="model" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Model</span>
+            </label>
+            <select id="model" name="model" class="select select-bordered w-full bg-base-200">
                 <option value="fal-ai/flux-pro">Flux Pro</option>
                 <option value="fal-ai/flux-lora">Flux Lora</option>
                 <option value="fal-ai/flux/dev">Flux Dev</option>
                 <option value="fal-ai/flux-realism">Flux Realism</option>
             </select>
         </div>
-        <div>
-            <label for="imageSize" class="block text-sm font-medium text-gray-700 mb-1">Image Size</label>
-            <select id="imageSize" name="image_size" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Image Size</span>
+            </label>
+            <select id="imageSize" name="image_size" class="select select-bordered w-full bg-base-200">
                 <option value="youtube_thumbnail">YouTube Thumbnail (1280x704)</option>
                 <option value="landscape_4_3">Landscape 4:3 (1280x960)</option>
                 <option value="landscape_16_9">Landscape 16:9 (1280x720)</option>
@@ -25,18 +32,21 @@
                 <option value="square">Square 1:1 (1024x1024)</option>
                 <option value="square_hd">Square HD (1280x1280)</option>
                 <option value="instagram_post_square">Instagram Post Square (1080x1080)</option>
-                <option value="instagram_post_portrait">Instagram Post Portrait (1080x1360)</option>
+                <option value="instagram_post_portrait">Instagram Post Portrait (1080x1350)</option>
                 <option value="instagram_story">Instagram Story (1080x1920)</option>
                 <option value="logo">Logo (512x512)</option>
                 <option value="blog_banner">Blog Banner (1280x640)</option>
-                <option value="linkedin_post">LinkedIn Post (1200x628)</option>
-                <option value="facebook_post_landscape">Facebook Post (1200x628)</option>
+                <option value="linkedin_post">LinkedIn Post (1200x627)</option>
+                <option value="facebook_post_landscape">Facebook Post (1200x630)</option>
                 <option value="twitter_header">Twitter Header (1500x500)</option>
             </select>
         </div>
-        <div class="relative">
-            <label for="artStyle" class="block text-sm font-medium text-gray-700 mb-1">Artistic Style</label>
-            <select id="artStyle" name="art_style" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" onchange="showArtStyleDescription()">
+
+        <div class="form-control relative">
+            <label class="label">
+                <span class="label-text">Artistic Style</span>
+            </label>
+            <select id="artStyle" name="art_style" class="select select-bordered w-full bg-base-200" onchange="showArtStyleDescription()">
                 <option value="None">None</option>
                 <option value="Impressionism">Impressionism</option>
                 <option value="Cubism">Cubism</option>
@@ -64,11 +74,14 @@
                 <option value="Bauhaus">Bauhaus</option>
                 <option value="Illustrative">Illustrative</option>
             </select>
-            <div id="artStyleTooltip" class="hidden absolute z-10 w-64 p-2 mt-1 text-sm text-white bg-gray-800 rounded-lg shadow-lg"></div>
+            <div id="artStyleTooltip" class="hidden absolute z-10 w-64 p-3 mt-1 text-sm bg-base-300 rounded-lg shadow-xl border border-base-content/10"></div>
         </div>
-        <div>
-            <label for="colorScheme" class="block text-sm font-medium text-gray-700 mb-1">Color Scheme</label>
-            <select id="colorScheme" name="color_scheme" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Color Scheme</span>
+            </label>
+            <select id="colorScheme" name="color_scheme" class="select select-bordered w-full bg-base-200">
                 <option value="None">None</option>
                 <option value="Warm">Warm</option>
                 <option value="Cool">Cool</option>
@@ -79,9 +92,12 @@
                 <option value="Neon">Neon</option>
             </select>
         </div>
-        <div>
-            <label for="lightingMood" class="block text-sm font-medium text-gray-700 mb-1">Lighting and Mood</label>
-            <select id="lightingMood" name="lighting_mood" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Lighting and Mood</span>
+            </label>
+            <select id="lightingMood" name="lighting_mood" class="select select-bordered w-full bg-base-200">
                 <option value="None">None</option>
                 <option value="Natural Light">Natural Light</option>
                 <option value="Studio Light">Studio Light</option>
@@ -92,9 +108,12 @@
                 <option value="High Key">High Key</option>
             </select>
         </div>
-        <div>
-            <label for="subjectFocus" class="block text-sm font-medium text-gray-700 mb-1">Subject Focus</label>
-            <select id="subjectFocus" name="subject_focus" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Subject Focus</span>
+            </label>
+            <select id="subjectFocus" name="subject_focus" class="select select-bordered w-full bg-base-200">
                 <option value="None">None</option>
                 <option value="People">People</option>
                 <option value="Nature">Nature</option>
@@ -104,9 +123,12 @@
                 <option value="Abstract">Abstract</option>
             </select>
         </div>
-        <div>
-            <label for="backgroundStyle" class="block text-sm font-medium text-gray-700 mb-1">Background Style</label>
-            <select id="backgroundStyle" name="background_style" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Background Style</span>
+            </label>
+            <select id="backgroundStyle" name="background_style" class="select select-bordered w-full bg-base-200">
                 <option value="None">None</option>
                 <option value="Plain">Plain</option>
                 <option value="Gradient">Gradient</option>
@@ -116,9 +138,12 @@
                 <option value="Environmental">Environmental</option>
             </select>
         </div>
-        <div>
-            <label for="effectsFilters" class="block text-sm font-medium text-gray-700 mb-1">Effects and Filters</label>
-            <select id="effectsFilters" name="effects_filters" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Effects and Filters</span>
+            </label>
+            <select id="effectsFilters" name="effects_filters" class="select select-bordered w-full bg-base-200">
                 <option value="None">None</option>
                 <option value="Vintage">Vintage</option>
                 <option value="Black and White">Black and White</option>
@@ -129,47 +154,75 @@
                 <option value="Blur">Blur</option>
             </select>
         </div>
-        <div>
-            <label for="numInferenceSteps" class="block text-sm font-medium text-gray-700 mb-1">Number of Inference Steps</label>
-            <input type="number" id="numInferenceSteps" name="num_inference_steps" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" value="28" min="1" max="50">
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Number of Inference Steps</span>
+            </label>
+            <input type="number" id="numInferenceSteps" name="num_inference_steps" 
+                class="input input-bordered w-full bg-base-200" 
+                value="28" min="1" max="50">
         </div>
-        <div>
-            <label for="guidanceScale" class="block text-sm font-medium text-gray-700 mb-1">Guidance Scale</label>
-            <input type="number" id="guidanceScale" name="guidance_scale" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" value="3.5" min="0" max="20" step="0.1">
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Guidance Scale</span>
+            </label>
+            <input type="number" id="guidanceScale" name="guidance_scale" 
+                class="input input-bordered w-full bg-base-200" 
+                value="3.5" min="0" max="20" step="0.1">
         </div>
-        <div>
-            <label for="seed" class="block text-sm font-medium text-gray-700 mb-1">Seed (optional)</label>
-            <input type="number" id="seed" name="seed" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" min="0">
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Seed (optional)</span>
+            </label>
+            <input type="number" id="seed" name="seed" 
+                class="input input-bordered w-full bg-base-200" 
+                min="0">
         </div>
     </div>
 
-    <div id="loraInputs" class="hidden">
-        <div>
-            <label for="loraPath" class="block text-sm font-medium text-gray-700 mb-1">LoRA Path (safetensors)</label>
-            <input type="text" id="loraPath" name="lora_path" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+    <div id="loraInputs" class="hidden space-y-4 mt-4">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">LoRA Path (safetensors)</span>
+            </label>
+            <input type="text" id="loraPath" name="lora_path" 
+                class="input input-bordered w-full bg-base-200">
         </div>
-        <div>
-            <label for="loraScale" class="block text-sm font-medium text-gray-700 mb-1">LoRA Scale</label>
-            <input type="number" id="loraScale" name="lora_scale" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent" value="1" min="0" max="1" step="0.1">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">LoRA Scale</span>
+            </label>
+            <input type="number" id="loraScale" name="lora_scale" 
+                class="input input-bordered w-full bg-base-200" 
+                value="1" min="0" max="1" step="0.1">
         </div>
     </div>
 
     <div class="text-center">
-        <button type="button" id="enhancePrompt" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-full hover:opacity-90 transition duration-300 flex items-center justify-center mx-auto">
-            <i class="fas fa-magic mr-2"></i> Enhance Image Prompt
+        <button type="button" id="enhancePrompt" class="btn btn-primary btn-lg w-64">
+            Enhance Image Prompt
         </button>
     </div>
 </form>
 
 <div id="enhancedPromptContainer" class="mt-8 hidden">
-    <h3 class="text-xl font-semibold mb-4">Enhanced Prompt</h3>
-    <textarea id="enhancedPromptText" class="w-full p-4 bg-gray-100 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-vertical" rows="10"></textarea>
-    <div class="text-center mt-4">
-        <button type="button" id="reEnhancePrompt" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-600 transition duration-300 mr-4">
-            Re-Enhance Prompt
-        </button>
-        <button type="button" id="generateImage" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-full hover:opacity-90 transition duration-300">
-            Generate Image
-        </button>
+    <div class="card bg-base-200">
+        <div class="card-body">
+            <h3 class="card-title text-base-content">Enhanced Prompt</h3>
+            <textarea id="enhancedPromptText" 
+                class="textarea textarea-bordered w-full bg-base-300 text-base-content min-h-[200px]" 
+                rows="10"></textarea>
+            <div class="card-actions justify-center mt-4 space-x-4">
+                <button type="button" id="reEnhancePrompt" class="btn btn-secondary btn-lg w-64">
+                    Re-Enhance Prompt
+                </button>
+                <button type="button" id="generateImage" class="btn btn-primary btn-lg w-64">
+                    Generate Image
+                </button>
+            </div>
+        </div>
     </div>
 </div>

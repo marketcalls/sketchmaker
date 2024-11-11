@@ -10,30 +10,59 @@
     <script>
         tailwind.config = {
             darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
             daisyui: {
                 themes: [
                     {
-                        dark: {
-                            "primary": "#8b5cf6",
-                            "primary-focus": "#7c3aed",
+                        light: {
+                            "primary": "#a855f7",
+                            "primary-focus": "#9333ea",
                             "primary-content": "#ffffff",
                             "secondary": "#f472b6",
                             "secondary-focus": "#ec4899",
                             "secondary-content": "#ffffff",
-                            "accent": "#37cdbe",
-                            "accent-focus": "#2aa79b",
+                            "accent": "#22d3ee",
+                            "accent-focus": "#06b6d4",
                             "accent-content": "#ffffff",
-                            "neutral": "#2a2e37",
-                            "neutral-focus": "#16181d",
+                            "neutral": "#f3f4f6",
+                            "neutral-focus": "#e5e7eb",
+                            "neutral-content": "#1f2937",
+                            "base-100": "#ffffff",
+                            "base-200": "#f3f4f6",
+                            "base-300": "#e5e7eb",
+                            "base-content": "#1f2937",
+                            "info": "#06b6d4",
+                            "success": "#10b981",
+                            "warning": "#f59e0b",
+                            "error": "#ef4444"
+                        },
+                        dark: {
+                            "primary": "#a855f7",
+                            "primary-focus": "#9333ea",
+                            "primary-content": "#ffffff",
+                            "secondary": "#f472b6",
+                            "secondary-focus": "#ec4899",
+                            "secondary-content": "#ffffff",
+                            "accent": "#22d3ee",
+                            "accent-focus": "#06b6d4",
+                            "accent-content": "#ffffff",
+                            "neutral": "#1e293b",
+                            "neutral-focus": "#0f172a",
                             "neutral-content": "#ffffff",
-                            "base-100": "#12141c",
-                            "base-200": "#1c1f2c",
-                            "base-300": "#262b3c",
-                            "base-content": "#ebecf0",
-                            "info": "#66c6ff",
-                            "success": "#87d039",
-                            "warning": "#e2d562",
-                            "error": "#ff6f6f"
+                            "base-100": "#0f172a",
+                            "base-200": "#1e293b",
+                            "base-300": "#334155",
+                            "base-content": "#e2e8f0",
+                            "info": "#06b6d4",
+                            "success": "#10b981",
+                            "warning": "#f59e0b",
+                            "error": "#ef4444"
                         }
                     }
                 ],
@@ -41,10 +70,82 @@
             },
         }
     </script>
+    <style>
+        /* Modern scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--fallback-b2,oklch(var(--b2)));
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--fallback-b3,oklch(var(--b3)));
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--fallback-bc,oklch(var(--bc)/0.5));
+        }
+        
+        /* Better form styling */
+        .input, .select, .textarea {
+            background-color: var(--fallback-b2,oklch(var(--b2))) !important;
+            border-color: var(--fallback-b3,oklch(var(--b3))) !important;
+            color: var(--fallback-bc,oklch(var(--bc))) !important;
+        }
+        .input:focus, .select:focus, .textarea:focus {
+            border-color: var(--fallback-p,oklch(var(--p))) !important;
+            box-shadow: 0 0 0 2px var(--fallback-p,oklch(var(--p)/0.2)) !important;
+        }
+        .label-text {
+            color: var(--fallback-bc,oklch(var(--bc))) !important;
+            font-weight: 500 !important;
+        }
+        .label-text-alt {
+            color: var(--fallback-bc,oklch(var(--bc)/0.7)) !important;
+        }
+        
+        /* Card styling */
+        .card {
+            backdrop-filter: blur(12px);
+            background-color: var(--fallback-b2,oklch(var(--b2)/0.8)) !important;
+            border: 1px solid var(--fallback-b3,oklch(var(--b3)/0.5));
+        }
+        
+        /* Button styling */
+        .btn {
+            text-transform: none !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Text styling */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            letter-spacing: -0.025em;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="min-h-screen bg-base-100 text-base-content">
+<body class="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300">
     {% block content %}{% endblock %}
+    <script>
+        // Set default theme to dark
+        if (!localStorage.getItem('theme')) {
+            localStorage.setItem('theme', 'dark');
+        }
+        // Apply theme from localStorage
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme'));
+        
+        // Update theme controller state if it exists
+        const themeController = document.querySelector('.theme-controller');
+        if (themeController) {
+            themeController.checked = localStorage.getItem('theme') === 'dark';
+        }
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
