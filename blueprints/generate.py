@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, current_app
 from flask_login import login_required, current_user
 from .image_generator import generate_image
 from .prompt_generator import generate_prompt
+from .clients import APIKeyError
 from models import db, Image
 import os
 from PIL import Image as PILImage
@@ -22,22 +23,13 @@ def generate_prompt_route():
         return jsonify({'error': 'No topic provided'}), 400
 
     try:
-        # Build enhanced prompt with all parameters
-        prompt_context = f"""
-Base Description: {data['topic']}
+        if not current_user.has_required_api_keys():
+            return jsonify({'error': 'API keys are required. Please add them in your settings.'}), 400
 
-Format: {data['image_size']}
-Artistic Style: {data['art_style'] if data['art_style'] != 'None' else 'No specific style'}
-Color Scheme: {data['color_scheme'] if data['color_scheme'] != 'None' else 'Natural colors'}
-Lighting and Mood: {data['lighting_mood'] if data['lighting_mood'] != 'None' else 'Natural lighting'}
-Subject Focus: {data['subject_focus'] if data['subject_focus'] != 'None' else 'General focus'}
-Background Style: {data['background_style'] if data['background_style'] != 'None' else 'Natural background'}
-Effects/Filters: {data['effects_filters'] if data['effects_filters'] != 'None' else 'No effects'}
-
-Please enhance this description into a detailed image generation prompt that incorporates all these aspects.
-"""
-        prompt = generate_prompt(prompt_context)
+        prompt = generate_prompt(data['topic'])
         return jsonify({'prompt': prompt})
+    except APIKeyError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
         print(f"Error generating prompt: {str(e)}")
         print(traceback.format_exc())
@@ -47,6 +39,9 @@ Please enhance this description into a detailed image generation prompt that inc
 @login_required
 def generate_image_route():
     try:
+        if not current_user.has_required_api_keys():
+            return jsonify({'error': 'API keys are required. Please add them in your settings.'}), 400
+
         data = request.get_json()
         if not data or 'prompt' not in data:
             return jsonify({'error': 'No prompt provided'}), 400
@@ -150,6 +145,8 @@ def generate_image_route():
             'width': image_size['width'],
             'height': image_size['height']
         })
+    except APIKeyError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
         print(f"Error in generate_image_route: {str(e)}")
         print(traceback.format_exc())

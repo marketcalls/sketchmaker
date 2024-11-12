@@ -1,31 +1,70 @@
-import os
 from openai import OpenAI
-import fal_client
-from dotenv import load_dotenv
+from flask import current_app, g
+from flask_login import current_user
+import os
 
-# Load environment variables
-load_dotenv()
+class APIKeyError(Exception):
+    """Exception raised when required API keys are missing"""
+    pass
 
-def get_required_env(name):
-    """Get required environment variable or raise error"""
-    value = os.getenv(name)
-    if not value:
-        raise ValueError(f"Missing required environment variable: {name}")
-    return value
+def get_openai_client():
+    """Get OpenAI client with user's API key"""
+    api_keys = current_user.get_api_keys()
+    if not api_keys['openai_api_key']:
+        raise APIKeyError("OpenAI API key is required. Please add it in your settings.")
+    return OpenAI(api_key=api_keys['openai_api_key'])
 
-# Configure OpenAI client
-OPENAI_API_KEY = get_required_env('OPENAI_API_KEY')
-OPENAI_MODEL = get_required_env('OPENAI_MODEL')
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+def init_fal_client():
+    """Initialize FAL client with user's API key"""
+    api_keys = current_user.get_api_keys()
+    fal_key = api_keys['fal_key']
+    
+    if not fal_key:
+        raise APIKeyError("FAL API key is required. Please add it in your settings.")
+    
+    print(f"\nInitializing FAL client with key: {fal_key}")
+    
+    try:
+        # Set the environment variable
+        os.environ['FAL_KEY'] = fal_key
+        
+        # Import fal_client after setting environment variable
+        import fal_client
+        
+        def on_queue_update(update):
+            if isinstance(update, fal_client.InProgress):
+                for log in update.logs:
+                    print(f"FAL log: {log['message']}")
 
-# Configure FAL client
-FAL_KEY = get_required_env('FAL_KEY')
-FLUX_PRO_MODEL = get_required_env('FLUX_PRO_MODEL')
+        result = fal_client.subscribe(
+            "fal-ai/flux-pro/v1.1",
+            arguments={
+                "prompt": "test prompt",
+                "image_size": {
+                    "width": 512,
+                    "height": 512
+                },
+                "num_images": 1,
+                "enable_safety_checker": True,
+                "safety_tolerance": "2",
+                "seed": 2345
+            },
+            with_logs=True,
+            on_queue_update=on_queue_update
+        )
+        print("FAL client initialized and tested successfully")
+        print(f"Test result: {result}")
+        return fal_client
+    except Exception as e:
+        print(f"Error initializing FAL client: {str(e)}")
+        if "authentication failed" in str(e).lower():
+            raise APIKeyError("FAL API key authentication failed. Please check your key in settings.")
+        raise APIKeyError(f"Error initializing FAL client: {str(e)}")
 
-try:
-    # Initialize FAL client
-    fal_client.api_key = FAL_KEY
-    print("FAL client initialized successfully")
-except Exception as e:
-    print(f"Error initializing FAL client: {str(e)}")
-    raise
+def get_openai_model():
+    """Get OpenAI model name"""
+    return current_app.config.get('OPENAI_MODEL', 'gpt-4o-mini')
+
+def get_flux_model():
+    """Get FAL Flux model name"""
+    return "fal-ai/flux-pro/v1.1"

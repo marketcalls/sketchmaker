@@ -17,6 +17,53 @@ document.addEventListener('DOMContentLoaded', () => {
         'twitter_header': { width: 1500, height: 500 }
     };
 
+    // Toast notification system
+    function showToast(message, type = 'error') {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} fixed bottom-4 right-4 w-96 z-50 animate-fade-in-up shadow-lg`;
+        
+        const icon = document.createElement('svg');
+        icon.className = 'h-6 w-6 shrink-0';
+        icon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        icon.setAttribute('fill', 'none');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('stroke', 'currentColor');
+        
+        const path = document.createElement('path');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        path.setAttribute('stroke-width', '2');
+        
+        if (type === 'success') {
+            path.setAttribute('d', 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z');
+        } else {
+            path.setAttribute('d', 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z');
+        }
+        
+        icon.appendChild(path);
+        toast.appendChild(icon);
+        toast.appendChild(document.createTextNode(message));
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('animate-fade-out-down');
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
+    }
+
+    // API error handler
+    function handleAPIError(error) {
+        const errorMessage = error.message || error;
+        if (errorMessage.toLowerCase().includes('api key')) {
+            showToast('Invalid or missing API key. Please check your API keys in settings.', 'error');
+        } else if (errorMessage.toLowerCase().includes('authentication failed')) {
+            showToast('API authentication failed. Please verify your API keys in settings.', 'error');
+        } else {
+            showToast(errorMessage, 'error');
+        }
+    }
+
     // Theme handling
     const themeController = document.querySelector('.theme-controller');
     if (themeController) {
@@ -74,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function enhancePrompt(reEnhance = false) {
         const userInput = document.getElementById('userInput');
         if (!userInput.value.trim()) {
-            alert('Please enter a prompt to enhance');
+            showToast('Please enter a prompt to enhance', 'error');
             return;
         }
 
@@ -117,11 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(formData),
             });
 
+            const data = await response.json();
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
             if (data.prompt) {
                 enhancedPromptText.value = data.prompt;
                 enhancedPromptContainer.classList.remove('hidden');
@@ -129,12 +176,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     top: enhancedPromptContainer.offsetTop,
                     behavior: 'smooth'
                 });
+                showToast('Prompt enhanced successfully!', 'success');
             } else {
                 throw new Error(data.error || 'Invalid response from server');
             }
         } catch (error) {
             console.error('Error enhancing prompt:', error);
-            alert('An error occurred while enhancing the prompt: ' + error.message);
+            handleAPIError(error);
         } finally {
             hideLoading(loadingIndicator);
         }
@@ -142,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function generateImage() {
         if (!enhancedPromptText.value.trim()) {
-            alert('Please enhance the prompt before generating an image.');
+            showToast('Please enhance the prompt before generating an image.', 'error');
             return;
         }
 
@@ -165,19 +213,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }),
             });
 
+            const data = await response.json();
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
             if (data.images && data.images.length > 0) {
                 displayGeneratedImage(data);
+                showToast('Image generated successfully!', 'success');
             } else {
                 throw new Error(data.error || 'Invalid response from server');
             }
         } catch (error) {
             console.error('Error generating image:', error);
-            alert('An error occurred while generating the image: ' + error.message);
+            handleAPIError(error);
         } finally {
             hideLoading(loadingIndicator);
         }

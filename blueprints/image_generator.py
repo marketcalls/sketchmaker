@@ -1,12 +1,12 @@
-import fal_client
 import uuid
 import os
 import requests
 from flask import current_app
-from .clients import FLUX_PRO_MODEL
+from .clients import init_fal_client
 import io
 
 def generate_image(prompt, image_size):
+    """Generate image using FAL API with user's API key"""
     try:
         # Validate inputs
         if not prompt:
@@ -14,20 +14,30 @@ def generate_image(prompt, image_size):
         if not isinstance(image_size, dict) or 'width' not in image_size or 'height' not in image_size:
             raise ValueError("Invalid image size format")
 
-        # Prepare request
-        fal_request = {
-            "prompt": prompt,
-            "image_size": image_size,
-            "num_images": 1,
-            "enable_safety_checker": True,
-            "safety_tolerance": "2"
-        }
+        print(f"Generating image with prompt: {prompt}, size: {image_size}")  # Debug log
 
-        print(f"Submitting request to FAL: {fal_request}")  # Debug log
+        # Initialize FAL client and get instance
+        fal_client = init_fal_client()
 
-        # Submit request
-        handler = fal_client.submit(FLUX_PRO_MODEL, arguments=fal_request)
-        result = handler.get()
+        def on_queue_update(update):
+            if isinstance(update, fal_client.InProgress):
+                for log in update.logs:
+                    print(f"FAL generation log: {log['message']}")
+
+        # Generate image using FAL API
+        result = fal_client.subscribe(
+            "fal-ai/flux-pro/v1.1",
+            arguments={
+                "prompt": prompt,
+                "image_size": image_size,
+                "num_images": 1,
+                "enable_safety_checker": True,
+                "safety_tolerance": "2",
+                "seed": 2345
+            },
+            with_logs=True,
+            on_queue_update=on_queue_update
+        )
         
         print(f"Received response from FAL: {result}")  # Debug log
         
@@ -40,42 +50,46 @@ def generate_image(prompt, image_size):
                 continue
 
             # Generate a unique filename
-            filename = f"{uuid.uuid4()}.png"
+            base_filename = str(uuid.uuid4())
             
             # Get absolute paths
-            filepath = os.path.join(current_app.root_path, 'static', 'images', filename)
+            static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+            images_dir = os.path.join(static_dir, 'images')
             
-            # Ensure directory exists
-            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            # Ensure the images directory exists
+            os.makedirs(images_dir, exist_ok=True)
             
             # Download image
             response = requests.get(img['url'])
             response.raise_for_status()
             
-            # Save image
-            with open(filepath, 'wb') as f:
-                f.write(response.content)
+            # Load image into PIL
+            image_data = io.BytesIO(response.content)
             
-            print(f"Saved PNG image to: {filepath}")  # Debug log
+            # Save as PNG
+            png_filename = f"{base_filename}.png"
+            png_filepath = os.path.join(images_dir, png_filename)
+            
+            with open(png_filepath, 'wb') as f:
+                f.write(image_data.getvalue())
+            
+            print(f"Saved PNG image to: {png_filepath}")  # Debug log
             
             # Verify file was saved
-            if not os.path.exists(filepath):
-                print(f"Warning: Failed to save image to {filepath}")
+            if not os.path.exists(png_filepath):
+                print(f"Warning: Failed to save image to {png_filepath}")
                 continue
                 
-            image_urls.append(f"/static/images/{filename}")
+            image_urls.append(f"/static/images/{png_filename}")
 
         if not image_urls:
             raise ValueError("No images were successfully downloaded")
 
         return {
             "image_url": image_urls,
-            "width": fal_request["image_size"]["width"],
-            "height": fal_request["image_size"]["height"]
+            "width": image_size["width"],
+            "height": image_size["height"]
         }
-    except requests.exceptions.RequestException as e:
-        print(f"Error downloading image: {str(e)}")  # Debug log
-        raise ValueError(f"Failed to download generated image: {str(e)}")
     except Exception as e:
         print(f"Error in generate_image: {str(e)}")  # Debug log
         raise

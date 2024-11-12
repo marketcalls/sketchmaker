@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="min-h-screen">
+    <!-- Header -->
+    <div class="navbar bg-base-200/50 backdrop-blur-lg border-b border-base-content/10">
+        <div class="container mx-auto px-4">
+            <div class="flex-1">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <h1 class="text-xl font-semibold">Settings</h1>
+                </div>
+            </div>
+            <div class="flex-none gap-2">
+                <a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost btn-sm">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="card bg-base-200/50 backdrop-blur-lg border border-base-content/10">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">API Settings</h2>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    {% if category == 'success' %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    {% else %}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    {% endif %}
+                                </svg>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('core.settings') }}" class="space-y-6">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">OpenAI API Key</span>
+                            <a href="https://openai.com/index/openai-api/" target="_blank" class="label-text-alt link link-primary">Get API Key</a>
+                        </label>
+                        <input type="password" name="openai_api_key" 
+                               class="input input-bordered w-full bg-base-300" 
+                               value="{{ current_user.openai_api_key or '' }}"
+                               placeholder="sk-...">
+                        <label class="label">
+                            <span class="label-text-alt text-base-content/70">Required for prompt enhancement. Must start with 'sk-'</span>
+                        </label>
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">FAL API Key</span>
+                            <a href="https://fal.ai/dashboard/keys" target="_blank" class="label-text-alt link link-primary">Get API Key</a>
+                        </label>
+                        <input type="password" name="fal_key" 
+                               class="input input-bordered w-full bg-base-300" 
+                               value="{{ current_user.fal_key or '' }}"
+                               placeholder="Your FAL API key">
+                        <label class="label">
+                            <span class="label-text-alt text-base-content/70">Required for image generation. Get your key from FAL dashboard.</span>
+                        </label>
+                    </div>
+
+                    <div class="alert alert-info mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                            <h3 class="font-bold">Important!</h3>
+                            <div class="text-sm">
+                                <p>Your API keys are stored securely and are only used for your own requests.</p>
+                                <p class="mt-2">Make sure to:</p>
+                                <ul class="list-disc list-inside ml-4 mt-1">
+                                    <li>Use valid API keys from OpenAI and FAL</li>
+                                    <li>Keep your keys secure and private</li>
+                                    <li>Never share your API keys with others</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn btn-primary">
+                            Save Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

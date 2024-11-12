@@ -19,9 +19,13 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sketchmaker.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # Set OpenAI model
+    app.config['OPENAI_MODEL'] = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+    app.config['FLUX_PRO_MODEL'] = os.getenv('FLUX_PRO_MODEL', 'fal-ai/flux-pro/v1.1')
 
     # Ensure required environment variables are set
-    required_vars = ['SECRET_KEY', 'OPENAI_API_KEY', 'FAL_KEY', 'OPENAI_MODEL', 'FLUX_PRO_MODEL']
+    required_vars = ['SECRET_KEY']
     missing_vars = [var for var in required_vars if not os.getenv(var)]
     if missing_vars:
         raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
