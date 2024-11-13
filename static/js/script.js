@@ -123,7 +123,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        showLoading(loadingIndicator);
+        // Show loading state
+        const button = reEnhance ? reEnhancePromptButton : enhancePromptButton;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.innerHTML = '<span class="loading loading-spinner"></span> Enhancing...';
         enhancedPromptContainer.classList.add('hidden');
 
         try {
@@ -148,7 +152,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             if (!response.ok) {
-                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                let errorMessage = data.error || 'Failed to enhance prompt';
+                let errorDetails = data.details;
+
+                // Handle specific error types
+                if (data.type === 'invalid_openai_key') {
+                    errorMessage = 'Invalid OpenAI API Key';
+                    errorDetails = 'Please check your OpenAI API key in settings';
+                } else if (data.type === 'rate_limit') {
+                    errorMessage = 'Rate Limit Exceeded';
+                    errorDetails = 'Please try again later';
+                } else if (data.type === 'missing_keys') {
+                    errorMessage = 'API Keys Required';
+                    errorDetails = 'Please add your API keys in settings';
+                }
+
+                throw new Error(errorMessage + (errorDetails ? `: ${errorDetails}` : ''));
             }
 
             if (data.prompt) {
@@ -160,13 +179,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 showToast('Prompt enhanced successfully!', 'success');
             } else {
-                throw new Error(data.error || 'Invalid response from server');
+                throw new Error('Invalid response from server');
             }
         } catch (error) {
             console.error('Error enhancing prompt:', error);
-            handleAPIError(error);
+            showToast(error.message, 'error');
         } finally {
-            hideLoading(loadingIndicator);
+            // Reset button state
+            button.disabled = false;
+            button.textContent = originalText;
         }
     }
 

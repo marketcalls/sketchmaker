@@ -9,6 +9,7 @@ from PIL import Image as PILImage
 import uuid
 import traceback
 from fal_client.client import FalClientError
+from openai import AuthenticationError, OpenAIError
 
 generate_bp = Blueprint('generate', __name__)
 
@@ -21,7 +22,11 @@ def get_absolute_path(filename):
 def generate_prompt_route():
     data = request.get_json()
     if not data or 'topic' not in data:
-        return jsonify({'error': 'No topic provided'}), 400
+        return jsonify({
+            'error': 'No topic provided',
+            'details': 'Please provide a topic to generate a prompt',
+            'type': 'missing_topic'
+        }), 400
 
     try:
         if not current_user.has_required_api_keys():
@@ -31,8 +36,30 @@ def generate_prompt_route():
                 'type': 'missing_keys'
             }), 400
 
-        prompt = generate_prompt(data['topic'])
-        return jsonify({'prompt': prompt})
+        try:
+            prompt = generate_prompt(data['topic'])
+            return jsonify({'prompt': prompt})
+        except AuthenticationError as e:
+            return jsonify({
+                'error': 'Invalid OpenAI API key',
+                'details': 'Please check your OpenAI API key in settings',
+                'type': 'invalid_openai_key'
+            }), 401
+        except OpenAIError as e:
+            error_message = str(e)
+            if 'rate limit' in error_message.lower():
+                return jsonify({
+                    'error': 'Rate limit exceeded',
+                    'details': 'Please try again later',
+                    'type': 'rate_limit'
+                }), 429
+            else:
+                return jsonify({
+                    'error': 'OpenAI API error',
+                    'details': error_message,
+                    'type': 'openai_api_error'
+                }), 400
+
     except APIKeyError as e:
         return jsonify({
             'error': str(e),
