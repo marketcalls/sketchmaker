@@ -1,9 +1,17 @@
 <form id="imageGenForm" class="space-y-8">
     <div class="mb-8">
         <h2 class="text-2xl font-semibold mb-4">Image Description</h2>
-        <textarea id="userInput" name="message" rows="4" 
-            class="textarea textarea-bordered w-full bg-base-200 text-base-content placeholder-base-content/50" 
-            placeholder="Describe your image content in detail."></textarea>
+        <div class="relative">
+            <textarea id="userInput" name="message" rows="4" 
+                class="textarea textarea-bordered w-full bg-base-200 text-base-content placeholder-base-content/50" 
+                placeholder="Describe your image content in detail."></textarea>
+            <div id="characterCount" class="absolute bottom-2 right-2 text-sm opacity-70 hidden">
+                <span id="currentCount">0</span>/<span id="maxCount">1000</span>
+            </div>
+            <div id="characterWarning" class="mt-2 text-error hidden">
+                Prompt exceeds 1000 characters. Excess text will be trimmed.
+            </div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -17,7 +25,52 @@
                 <option value="fal-ai/flux-lora">Flux Lora</option>
                 <option value="fal-ai/flux/dev">Flux Dev</option>
                 <option value="fal-ai/flux-realism">Flux Realism</option>
+                <option value="fal-ai/recraft-v3">Recraft V3</option>
             </select>
+        </div>
+
+        <!-- Recraft V3 Style Control -->
+        <div class="form-control hidden" id="recraftStyleControl">
+            <label class="label">
+                <span class="label-text">Recraft Style</span>
+            </label>
+            <select id="recraftStyle" name="recraft_style" class="select select-bordered w-full bg-base-200">
+                <option value="any">Default</option>
+                <option value="realistic_image">Realistic Image</option>
+                <option value="digital_illustration">Digital Illustration</option>
+                <option value="vector_illustration">Vector Illustration</option>
+                <option value="realistic_image/b_and_w">Realistic B&W</option>
+                <option value="realistic_image/hard_flash">Realistic Hard Flash</option>
+                <option value="realistic_image/hdr">Realistic HDR</option>
+                <option value="realistic_image/natural_light">Realistic Natural Light</option>
+                <option value="realistic_image/studio_portrait">Realistic Studio Portrait</option>
+                <option value="realistic_image/enterprise">Realistic Enterprise</option>
+                <option value="realistic_image/motion_blur">Realistic Motion Blur</option>
+                <option value="digital_illustration/pixel_art">Digital Pixel Art</option>
+                <option value="digital_illustration/hand_drawn">Digital Hand Drawn</option>
+                <option value="digital_illustration/grain">Digital Grain</option>
+                <option value="digital_illustration/infantile_sketch">Digital Infantile Sketch</option>
+                <option value="digital_illustration/2d_art_poster">Digital 2D Art Poster</option>
+                <option value="digital_illustration/handmade_3d">Digital Handmade 3D</option>
+                <option value="digital_illustration/hand_drawn_outline">Digital Hand Drawn Outline</option>
+                <option value="digital_illustration/engraving_color">Digital Engraving Color</option>
+                <option value="digital_illustration/2d_art_poster_2">Digital 2D Art Poster 2</option>
+                <option value="vector_illustration/engraving">Vector Engraving</option>
+                <option value="vector_illustration/line_art">Vector Line Art</option>
+                <option value="vector_illustration/line_circuit">Vector Line Circuit</option>
+                <option value="vector_illustration/linocut">Vector Linocut</option>
+            </select>
+        </div>
+
+        <!-- Recraft V3 Colors Control -->
+        <div class="form-control hidden" id="recraftColorsControl">
+            <label class="label">
+                <span class="label-text">Colors</span>
+                <button type="button" id="addColorBtn" class="btn btn-sm btn-primary">Add Color</button>
+            </label>
+            <div id="colorPickers" class="flex flex-wrap gap-2">
+                <!-- Color pickers will be added here dynamically -->
+            </div>
         </div>
 
         <div class="form-control" id="imageSizeControl">
@@ -229,9 +282,17 @@
     <div class="card bg-base-200">
         <div class="card-body">
             <h3 class="card-title text-base-content">Enhanced Prompt</h3>
-            <textarea id="enhancedPromptText" 
-                class="textarea textarea-bordered w-full bg-base-300 text-base-content min-h-[200px]" 
-                rows="10"></textarea>
+            <div class="relative">
+                <textarea id="enhancedPromptText" 
+                    class="textarea textarea-bordered w-full bg-base-300 text-base-content min-h-[200px]" 
+                    rows="10"></textarea>
+                <div id="enhancedCharacterCount" class="absolute bottom-2 right-2 text-sm opacity-70 hidden">
+                    <span id="enhancedCurrentCount">0</span>/<span id="enhancedMaxCount">1000</span>
+                </div>
+                <div id="enhancedCharacterWarning" class="mt-2 text-error hidden">
+                    Prompt exceeds 1000 characters. Excess text will be trimmed.
+                </div>
+            </div>
             <div class="card-actions justify-center mt-4 space-x-4">
                 <button type="button" id="reEnhancePrompt" class="btn btn-secondary btn-lg w-64">
                     Re-Enhance Prompt
@@ -252,6 +313,10 @@ document.getElementById('model').addEventListener('change', function(e) {
     const loraInputs = document.getElementById('loraInputs');
     const numInferenceStepsControl = document.getElementById('numInferenceSteps').closest('.form-control');
     const guidanceScaleControl = document.getElementById('guidanceScale').closest('.form-control');
+    const recraftStyleControl = document.getElementById('recraftStyleControl');
+    const recraftColorsControl = document.getElementById('recraftColorsControl');
+    const characterCount = document.getElementById('characterCount');
+    const enhancedCharacterCount = document.getElementById('enhancedCharacterCount');
     
     // Reset all controls first
     imageSizeControl.classList.remove('hidden');
@@ -259,6 +324,10 @@ document.getElementById('model').addEventListener('change', function(e) {
     loraInputs.classList.add('hidden');
     numInferenceStepsControl.classList.remove('hidden');
     guidanceScaleControl.classList.remove('hidden');
+    recraftStyleControl.classList.add('hidden');
+    recraftColorsControl.classList.add('hidden');
+    characterCount.classList.add('hidden');
+    enhancedCharacterCount.classList.add('hidden');
 
     // Apply model-specific controls
     switch(e.target.value) {
@@ -276,10 +345,54 @@ document.getElementById('model').addEventListener('change', function(e) {
             numInferenceStepsControl.classList.add('hidden');
             guidanceScaleControl.classList.add('hidden');
             break;
+        case 'fal-ai/recraft-v3':
+            recraftStyleControl.classList.remove('hidden');
+            recraftColorsControl.classList.remove('hidden');
+            numInferenceStepsControl.classList.add('hidden');
+            guidanceScaleControl.classList.add('hidden');
+            characterCount.classList.remove('hidden');
+            enhancedCharacterCount.classList.remove('hidden');
+            break;
     }
+    
+    // Update character counts
+    updateCharacterCount();
+    updateEnhancedCharacterCount();
     
     console.log('Model changed to:', e.target.value);
 });
+
+// Character counter functionality
+const MAX_CHARS = 1000;
+
+function updateCharacterCount(textarea = document.getElementById('userInput'), 
+                           countElement = document.getElementById('currentCount'),
+                           warningElement = document.getElementById('characterWarning')) {
+    const length = textarea.value.length;
+    countElement.textContent = length;
+
+    if (document.getElementById('model').value === 'fal-ai/recraft-v3') {
+        if (length > MAX_CHARS) {
+            countElement.parentElement.classList.add('text-error');
+            warningElement.classList.remove('hidden');
+            textarea.classList.add('textarea-error');
+        } else {
+            countElement.parentElement.classList.remove('text-error');
+            warningElement.classList.add('hidden');
+            textarea.classList.remove('textarea-error');
+        }
+    }
+}
+
+function updateEnhancedCharacterCount() {
+    const textarea = document.getElementById('enhancedPromptText');
+    const countElement = document.getElementById('enhancedCurrentCount');
+    const warningElement = document.getElementById('enhancedCharacterWarning');
+    updateCharacterCount(textarea, countElement, warningElement);
+}
+
+document.getElementById('userInput').addEventListener('input', () => updateCharacterCount());
+document.getElementById('enhancedPromptText').addEventListener('input', updateEnhancedCharacterCount);
 
 // Initialize controls based on default model
 window.addEventListener('DOMContentLoaded', function() {
@@ -335,5 +448,28 @@ document.addEventListener('click', function(event) {
     if (artStyleTooltip && event.target !== artStyleSelect && event.target !== artStyleTooltip) {
         artStyleTooltip.classList.add('hidden');
     }
+});
+
+// Color picker functionality
+document.getElementById('addColorBtn')?.addEventListener('click', function() {
+    const colorPickers = document.getElementById('colorPickers');
+    const colorPickerWrapper = document.createElement('div');
+    colorPickerWrapper.className = 'flex items-center gap-2';
+    
+    const colorPicker = document.createElement('input');
+    colorPicker.type = 'color';
+    colorPicker.className = 'w-10 h-10 rounded cursor-pointer';
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn btn-sm btn-error';
+    removeBtn.innerHTML = '×';
+    removeBtn.onclick = function() {
+        colorPickerWrapper.remove();
+    };
+    
+    colorPickerWrapper.appendChild(colorPicker);
+    colorPickerWrapper.appendChild(removeBtn);
+    colorPickers.appendChild(colorPickerWrapper);
 });
 </script>

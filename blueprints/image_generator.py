@@ -19,7 +19,14 @@ def get_model_arguments(model, data):
     }
 
     # Define model-specific arguments
-    if model == "fal-ai/flux-pro/v1.1-ultra":
+    if model == "fal-ai/recraft-v3":
+        model_args = {
+            "image_size": data.get("image_size", {"width": 1024, "height": 1024}),
+            "style": data.get("style", "realistic_image"),
+            "colors": data.get("colors", []),
+            "style_id": data.get("style_id")
+        }
+    elif model == "fal-ai/flux-pro/v1.1-ultra":
         model_args = {
             "aspect_ratio": data.get("aspect_ratio", "16:9"),
             "output_format": "jpeg",

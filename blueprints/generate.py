@@ -37,7 +37,9 @@ def generate_prompt_route():
             }), 400
 
         try:
-            prompt = generate_prompt(data['topic'])
+            # Pass the model to generate_prompt for model-specific prompt generation
+            model = data.get('model')
+            prompt = generate_prompt(data['topic'], model)
             return jsonify({'prompt': prompt})
         except AuthenticationError as e:
             return jsonify({
@@ -99,8 +101,11 @@ def generate_image_route():
         art_style = data.get('artStyle')
         model = data.get('model', 'fal-ai/flux-pro/v1.1')
         
-        # Add art style to prompt if provided
-        full_prompt = f"{prompt} in {art_style} style" if art_style else prompt
+        # Add art style to prompt if provided and not using Recraft V3
+        if art_style and model != 'fal-ai/recraft-v3':
+            full_prompt = f"{prompt} in {art_style} style"
+        else:
+            full_prompt = prompt
         
         # Prepare generation parameters
         generation_params = {
@@ -112,31 +117,35 @@ def generate_image_route():
         }
 
         # Add model-specific parameters
-        if model != 'fal-ai/flux-pro/v1.1-ultra':
-            # All models except Ultra use image_size
+        if model == 'fal-ai/recraft-v3':
+            generation_params.update({
+                'style': data.get('style', 'realistic_image'),
+                'colors': data.get('colors', []),
+                'style_id': data.get('style_id'),
+                'image_size': data.get('image_size', {
+                    'width': 1024,
+                    'height': 1024
+                })
+            })
+        elif model == 'fal-ai/flux-pro/v1.1-ultra':
+            generation_params['aspect_ratio'] = data.get('aspect_ratio', '16:9')
+        else:
             generation_params['image_size'] = data.get('image_size', {
                 'width': 1024,
                 'height': 1024
             })
 
         if model in ['fal-ai/flux-lora', 'fal-ai/flux-realism']:
-            # Add parameters specific to Lora and Realism models
             generation_params.update({
                 'num_inference_steps': data.get('num_inference_steps', 28),
                 'guidance_scale': data.get('guidance_scale', 3.5)
             })
 
         if model == 'fal-ai/flux-lora' and data.get('loras'):
-            # Add LoRA specific parameters
             generation_params['loras'] = data.get('loras')
 
         if model == 'fal-ai/flux-realism':
-            # Add Realism specific parameters
             generation_params['strength'] = data.get('strength', 1)
-
-        if model == 'fal-ai/flux-pro/v1.1-ultra':
-            # Add Ultra specific parameters
-            generation_params['aspect_ratio'] = data.get('aspect_ratio', '16:9')
         
         print(f"Generating image with parameters: {generation_params}")
         

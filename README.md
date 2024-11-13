@@ -10,12 +10,22 @@ A modern web application that uses AI to generate artwork from text descriptions
   - Flux Lora: Custom model fine-tuning support
   - Flux Dev: Development and testing
   - Flux Realism: Enhanced realism in generated images
+  - Recraft V3: Advanced style control with color customization
 
 - AI-powered Features:
   - Smart prompt enhancement using OpenAI
   - Image generation from enhanced prompts
   - Support for various aspect ratios and image sizes
   - 25+ artistic styles to choose from
+
+- Recraft V3 Features:
+  - 24 predefined styles including:
+    * Realistic image variations (B&W, HDR, natural light, etc.)
+    * Digital illustration variations (pixel art, hand drawn, etc.)
+    * Vector illustration variations (line art, linocut, etc.)
+  - Dynamic color control with multiple color support
+  - Custom style IDs support
+  - Optimized prompt handling for better results
 
 - User Experience:
   - Secure API key management with show/hide functionality
@@ -24,6 +34,7 @@ A modern web application that uses AI to generate artwork from text descriptions
   - Multiple download formats (WebP, PNG, JPEG)
   - Dark/Light theme support
   - Responsive modern UI using daisyUI and Tailwind CSS
+  - Dynamic color picker for Recraft V3 model
 
 - Admin Features:
   - Role-based access control (admin/user roles)
@@ -38,6 +49,7 @@ A modern web application that uses AI to generate artwork from text descriptions
   - Graceful error handling for API failures
   - Model-specific parameter optimization
   - Automatic image format conversion
+  - Smart prompt length management for different models
 
 ## Setup
 
@@ -98,10 +110,16 @@ The application will be available at `http://localhost:5000`
    - Flux Pro Ultra for aspect ratio control
    - Flux Lora for custom model support
    - Flux Realism for enhanced realism
+   - Recraft V3 for style and color control
 6. Select additional parameters:
-   - Artistic style
-   - Image size or aspect ratio
-   - Model-specific settings
+   - For standard models:
+     * Artistic style
+     * Image size or aspect ratio
+     * Model-specific settings
+   - For Recraft V3:
+     * Choose from 24 predefined styles
+     * Add/remove colors using the color picker
+     * Set image dimensions
 7. Click "Generate" to create your artwork
 8. Download your image in your preferred format (WebP, PNG, or JPEG)
 9. View all your generated images in your personal gallery
@@ -167,6 +185,7 @@ The application includes comprehensive error handling for:
 - Server errors
 - Authentication and authorization errors
 - Role-based access control violations
+- Model-specific limitations (e.g., prompt length)
 
 Each error is handled gracefully with clear user feedback and guidance for resolution.
 

@@ -52,6 +52,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     }
 
+    // Convert hex color to RGB
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    // Get colors from color pickers
+    function getSelectedColors() {
+        const colorPickers = document.querySelectorAll('#colorPickers input[type="color"]');
+        const colors = [];
+        colorPickers.forEach(picker => {
+            const rgb = hexToRgb(picker.value);
+            if (rgb) {
+                colors.push(rgb);
+            }
+        });
+        return colors;
+    }
+
     // API error handler
     function handleAPIError(error) {
         const errorMessage = error.message || error;
@@ -62,17 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             showToast(errorMessage, 'error');
         }
-    }
-
-    // Theme handling
-    const themeController = document.querySelector('.theme-controller');
-    if (themeController) {
-        themeController.checked = localStorage.getItem('theme') === 'dark';
-        themeController.addEventListener('change', function(e) {
-            const theme = e.target.checked ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-        });
     }
 
     const form = document.getElementById('imageGenForm');
@@ -91,12 +103,23 @@ document.addEventListener('DOMContentLoaded', () => {
     gsap.from('header', { duration: 1, y: -50, opacity: 0, ease: 'power3.out' });
     gsap.from('main', { duration: 1, y: 50, opacity: 0, ease: 'power3.out', delay: 0.3 });
 
-    // Toggle LoRA inputs visibility
+    // Toggle model-specific controls
     modelSelect?.addEventListener('change', (e) => {
         console.log('Model changed to:', e.target.value);
-        if (e.target.value === 'fal-ai/flux-lora') {
+        const recraftControls = document.getElementById('recraftStyleControl');
+        const recraftColorsControl = document.getElementById('recraftColorsControl');
+        
+        if (e.target.value === 'fal-ai/recraft-v3') {
+            recraftControls.classList.remove('hidden');
+            recraftColorsControl.classList.remove('hidden');
+            loraInputs.classList.add('hidden');
+        } else if (e.target.value === 'fal-ai/flux-lora') {
+            recraftControls.classList.add('hidden');
+            recraftColorsControl.classList.add('hidden');
             loraInputs.classList.remove('hidden');
         } else {
+            recraftControls.classList.add('hidden');
+            recraftColorsControl.classList.add('hidden');
             loraInputs.classList.add('hidden');
         }
     });
@@ -152,22 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             if (!response.ok) {
-                let errorMessage = data.error || 'Failed to enhance prompt';
-                let errorDetails = data.details;
-
-                // Handle specific error types
-                if (data.type === 'invalid_openai_key') {
-                    errorMessage = 'Invalid OpenAI API Key';
-                    errorDetails = 'Please check your OpenAI API key in settings';
-                } else if (data.type === 'rate_limit') {
-                    errorMessage = 'Rate Limit Exceeded';
-                    errorDetails = 'Please try again later';
-                } else if (data.type === 'missing_keys') {
-                    errorMessage = 'API Keys Required';
-                    errorDetails = 'Please add your API keys in settings';
-                }
-
-                throw new Error(errorMessage + (errorDetails ? `: ${errorDetails}` : ''));
+                throw new Error(data.error || 'Failed to enhance prompt');
             }
 
             if (data.prompt) {
@@ -216,8 +224,13 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             // Add model-specific parameters
-            if (selectedModel === 'fal-ai/flux-pro/v1.1-ultra') {
-                formData.aspect_ratio = '16:9';
+            if (selectedModel === 'fal-ai/recraft-v3') {
+                formData.style = document.getElementById('recraftStyle').value;
+                formData.colors = getSelectedColors();
+                formData.style_id = null;
+                formData.image_size = dimensions;
+            } else if (selectedModel === 'fal-ai/flux-pro/v1.1-ultra') {
+                formData.aspect_ratio = document.getElementById('aspectRatio').value;
             } else {
                 formData.image_size = dimensions;
             }
@@ -333,54 +346,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Art style tooltip functionality
-    const artStyleSelect = document.getElementById('artStyle');
-    const artStyleTooltip = document.getElementById('artStyleTooltip');
-
-    function showArtStyleDescription() {
-        const artStyle = artStyleSelect.value;
-        const descriptions = {
-            'Impressionism': 'Captures light and color, focusing on moments of time.',
-            'Cubism': 'Depicts objects from multiple angles, abstracted into geometric forms.',
-            'Surrealism': 'Merges dreamlike elements with reality, emphasizing the unconscious mind.',
-            'Abstract Expressionism': 'Focuses on spontaneous, abstract forms to express emotions.',
-            'Fauvism': 'Known for bold, vibrant colors and simple, exaggerated forms.',
-            'Art Nouveau': 'Features flowing lines and organic shapes inspired by nature.',
-            'Baroque': 'Ornate and dramatic, emphasizing movement, contrast, and detail.',
-            'Renaissance': 'Revival of classical themes, focusing on realism and proportion.',
-            'Gothic': 'Characterized by dark, intricate designs and dramatic elements.',
-            'Pop Art': 'Incorporates imagery from popular culture, often in a bold, graphic style.',
-            'Minimalism': 'Reduces art to its essential forms, focusing on simplicity.',
-            'Post-Impressionism': 'Builds on Impressionism, with more emphasis on structure and form.',
-            'Romanticism': 'Emphasizes emotion, nature, and individualism, often with dramatic scenes.',
-            'Realism': 'Depicts subjects truthfully, without idealization or exaggeration.',
-            'Symbolism': 'Uses symbolic imagery to convey deeper meanings and emotions.',
-            'Expressionism': 'Focuses on intense emotions through distorted forms and bold colors.',
-            'Neo-Classical': 'Inspired by classical antiquity, emphasizing harmony and order.',
-            'Constructivism': 'Geometric abstraction using industrial materials, focusing on function.',
-            'Futurism': 'Celebrates speed, technology, and dynamic movement.',
-            'Dadaism': 'An anti-art movement emphasizing absurdity and randomness.',
-            'Art Deco': 'Combines geometric patterns with bold colors and luxurious materials.',
-            'Op Art': 'Creates visual effects and illusions through patterns and colors.',
-            'Photorealism': 'Paintings that are extremely detailed, resembling photographs.',
-            'Bauhaus': 'Integrates art, craft, and technology, focusing on simplicity and function.',
-            'Illustrative': 'Detailed and narrative-driven, often used in books, comics, and advertising.'
-        };
-        
-        if (descriptions[artStyle]) {
-            artStyleTooltip.textContent = descriptions[artStyle];
-            artStyleTooltip.classList.remove('hidden');
-        } else {
-            artStyleTooltip.classList.add('hidden');
-        }
-    }
-
-    artStyleSelect?.addEventListener('change', showArtStyleDescription);
-
-    // Hide tooltip when clicking outside
-    document.addEventListener('click', function(event) {
-        if (artStyleTooltip && event.target !== artStyleSelect && event.target !== artStyleTooltip) {
-            artStyleTooltip.classList.add('hidden');
-        }
+    // Initialize controls based on default model
+    window.addEventListener('DOMContentLoaded', function() {
+        const model = document.getElementById('model');
+        const event = new Event('change');
+        model.dispatchEvent(event);
     });
 });
