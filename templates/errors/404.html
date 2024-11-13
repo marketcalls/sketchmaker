@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
+    <div class="card max-w-2xl w-full bg-base-200/50">
+        <div class="card-body items-center text-center">
+            <!-- Animated SVG -->
+            <div class="w-64 h-64 mb-8" id="error-illustration">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <!-- Search magnifying glass -->
+                    <circle id="search-circle" cx="11" cy="11" r="7" class="stroke-primary" stroke-width="2"/>
+                    <line id="search-handle" x1="16" y1="16" x2="20" y2="20" class="stroke-primary" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Question mark -->
+                    <path id="question-mark" d="M11 14V13C11 11.9 11.9 11 13 11H14C15.1 11 16 10.1 16 9V8C16 6.9 15.1 6 14 6H10C8.9 6 8 6.9 8 8" class="stroke-primary" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+                    <circle id="question-dot" cx="11" cy="16" r="1" class="fill-primary" opacity="0"/>
+                </svg>
+            </div>
+            
+            <h2 class="text-4xl font-bold mb-4">Page Not Found</h2>
+            <p class="text-lg mb-8 text-base-content/70">
+                The page you're looking for doesn't exist or has been moved.
+            </p>
+            
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button onclick="window.history.back()" class="btn btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Go Back
+                </button>
+                <a href="{{ url_for('core.index') }}" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                    </svg>
+                    Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // GSAP animation timeline
+    const tl = gsap.timeline({ repeat: -1 });
+    
+    // Initial state
+    gsap.set('#search-circle', { scale: 1, transformOrigin: 'center' });
+    gsap.set('#search-handle', { scale: 1, transformOrigin: '16px 16px' });
+    gsap.set('#question-mark, #question-dot', { opacity: 0 });
+    
+    // Animation sequence
+    tl.to('#search-circle', {
+        scale: 1.1,
+        duration: 0.5,
+        ease: 'power2.out'
+    })
+    .to('#search-handle', {
+        rotate: 15,
+        duration: 0.3,
+        ease: 'power2.out'
+    })
+    .to('#search-circle, #search-handle', {
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+    })
+    .to('#question-mark, #question-dot', {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+    })
+    .to('#question-mark', {
+        y: -5,
+        duration: 0.5,
+        ease: 'power2.inOut',
+        yoyo: true,
+        repeat: 1
+    })
+    .to('#question-mark, #question-dot', {
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.in'
+    })
+    .to('#search-circle, #search-handle', {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+    })
+    .to('#search-handle', {
+        rotate: 0,
+        duration: 0.3,
+        ease: 'power2.inOut'
+    })
+    .to('#search-circle', {
+        scale: 1,
+        duration: 0.5,
+        ease: 'power2.inOut'
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -2,19 +2,23 @@ from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required, current_user
 from models import db, User, APIProvider, AIModel
 from datetime import datetime
+from extensions import limiter, get_rate_limit_string
 
 core_bp = Blueprint('core', __name__)
 
 @core_bp.route('/')
+@limiter.limit(get_rate_limit_string())
 def index():
     return render_template('index.html', current_year=datetime.now().year)
 
 @core_bp.route('/dashboard')
+@limiter.limit(get_rate_limit_string())
 @login_required
 def dashboard():
     return render_template('dashboard.html')
 
 @core_bp.route('/settings')
+@limiter.limit(get_rate_limit_string())
 @login_required
 def settings():
     # Get all providers and models
@@ -26,6 +30,7 @@ def settings():
                          models=models)
 
 @core_bp.route('/settings/update', methods=['POST'])
+@limiter.limit(get_rate_limit_string())
 @login_required
 def update_settings():
     try:
@@ -72,6 +77,7 @@ def update_settings():
         return jsonify({'error': str(e)}), 500
 
 @core_bp.route('/settings/models/<int:provider_id>')
+@limiter.limit(get_rate_limit_string())
 @login_required
 def get_provider_models(provider_id):
     try:

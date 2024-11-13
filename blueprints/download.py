@@ -1,11 +1,13 @@
 from flask import Blueprint, send_file, abort
 from flask_login import login_required, current_user
 from models import Image
+from extensions import limiter, get_rate_limit_string
 import os
 
 download_bp = Blueprint('download', __name__)
 
 @download_bp.route('/download/<filename>/<format>')
+@limiter.limit(get_rate_limit_string())
 @login_required
 def download_image(filename, format):
     # Get base filename without extension

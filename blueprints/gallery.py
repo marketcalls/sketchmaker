@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template, abort
 from flask_login import login_required, current_user
 from models import Image
+from extensions import limiter, get_rate_limit_string
 import markdown2
 
 gallery_bp = Blueprint('gallery', __name__)
 
 @gallery_bp.route('/gallery')
+@limiter.limit(get_rate_limit_string())
 @login_required
 def view_gallery():
     # Get user's images ordered by creation date (newest first)
@@ -16,6 +18,7 @@ def view_gallery():
     return render_template('gallery.html', images=images)
 
 @gallery_bp.route('/gallery/<int:image_id>')
+@limiter.limit(get_rate_limit_string())
 @login_required
 def view_image(image_id):
     # Get the specific image and verify ownership

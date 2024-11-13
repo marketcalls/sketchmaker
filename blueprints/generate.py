@@ -4,6 +4,7 @@ from .image_generator import generate_image
 from .prompt_generator import generate_prompt
 from .clients import APIKeyError
 from models import db, Image
+from extensions import limiter, get_rate_limit_string
 import os
 from PIL import Image as PILImage
 import uuid
@@ -20,6 +21,7 @@ def get_absolute_path(filename):
     return os.path.join(current_app.root_path, 'static', 'images', filename)
 
 @generate_bp.route('/generate/prompt', methods=['POST'])
+@limiter.limit(get_rate_limit_string())
 @login_required
 def generate_prompt_route():
     data = request.get_json()
@@ -85,6 +87,7 @@ def generate_prompt_route():
         }), 500
 
 @generate_bp.route('/generate/image', methods=['POST'])
+@limiter.limit(get_rate_limit_string())
 @login_required
 def generate_image_route():
     try:
@@ -240,7 +243,7 @@ def generate_image_route():
                 db.session.add(new_image)
                 
                 saved_images.append({
-                    'png_url': f'/static/images/{png_filename}',  # Changed from image_url to png_url
+                    'png_url': f'/static/images/{png_filename}',
                     'webp_url': f'/static/images/{webp_filename}',
                     'jpeg_url': f'/static/images/{jpeg_filename}',
                     'image_url': f'/static/images/{png_filename}'  # Keep image_url for backward compatibility

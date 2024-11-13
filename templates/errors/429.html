@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Rate Limit Exceeded - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
+    <div class="card max-w-2xl w-full bg-base-200/50">
+        <div class="card-body items-center text-center">
+            <!-- Animated SVG -->
+            <div class="w-64 h-64 mb-8" id="error-illustration">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <!-- Clock face -->
+                    <circle id="clock-face" cx="12" cy="12" r="9" class="stroke-primary" stroke-width="2"/>
+                    <!-- Hour hand -->
+                    <line id="hour-hand" x1="12" y1="12" x2="12" y2="8" class="stroke-primary" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Minute hand -->
+                    <line id="minute-hand" x1="12" y1="12" x2="16" y2="12" class="stroke-primary" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Center dot -->
+                    <circle cx="12" cy="12" r="1" class="fill-primary"/>
+                    <!-- Warning icon -->
+                    <path id="warning-icon" d="M12 8v4m0 2v2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" class="stroke-error" stroke-width="2" stroke-linecap="round" opacity="0"/>
+                </svg>
+            </div>
+            
+            <h2 class="text-4xl font-bold mb-4">Rate Limit Exceeded</h2>
+            <p class="text-lg mb-2 text-base-content/70">
+                Too many requests. Please wait before trying again.
+            </p>
+            <p class="text-base mb-8 text-base-content/60">
+                You can try again in <span id="retry-timer" class="font-mono text-primary">{{ retry_after }}</span> seconds.
+            </p>
+            
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button onclick="window.history.back()" class="btn btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Go Back
+                </button>
+                <a href="{{ url_for('core.index') }}" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                    </svg>
+                    Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // GSAP animation timeline
+    const tl = gsap.timeline({ repeat: -1 });
+    
+    // Initial state
+    gsap.set('#hour-hand, #minute-hand', { transformOrigin: '12px 12px' });
+    gsap.set('#warning-icon', { opacity: 0, scale: 0.8, transformOrigin: 'center' });
+    
+    // Animation sequence
+    tl.to('#hour-hand', {
+        rotate: 360,
+        duration: 4,
+        ease: 'linear'
+    })
+    .to('#minute-hand', {
+        rotate: 360 * 12,
+        duration: 4,
+        ease: 'linear'
+    }, 0)
+    .to('#clock-face', {
+        scale: 1.1,
+        duration: 0.5,
+        ease: 'power2.out'
+    }, 3.5)
+    .to('#hour-hand, #minute-hand, #clock-face', {
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+    }, 3.8)
+    .to('#warning-icon', {
+        opacity: 1,
+        scale: 1,
+        duration: 0.3,
+        ease: 'back.out'
+    }, 4)
+    .to('#warning-icon', {
+        scale: 1.1,
+        duration: 0.5,
+        yoyo: true,
+        repeat: 1,
+        ease: 'power2.inOut'
+    }, 4.3)
+    .to('#warning-icon', {
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.3,
+        ease: 'power2.in'
+    }, 5.3)
+    .to('#hour-hand, #minute-hand, #clock-face', {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+    }, 5.6)
+    .to('#clock-face', {
+        scale: 1,
+        duration: 0.5,
+        ease: 'power2.inOut'
+    }, 5.6);
+
+    // Countdown timer
+    let timeLeft = parseInt(document.getElementById('retry-timer').textContent);
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            location.reload();
+        } else {
+            document.getElementById('retry-timer').textContent = timeLeft;
+        }
+    }, 1000);
+});
+</script>
+{% endblock %}
+{% endblock %}

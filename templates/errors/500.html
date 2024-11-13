@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
+    <div class="card max-w-2xl w-full bg-base-200/50">
+        <div class="card-body items-center text-center">
+            <!-- Animated SVG -->
+            <div class="w-64 h-64 mb-8" id="error-illustration">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <!-- Server rack -->
+                    <rect id="server-1" x="4" y="4" width="16" height="4" rx="1" class="stroke-primary" stroke-width="2"/>
+                    <rect id="server-2" x="4" y="10" width="16" height="4" rx="1" class="stroke-primary" stroke-width="2"/>
+                    <rect id="server-3" x="4" y="16" width="16" height="4" rx="1" class="stroke-primary" stroke-width="2"/>
+                    <!-- Status lights -->
+                    <circle id="light-1" cx="7" cy="6" r="1" class="fill-success"/>
+                    <circle id="light-2" cx="7" cy="12" r="1" class="fill-success"/>
+                    <circle id="light-3" cx="7" cy="18" r="1" class="fill-success"/>
+                    <!-- Error symbols -->
+                    <path id="error-x-1" d="M18 6L16 8M16 6L18 8" class="stroke-error" stroke-width="2" stroke-linecap="round" opacity="0"/>
+                    <path id="error-x-2" d="M18 12L16 14M16 12L18 14" class="stroke-error" stroke-width="2" stroke-linecap="round" opacity="0"/>
+                    <path id="error-x-3" d="M18 18L16 20M16 18L18 20" class="stroke-error" stroke-width="2" stroke-linecap="round" opacity="0"/>
+                </svg>
+            </div>
+            
+            <h2 class="text-4xl font-bold mb-4 glitch-text" data-text="Server Error">Server Error</h2>
+            <p class="text-lg mb-8 text-base-content/70">
+                Something went wrong on our end. Our team has been notified and is working to fix it.
+            </p>
+            
+            <div class="stats shadow mb-8">
+                <div class="stat">
+                    <div class="stat-title">Error Code</div>
+                    <div class="stat-value text-error">500</div>
+                    <div class="stat-desc">Internal Server Error</div>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button onclick="window.history.back()" class="btn btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Go Back
+                </button>
+                <a href="{{ url_for('core.index') }}" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                    </svg>
+                    Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+.glitch-text {
+    position: relative;
+    animation: glitch 1s infinite;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch-text::before {
+    left: 2px;
+    text-shadow: -2px 0 #ff00c1;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+    left: -2px;
+    text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+    animation: glitch-anim2 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch {
+    2%, 64% {
+        transform: translate(2px,0) skew(0deg);
+    }
+    4%, 60% {
+        transform: translate(-2px,0) skew(0deg);
+    }
+    62% {
+        transform: translate(0,0) skew(5deg);
+    }
+}
+
+@keyframes glitch-anim {
+    0% {
+        clip: rect(31px, 9999px, 94px, 0);
+    }
+    20% {
+        clip: rect(62px, 9999px, 42px, 0);
+    }
+    40% {
+        clip: rect(16px, 9999px, 78px, 0);
+    }
+    60% {
+        clip: rect(94px, 9999px, 38px, 0);
+    }
+    80% {
+        clip: rect(67px, 9999px, 11px, 0);
+    }
+    100% {
+        clip: rect(40px, 9999px, 53px, 0);
+    }
+}
+
+@keyframes glitch-anim2 {
+    0% {
+        clip: rect(65px, 9999px, 119px, 0);
+    }
+    20% {
+        clip: rect(82px, 9999px, 73px, 0);
+    }
+    40% {
+        clip: rect(128px, 9999px, 78px, 0);
+    }
+    60% {
+        clip: rect(38px, 9999px, 92px, 0);
+    }
+    80% {
+        clip: rect(133px, 9999px, 51px, 0);
+    }
+    100% {
+        clip: rect(91px, 9999px, 100px, 0);
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // GSAP animation timeline
+    const tl = gsap.timeline({ repeat: -1 });
+    
+    // Initial state
+    gsap.set('#error-x-1, #error-x-2, #error-x-3', { opacity: 0 });
+    
+    // Animation sequence
+    tl.to(['#server-1', '#server-2', '#server-3'], {
+        x: 'random(-2, 2)',
+        y: 'random(-2, 2)',
+        duration: 0.1,
+        ease: 'none',
+        repeat: 5,
+        yoyo: true
+    })
+    .to('#light-1', {
+        fill: '#ef4444',
+        duration: 0.2
+    }, 0)
+    .to('#error-x-1', {
+        opacity: 1,
+        duration: 0.2
+    }, 0)
+    .to('#light-2', {
+        fill: '#ef4444',
+        duration: 0.2
+    }, 0.2)
+    .to('#error-x-2', {
+        opacity: 1,
+        duration: 0.2
+    }, 0.2)
+    .to('#light-3', {
+        fill: '#ef4444',
+        duration: 0.2
+    }, 0.4)
+    .to('#error-x-3', {
+        opacity: 1,
+        duration: 0.2
+    }, 0.4)
+    .to(['#server-1', '#server-2', '#server-3'], {
+        x: 'random(-4, 4)',
+        y: 'random(-4, 4)',
+        duration: 0.2,
+        ease: 'none',
+        repeat: 3,
+        yoyo: true
+    }, 0.6)
+    .to(['#light-1', '#light-2', '#light-3'], {
+        fill: '#22c55e',
+        duration: 0.3
+    }, 1.4)
+    .to(['#error-x-1', '#error-x-2', '#error-x-3'], {
+        opacity: 0,
+        duration: 0.3
+    }, 1.4)
+    .to(['#server-1', '#server-2', '#server-3'], {
+        x: 0,
+        y: 0,
+        duration: 0.3
+    }, 1.4);
+});
+</script>
+{% endblock %}
+{% endblock %}

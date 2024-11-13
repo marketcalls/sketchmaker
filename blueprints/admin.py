@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from functools import wraps
 from models import db, User
+from extensions import limiter, get_rate_limit_string
 
 admin = Blueprint('admin', __name__)
 
@@ -15,6 +16,7 @@ def admin_required(f):
     return decorated_function
 
 @admin.route('/manage')
+@limiter.limit(get_rate_limit_string())
 @login_required
 @admin_required
 def manage():
@@ -22,6 +24,7 @@ def manage():
     return render_template('admin/manage.html', users=users)
 
 @admin.route('/manage/user/<int:user_id>', methods=['POST'])
+@limiter.limit(get_rate_limit_string())
 @login_required
 @admin_required
 def update_user(user_id):
