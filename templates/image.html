@@ -20,12 +20,14 @@
                     <img src="{{ image.get_url('webp') }}" 
                          alt="Generated image" 
                          class="w-full rounded-lg shadow-lg">
-                    <!-- Dimensions Badge -->
+                    <!-- Dimensions Badge - Only show if dimensions are available -->
+                    {% if image.width and image.height %}
                     <div class="absolute top-4 right-4">
                         <div class="badge badge-lg bg-base-300/80 backdrop-blur-sm text-base-content px-3 py-3">
                             {{ image.width }}x{{ image.height }}
                         </div>
                     </div>
+                    {% endif %}
                 </div>
                 
                 <!-- Download Options -->
