@@ -1,27 +1,24 @@
-import os
 import sys
+import fal_client
 
 def test_fal_key(key):
     """Test if a FAL API key works"""
     print(f"Testing FAL key: {key}")
     
     try:
-        # Set the environment variable before importing fal_client
-        os.environ['FAL_KEY'] = key
-        
-        # Import fal_client after setting environment variable
-        import fal_client
+        # Create a sync client with the API key
+        client = fal_client.SyncClient(key=key)
         
         def on_queue_update(update):
             if isinstance(update, fal_client.InProgress):
                 for log in update.logs:
                     print(f"Log: {log['message']}")
-
-        # Try to generate a test image
-        result = fal_client.subscribe(
+        
+        # Use the client's subscribe method
+        result = client.subscribe(
             "fal-ai/flux-pro/v1.1",
             arguments={
-                "prompt": "test prompt",
+                "prompt": "man on the moon",
                 "image_size": {
                     "width": 512,
                     "height": 512
@@ -36,6 +33,11 @@ def test_fal_key(key):
         )
         
         print("Success! Result:", result)
+        
+        # Print the image URL separately for easy access
+        if result.get('images') and len(result['images']) > 0:
+            print("\nGenerated Image URL:", result['images'][0]['url'])
+            
         return True
     except Exception as e:
         print(f"Error: {str(e)}")

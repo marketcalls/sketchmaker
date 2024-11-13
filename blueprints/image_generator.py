@@ -4,6 +4,7 @@ import requests
 from flask import current_app
 from .clients import init_fal_client
 import io
+import fal_client
 
 def generate_image(prompt, image_size):
     """Generate image using FAL API with user's API key"""
@@ -17,7 +18,7 @@ def generate_image(prompt, image_size):
         print(f"Generating image with prompt: {prompt}, size: {image_size}")  # Debug log
 
         # Initialize FAL client and get instance
-        fal_client = init_fal_client()
+        client = init_fal_client()
 
         def on_queue_update(update):
             if isinstance(update, fal_client.InProgress):
@@ -25,7 +26,7 @@ def generate_image(prompt, image_size):
                     print(f"FAL generation log: {log['message']}")
 
         # Generate image using FAL API
-        result = fal_client.subscribe(
+        result = client.subscribe(
             "fal-ai/flux-pro/v1.1",
             arguments={
                 "prompt": prompt,

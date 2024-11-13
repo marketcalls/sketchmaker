@@ -1,7 +1,7 @@
 from openai import OpenAI
 from flask import current_app, g
 from flask_login import current_user
-import os
+import fal_client
 
 class APIKeyError(Exception):
     """Exception raised when required API keys are missing"""
@@ -25,18 +25,16 @@ def init_fal_client():
     print(f"\nInitializing FAL client with key: {fal_key}")
     
     try:
-        # Set the environment variable
-        os.environ['FAL_KEY'] = fal_key
-        
-        # Import fal_client after setting environment variable
-        import fal_client
+        # Create a sync client with the API key
+        client = fal_client.SyncClient(key=fal_key)
         
         def on_queue_update(update):
             if isinstance(update, fal_client.InProgress):
                 for log in update.logs:
                     print(f"FAL log: {log['message']}")
 
-        result = fal_client.subscribe(
+        # Test the client
+        result = client.subscribe(
             "fal-ai/flux-pro/v1.1",
             arguments={
                 "prompt": "test prompt",
@@ -54,7 +52,7 @@ def init_fal_client():
         )
         print("FAL client initialized and tested successfully")
         print(f"Test result: {result}")
-        return fal_client
+        return client
     except Exception as e:
         print(f"Error initializing FAL client: {str(e)}")
         if "authentication failed" in str(e).lower():

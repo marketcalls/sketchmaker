@@ -4,6 +4,7 @@ from datetime import datetime
 from models import db
 import os
 from openai import OpenAI, AuthenticationError
+import fal_client
 
 core_bp = Blueprint('core', __name__)
 
@@ -27,11 +28,8 @@ def test_fal_key(key):
     try:
         print(f"\nTesting FAL key: {key}")
         
-        # Set the environment variable before importing fal_client
-        os.environ['FAL_KEY'] = key
-        
-        # Import fal_client after setting environment variable
-        import fal_client
+        # Create a sync client with the API key
+        client = fal_client.SyncClient(key=key)
         
         def on_queue_update(update):
             if isinstance(update, fal_client.InProgress):
@@ -39,7 +37,7 @@ def test_fal_key(key):
                     print(f"Log: {log['message']}")
 
         # Try to generate a test image
-        result = fal_client.subscribe(
+        result = client.subscribe(
             "fal-ai/flux-pro/v1.1",
             arguments={
                 "prompt": "test prompt",
