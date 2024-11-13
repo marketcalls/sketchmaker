@@ -8,11 +8,12 @@
     <div class="mb-8 p-6 bg-base-200 rounded-lg">
         <h2 class="text-2xl font-semibold mb-6">AI Provider Settings</h2>
         
-        <form id="providerSettingsForm" class="space-y-6">
+        <div id="settingsForm" class="space-y-6">
             <!-- Provider Selection -->
             <div class="form-control w-full max-w-md">
                 <label class="label">
                     <span class="label-text text-lg">API Provider</span>
+                    <span class="label-text-alt text-error hidden" id="providerError">Please select a provider</span>
                 </label>
                 <select id="apiProvider" class="select select-bordered w-full" name="provider">
                     <option value="">Select Provider</option>
@@ -28,6 +29,7 @@
             <div class="form-control w-full max-w-md">
                 <label class="label">
                     <span class="label-text text-lg">AI Model</span>
+                    <span class="label-text-alt text-error hidden" id="modelError">Please select a model</span>
                 </label>
                 <select id="aiModel" class="select select-bordered w-full" name="model">
                     <option value="">Select Model</option>
@@ -43,6 +45,7 @@
             <div id="promptKeyContainer" class="form-control w-full max-w-md">
                 <label class="label">
                     <span id="promptKeyLabel" class="label-text text-lg">Prompt API Key</span>
+                    <span class="label-text-alt text-error hidden" id="promptKeyError">API key is required</span>
                 </label>
                 <div class="relative">
                     <input type="password" id="promptApiKey" name="prompt_api_key" 
@@ -59,6 +62,7 @@
             <div class="form-control w-full max-w-md">
                 <label class="label">
                     <span class="label-text text-lg">Image Generation API Key (FAL)</span>
+                    <span class="label-text-alt text-error hidden" id="falKeyError">FAL API key is required</span>
                 </label>
                 <div class="relative">
                     <input type="password" id="falKey" name="fal_key" 
@@ -72,15 +76,25 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Save Settings</button>
-        </form>
+            <button type="button" onclick="handleSubmit()" class="btn btn-primary">Save Settings</button>
+        </div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
 </div>
 
 <script>
+let currentProvider = '{{ current_user.selected_provider_id }}';
+let currentModel = '{{ current_user.selected_model_id }}';
+
 function togglePassword(inputId) {
     const input = document.getElementById(inputId);
+    if (!input) return;
+    
     const button = input.nextElementSibling;
+    if (!button) return;
+    
     if (input.type === "password") {
         input.type = "text";
         button.textContent = "Hide";
@@ -90,13 +104,160 @@ function togglePassword(inputId) {
     }
 }
 
+function showError(elementId, show = true) {
+    const errorElement = document.getElementById(elementId);
+    if (!errorElement) return;
+    
+    const inputId = elementId.replace('Error', '');
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    if (show) {
+        errorElement.classList.remove('hidden');
+        input.classList.add('input-error');
+    } else {
+        errorElement.classList.add('hidden');
+        input.classList.remove('input-error');
+    }
+}
+
+function validateForm() {
+    let isValid = true;
+    let errors = [];
+    
+    const elements = {
+        apiProvider: 'API Provider is required',
+        aiModel: 'AI Model is required',
+        promptApiKey: 'Prompt API Key is required',
+        falKey: 'FAL API Key is required'
+    };
+    
+    for (const [elementId, errorMessage] of Object.entries(elements)) {
+        const element = document.getElementById(elementId);
+        if (!element || !element.value) {
+            showError(elementId + 'Error', true);
+            errors.push(errorMessage);
+            isValid = false;
+        } else {
+            showError(elementId + 'Error', false);
+        }
+    }
+    
+    if (!isValid) {
+        showToast('Please fix the following errors:\n' + errors.join('\n'), 'error');
+    }
+    
+    return isValid;
+}
+
+async function handleSubmit() {
+    if (!validateForm()) {
+        return;
+    }
+    
+    const providerSelect = document.getElementById('apiProvider');
+    const modelSelect = document.getElementById('aiModel');
+    const promptKeyInput = document.getElementById('promptApiKey');
+    
+    if (!providerSelect || !modelSelect || !promptKeyInput) {
+        showToast('Form elements not found', 'error');
+        return;
+    }
+    
+    const selectedProvider = providerSelect.options[providerSelect.selectedIndex].text;
+    const formData = {
+        provider_id: providerSelect.value,
+        model_id: modelSelect.value,
+        fal_key: document.getElementById('falKey')?.value || ''
+    };
+    
+    // Add the appropriate API key based on selected provider
+    switch(selectedProvider) {
+        case 'OpenAI':
+            formData.openai_api_key = promptKeyInput.value;
+            break;
+        case 'Anthropic':
+            formData.anthropic_api_key = promptKeyInput.value;
+            break;
+        case 'Google Gemini':
+            formData.gemini_api_key = promptKeyInput.value;
+            break;
+        case 'Groq':
+            formData.groq_api_key = promptKeyInput.value;
+            break;
+    }
+    
+    try {
+        const response = await fetch('/settings/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        if (response.ok) {
+            showToast('Settings saved successfully', 'success');
+            // Update current values after successful save
+            currentProvider = formData.provider_id;
+            currentModel = formData.model_id;
+        } else {
+            const data = await response.json();
+            showToast(data.error || 'Failed to save settings', 'error');
+        }
+    } catch (error) {
+        showToast('An error occurred while saving settings', 'error');
+    }
+}
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    
+    const icons = {
+        success: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                 </svg>`,
+        error: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+               </svg>`,
+        info: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>`
+    };
+
+    const typeClasses = {
+        success: 'bg-success text-success-content',
+        error: 'bg-error text-error-content',
+        info: 'bg-info text-info-content'
+    };
+
+    toast.className = `alert ${typeClasses[type]} shadow-lg max-w-sm`;
+    toast.innerHTML = `
+        <div class="flex items-center gap-2">
+            ${icons[type]}
+            <span class="flex-1">${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="btn btn-ghost btn-xs">×</button>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const providerSelect = document.getElementById('apiProvider');
     const modelSelect = document.getElementById('aiModel');
     const promptKeyInput = document.getElementById('promptApiKey');
     const promptKeyLabel = document.getElementById('promptKeyLabel');
     
-    // Function to update prompt API key field based on selected provider
+    if (!providerSelect || !modelSelect || !promptKeyInput || !promptKeyLabel) {
+        console.error('Required form elements not found');
+        return;
+    }
+    
     function updatePromptKeyField() {
         const selectedProvider = providerSelect.options[providerSelect.selectedIndex];
         if (selectedProvider && selectedProvider.value) {
@@ -104,19 +265,28 @@ document.addEventListener('DOMContentLoaded', function() {
             promptKeyLabel.textContent = `${providerName} API Key`;
             promptKeyInput.placeholder = `Enter ${providerName} API Key`;
             
-            // Set current value based on provider
-            switch(providerName) {
-                case 'OpenAI':
-                    promptKeyInput.value = '{{ current_user.openai_api_key or "" }}';
-                    break;
-                case 'Anthropic':
-                    promptKeyInput.value = '{{ current_user.anthropic_api_key or "" }}';
-                    break;
-                case 'Google Gemini':
-                    promptKeyInput.value = '{{ current_user.gemini_api_key or "" }}';
-                    break;
-                default:
-                    promptKeyInput.value = '';
+            if (currentProvider !== selectedProvider.value) {
+                switch(providerName) {
+                    case 'OpenAI':
+                        promptKeyInput.value = '{{ current_user.openai_api_key or "" }}';
+                        break;
+                    case 'Anthropic':
+                        promptKeyInput.value = '{{ current_user.anthropic_api_key or "" }}';
+                        break;
+                    case 'Google Gemini':
+                        promptKeyInput.value = '{{ current_user.gemini_api_key or "" }}';
+                        break;
+                    case 'Groq':
+                        promptKeyInput.value = '{{ current_user.groq_api_key or "" }}';
+                        break;
+                    default:
+                        promptKeyInput.value = '';
+                }
+                currentProvider = selectedProvider.value;
+            }
+            
+            if (promptKeyInput.value) {
+                showError('promptKeyError', false);
             }
         } else {
             promptKeyLabel.textContent = 'Prompt API Key';
@@ -125,7 +295,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Filter models based on selected provider
     function updateModelOptions() {
         const selectedProviderId = providerSelect.value;
         const options = modelSelect.options;
@@ -139,70 +308,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        if (modelSelect.selectedOptions[0].style.display === 'none') {
-            modelSelect.value = '';
+        if (currentProvider !== selectedProviderId) {
+            if (modelSelect.selectedOptions[0].style.display === 'none') {
+                modelSelect.value = '';
+            }
+            currentProvider = selectedProviderId;
         }
         
         updatePromptKeyField();
+        
+        if (selectedProviderId) {
+            showError('providerError', false);
+        }
     }
     
-    providerSelect.addEventListener('change', updateModelOptions);
-    updateModelOptions(); // Initial filter
+    providerSelect.addEventListener('change', function() {
+        updateModelOptions();
+        if (this.value) showError('providerError', false);
+    });
     
-    // Handle settings form submission
-    document.getElementById('providerSettingsForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const selectedProvider = providerSelect.options[providerSelect.selectedIndex].text;
-        const formData = {
-            provider_id: providerSelect.value,
-            model_id: modelSelect.value,
-            fal_key: document.getElementById('falKey').value
-        };
-        
-        // Add the appropriate API key based on selected provider
-        switch(selectedProvider) {
-            case 'OpenAI':
-                formData.openai_api_key = promptKeyInput.value;
-                break;
-            case 'Anthropic':
-                formData.anthropic_api_key = promptKeyInput.value;
-                break;
-            case 'Google Gemini':
-                formData.gemini_api_key = promptKeyInput.value;
-                break;
-        }
-        
-        try {
-            const response = await fetch('/settings/update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            if (response.ok) {
-                showAlert('Settings saved successfully', 'success');
-            } else {
-                const data = await response.json();
-                showAlert(data.error || 'Failed to save settings', 'error');
-            }
-        } catch (error) {
-            showAlert('An error occurred while saving settings', 'error');
+    modelSelect.addEventListener('change', function() {
+        if (this.value) {
+            showError('modelError', false);
+            currentModel = this.value;
         }
     });
+    
+    promptKeyInput.addEventListener('input', function() {
+        if (this.value) showError('promptKeyError', false);
+    });
+    
+    const falKeyInput = document.getElementById('falKey');
+    if (falKeyInput) {
+        falKeyInput.addEventListener('input', function() {
+            if (this.value) showError('falKeyError', false);
+        });
+    }
+    
+    updateModelOptions();
 });
-
-function showAlert(message, type) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} fixed top-4 right-4 w-auto max-w-sm`;
-    alertDiv.innerHTML = `
-        <span>${message}</span>
-        <button onclick="this.parentElement.remove()" class="btn btn-ghost btn-sm">×</button>
-    `;
-    document.body.appendChild(alertDiv);
-    setTimeout(() => alertDiv.remove(), 5000);
-}
 </script>
 {% endblock %}

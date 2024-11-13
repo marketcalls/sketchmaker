@@ -5,6 +5,7 @@ import fal_client
 import anthropic
 import google.generativeai as genai
 from google.api_core import exceptions as google_exceptions
+from groq import Groq
 
 class APIKeyError(Exception):
     """Exception raised when required API keys are missing"""
@@ -103,6 +104,32 @@ class GeminiClient(BaseAIClient):
         except Exception as e:
             raise APIKeyError(f"Error generating completion with Google Gemini: {str(e)}")
 
+class GroqClient(BaseAIClient):
+    def __init__(self, api_key):
+        super().__init__(api_key)
+        self.client = Groq(api_key=api_key)
+
+    def generate_completion(self, system_content, user_content, model, temperature=0.7, max_tokens=500):
+        try:
+            completion = self.client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": system_content},
+                    {"role": "user", "content": user_content}
+                ],
+                temperature=temperature,
+                max_tokens=max_tokens,
+                top_p=1,
+                stream=False,
+                stop=None
+            )
+            return completion.choices[0].message.content.strip()
+        except Exception as e:
+            error_message = str(e).lower()
+            if "authentication" in error_message or "api key" in error_message:
+                raise APIKeyError("Invalid Groq API key. Please check your API key in settings.")
+            raise APIKeyError(f"Error generating completion with Groq: {str(e)}")
+
 def get_ai_client():
     """Get the appropriate AI client based on user's selected provider"""
     from models import APIProvider, AIModel
@@ -125,6 +152,8 @@ def get_ai_client():
         return AnthropicClient(api_key)
     elif provider.name == "Google Gemini":
         return GeminiClient(api_key)
+    elif provider.name == "Groq":
+        return GroqClient(api_key)
     else:
         raise ValueError(f"Unsupported AI provider: {provider.name}")
 

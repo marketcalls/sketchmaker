@@ -57,6 +57,8 @@ def update_settings():
             current_user.anthropic_api_key = data['anthropic_api_key']
         if 'gemini_api_key' in data:
             current_user.gemini_api_key = data['gemini_api_key']
+        if 'groq_api_key' in data:
+            current_user.groq_api_key = data['groq_api_key']
         if 'fal_key' in data:
             current_user.fal_key = data['fal_key']
         

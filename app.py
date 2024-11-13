@@ -67,7 +67,8 @@ def init_api_providers(app):
             openai = APIProvider(name="OpenAI")
             anthropic = APIProvider(name="Anthropic")
             gemini = APIProvider(name="Google Gemini")
-            db.session.add_all([openai, anthropic, gemini])
+            groq = APIProvider(name="Groq")
+            db.session.add_all([openai, anthropic, gemini, groq])
             db.session.commit()
 
             # OpenAI models
@@ -100,6 +101,20 @@ def init_api_providers(app):
             ]
             for model in gemini_models:
                 db.session.add(AIModel(name=model, provider_id=gemini.id))
+
+            # Groq models
+            groq_models = [
+                "llama-3.1-70b-versatile",
+                "llama-3.1-8b-instant",
+                "llama-3.2-11b-text-preview",
+                "llama-3.2-11b-vision-preview",
+                "llama-3.2-1b-preview",
+                "llama-3.2-3b-preview",
+                "llama-3.2-90b-text-preview",
+                "llama-3.2-90b-vision-preview"
+            ]
+            for model in groq_models:
+                db.session.add(AIModel(name=model, provider_id=groq.id))
 
             db.session.commit()
 

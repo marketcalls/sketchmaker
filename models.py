@@ -8,13 +8,13 @@ db = SQLAlchemy()
 
 class APIProvider(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True, nullable=False)  # e.g. "OpenAI", "Anthropic", "Google Gemini"
+    name = db.Column(db.String(50), unique=True, nullable=False)  # e.g. "OpenAI", "Anthropic", "Google Gemini", "Groq"
     is_active = db.Column(db.Boolean, default=True)
     models = db.relationship('AIModel', backref='provider', lazy=True)
 
 class AIModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)  # e.g. "gpt-4o", "claude-3-sonnet"
+    name = db.Column(db.String(100), nullable=False)  # e.g. "gpt-4o", "claude-3-sonnet", "llama-3.1-8b-instant"
     provider_id = db.Column(db.Integer, db.ForeignKey('api_provider.id'), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -37,6 +37,7 @@ class User(UserMixin, db.Model):
     openai_api_key = db.Column(db.String(255))
     anthropic_api_key = db.Column(db.String(255))
     gemini_api_key = db.Column(db.String(255))
+    groq_api_key = db.Column(db.String(255))
     fal_key = db.Column(db.String(255))
 
     def get_api_keys(self):
@@ -45,6 +46,7 @@ class User(UserMixin, db.Model):
             'openai_api_key': self.openai_api_key,
             'anthropic_api_key': self.anthropic_api_key,
             'gemini_api_key': self.gemini_api_key,
+            'groq_api_key': self.groq_api_key,
             'fal_key': self.fal_key
         }
 
@@ -58,6 +60,8 @@ class User(UserMixin, db.Model):
                 return self.anthropic_api_key
             elif provider.name == 'Google Gemini':
                 return self.gemini_api_key
+            elif provider.name == 'Groq':
+                return self.groq_api_key
         return None
 
     def has_required_api_keys(self):

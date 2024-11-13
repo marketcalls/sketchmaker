@@ -4,16 +4,22 @@ A modern web application that uses AI to generate artwork from text descriptions
 
 ## Features
 
-- Multiple AI Model Support:
-  - Flux Pro: Standard image generation
-  - Flux Pro Ultra: High-quality generation with aspect ratio control
+- AI Provider Support for Prompt Enhancement:
+  - OpenAI: Advanced language models for high-quality prompt enhancement
+  - Anthropic: State-of-the-art language models with strong reasoning capabilities
+  - Google Gemini: Next-generation AI models with multimodal understanding
+  - Groq: High-performance inference platform with ultra-low latency
+
+- Image Generation Models (FAL):
+  - Flux Pro: Standard image generation with high-quality output
+  - Flux Pro Ultra: Advanced generation with aspect ratio control
   - Flux Lora: Custom model fine-tuning support
-  - Flux Dev: Development and testing
-  - Flux Realism: Enhanced realism in generated images
+  - Flux Dev: Development and testing environment
+  - Flux Realism: Enhanced photorealistic image generation
   - Recraft V3: Advanced style control with color customization
 
 - AI-powered Features:
-  - Smart prompt enhancement using OpenAI
+  - Smart prompt enhancement using selected AI provider
   - Image generation from enhanced prompts
   - Support for various aspect ratios and image sizes
   - 25+ artistic styles to choose from
@@ -75,7 +81,7 @@ pip install -r requirements.txt
 cp .env.sample .env
 ```
 Edit `.env` and add your:
-- OpenAI API key (for prompt enhancement)
+- AI Provider API keys (OpenAI, Anthropic, Google Gemini, or Groq)
 - FAL API key (for image generation)
 - Secret key for Flask sessions
 - Other required configuration
@@ -101,28 +107,18 @@ The application will be available at `http://localhost:5000`
    - The first user to register automatically becomes an administrator
    - Subsequent users are registered as regular users
 2. Add your API keys in the settings page:
-   - OpenAI API key for prompt enhancement
-   - FAL API key for image generation
+   - Choose your preferred AI provider (OpenAI, Anthropic, Google Gemini, or Groq)
+   - Add the corresponding API key
+   - Add FAL API key for image generation
 3. Navigate to the dashboard
 4. Enter a description of the artwork you want to generate
-5. Choose an AI model:
-   - Flux Pro for standard generation
-   - Flux Pro Ultra for aspect ratio control
-   - Flux Lora for custom model support
-   - Flux Realism for enhanced realism
-   - Recraft V3 for style and color control
-6. Select additional parameters:
-   - For standard models:
-     * Artistic style
-     * Image size or aspect ratio
-     * Model-specific settings
-   - For Recraft V3:
-     * Choose from 24 predefined styles
-     * Add/remove colors using the color picker
-     * Set image dimensions
-7. Click "Generate" to create your artwork
-8. Download your image in your preferred format (WebP, PNG, or JPEG)
-9. View all your generated images in your personal gallery
+5. Choose your preferred:
+   - AI provider for prompt enhancement
+   - FAL model for image generation
+   - Image parameters (size, style, etc.)
+6. Click "Generate" to create your artwork
+7. Download your image in your preferred format (WebP, PNG, or JPEG)
+8. View all your generated images in your personal gallery
 
 ## Admin Usage
 
@@ -170,8 +166,18 @@ sketchmaker/
 - Flask (Python web framework)
 - SQLite & SQLAlchemy (Database)
 - Flask-Login (Authentication)
-- OpenAI API (Prompt enhancement)
-- FAL API (Image generation)
+- Multiple AI Providers:
+  - OpenAI API
+  - Anthropic API
+  - Google Gemini API
+  - Groq API
+- FAL API (Image generation models):
+  - Flux Pro
+  - Flux Pro Ultra
+  - Flux Lora
+  - Flux Dev
+  - Flux Realism
+  - Recraft V3
 - daisyUI & Tailwind CSS (UI components)
 - Pillow (PIL) (Image processing)
 
