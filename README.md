@@ -35,7 +35,7 @@ A modern web application that uses AI to generate artwork from text descriptions
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/sketchmaker.git
+git clone https://github.com/marketcalls/sketchmaker.git
 cd sketchmaker
 ```
 
@@ -153,4 +153,4 @@ Each error is handled gracefully with clear user feedback and guidance for resol
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the AGPL v3.0 License - see the LICENSE file for details.
