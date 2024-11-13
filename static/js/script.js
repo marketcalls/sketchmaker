@@ -67,10 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Theme handling
     const themeController = document.querySelector('.theme-controller');
     if (themeController) {
-        // Set initial state
         themeController.checked = localStorage.getItem('theme') === 'dark';
-        
-        // Handle theme changes
         themeController.addEventListener('change', function(e) {
             const theme = e.target.checked ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', theme);
@@ -96,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Toggle LoRA inputs visibility
     modelSelect?.addEventListener('change', (e) => {
+        console.log('Model changed to:', e.target.value);
         if (e.target.value === 'fal-ai/flux-lora') {
             loraInputs.classList.remove('hidden');
         } else {
@@ -104,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Enhance prompt button handler
-    enhancePromptButton.addEventListener('click', async () => {
+    enhancePromptButton?.addEventListener('click', async () => {
         await enhancePrompt();
     });
 
@@ -129,32 +127,16 @@ document.addEventListener('DOMContentLoaded', () => {
         enhancedPromptContainer.classList.add('hidden');
 
         try {
-            // Get all form parameters
             const formData = {
                 topic: reEnhance ? enhancedPromptText.value : userInput.value,
-                image_size: document.getElementById('imageSize').value,
+                model: modelSelect.value,
                 art_style: document.getElementById('artStyle').value,
                 color_scheme: document.getElementById('colorScheme').value,
                 lighting_mood: document.getElementById('lightingMood').value,
                 subject_focus: document.getElementById('subjectFocus').value,
                 background_style: document.getElementById('backgroundStyle').value,
-                effects_filters: document.getElementById('effectsFilters').value,
-                model: document.getElementById('model').value,
-                num_inference_steps: parseInt(document.getElementById('numInferenceSteps').value),
-                guidance_scale: parseFloat(document.getElementById('guidanceScale').value)
+                effects_filters: document.getElementById('effectsFilters').value
             };
-
-            // Add seed if provided
-            const seed = document.getElementById('seed').value;
-            if (seed) {
-                formData.seed = parseInt(seed);
-            }
-
-            // Add LoRA parameters if applicable
-            if (modelSelect.value === 'fal-ai/flux-lora') {
-                formData.lora_path = document.getElementById('loraPath').value;
-                formData.lora_scale = parseFloat(document.getElementById('loraScale').value);
-            }
 
             const response = await fetch('/generate/prompt', {
                 method: 'POST',
@@ -199,18 +181,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const imageSizeKey = document.getElementById('imageSize').value;
         const dimensions = IMAGE_SIZES[imageSizeKey] || IMAGE_SIZES.square;
+        const selectedModel = modelSelect.value;
+
+        console.log('Generating image with model:', selectedModel);
 
         try {
+            const formData = {
+                prompt: enhancedPromptText.value,
+                model: selectedModel,
+                art_style: document.getElementById('artStyle').value,
+                num_images: 1,
+                enable_safety_checker: true
+            };
+
+            // Add model-specific parameters
+            if (selectedModel === 'fal-ai/flux-pro/v1.1-ultra') {
+                formData.aspect_ratio = '16:9';
+            } else {
+                formData.image_size = dimensions;
+            }
+
+            if (selectedModel === 'fal-ai/flux-lora' || selectedModel === 'fal-ai/flux-realism') {
+                formData.num_inference_steps = parseInt(document.getElementById('numInferenceSteps').value);
+                formData.guidance_scale = parseFloat(document.getElementById('guidanceScale').value);
+            }
+
+            if (selectedModel === 'fal-ai/flux-lora' && document.getElementById('loraPath').value) {
+                formData.loras = [{
+                    path: document.getElementById('loraPath').value,
+                    scale: parseFloat(document.getElementById('loraScale').value)
+                }];
+            }
+
+            const seed = document.getElementById('seed').value;
+            if (seed) {
+                formData.seed = parseInt(seed);
+            }
+
+            console.log('Sending request with data:', formData);
+
             const response = await fetch('/generate/image', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    prompt: enhancedPromptText.value,
-                    art_style: document.getElementById('artStyle').value,
-                    image_size: dimensions
-                }),
+                body: JSON.stringify(formData),
             });
 
             const data = await response.json();

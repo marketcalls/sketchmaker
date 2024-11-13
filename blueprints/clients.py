@@ -22,20 +22,27 @@ def init_fal_client():
     if not fal_key:
         raise APIKeyError("FAL API key is required. Please add it in your settings.")
     
-    print(f"\nInitializing FAL client with key: {fal_key}")
-    
     try:
         # Create a sync client with the API key
         client = fal_client.SyncClient(key=fal_key)
-        
+        return client
+    except Exception as e:
+        print(f"Error initializing FAL client: {str(e)}")
+        if "authentication failed" in str(e).lower():
+            raise APIKeyError("FAL API key authentication failed. Please check your key in settings.")
+        raise APIKeyError(f"Error initializing FAL client: {str(e)}")
+
+def test_fal_client(client):
+    """Test FAL client with a simple request"""
+    try:
         def on_queue_update(update):
             if isinstance(update, fal_client.InProgress):
                 for log in update.logs:
                     print(f"FAL log: {log['message']}")
 
-        # Test the client
+        # Use the dev model for testing as it's simpler
         result = client.subscribe(
-            "fal-ai/flux-pro/v1.1",
+            "fal-ai/flux/dev",
             arguments={
                 "prompt": "test prompt",
                 "image_size": {
@@ -44,25 +51,20 @@ def init_fal_client():
                 },
                 "num_images": 1,
                 "enable_safety_checker": True,
-                "safety_tolerance": "2",
+                "num_inference_steps": 28,
+                "guidance_scale": 3.5,
                 "seed": 2345
             },
             with_logs=True,
             on_queue_update=on_queue_update
         )
-        print("FAL client initialized and tested successfully")
+        print("FAL client tested successfully")
         print(f"Test result: {result}")
-        return client
+        return True
     except Exception as e:
-        print(f"Error initializing FAL client: {str(e)}")
-        if "authentication failed" in str(e).lower():
-            raise APIKeyError("FAL API key authentication failed. Please check your key in settings.")
-        raise APIKeyError(f"Error initializing FAL client: {str(e)}")
+        print(f"Error testing FAL client: {str(e)}")
+        raise APIKeyError(f"Error testing FAL client: {str(e)}")
 
 def get_openai_model():
     """Get OpenAI model name"""
     return current_app.config.get('OPENAI_MODEL', 'gpt-4o-mini')
-
-def get_flux_model():
-    """Get FAL Flux model name"""
-    return "fal-ai/flux-pro/v1.1"

@@ -50,10 +50,21 @@
                             <span class="label-text">OpenAI API Key</span>
                             <a href="https://openai.com/index/openai-api/" target="_blank" class="label-text-alt link link-primary">Get API Key</a>
                         </label>
-                        <input type="password" name="openai_api_key" 
-                               class="input input-bordered w-full bg-base-300" 
-                               value="{{ current_user.openai_api_key or '' }}"
-                               placeholder="sk-...">
+                        <div class="relative">
+                            <input type="password" name="openai_api_key" id="openai_api_key"
+                                   class="input input-bordered w-full bg-base-300 pr-10" 
+                                   value="{{ current_user.openai_api_key or '' }}"
+                                   placeholder="sk-...">
+                            <button type="button" onclick="toggleVisibility('openai_api_key')" 
+                                    class="absolute inset-y-0 right-0 px-3 flex items-center">
+                                <svg class="h-5 w-5 text-base-content/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
                         <label class="label">
                             <span class="label-text-alt text-base-content/70">Required for prompt enhancement. Must start with 'sk-'</span>
                         </label>
@@ -64,10 +75,21 @@
                             <span class="label-text">FAL API Key</span>
                             <a href="https://fal.ai/dashboard/keys" target="_blank" class="label-text-alt link link-primary">Get API Key</a>
                         </label>
-                        <input type="password" name="fal_key" 
-                               class="input input-bordered w-full bg-base-300" 
-                               value="{{ current_user.fal_key or '' }}"
-                               placeholder="Your FAL API key">
+                        <div class="relative">
+                            <input type="password" name="fal_key" id="fal_key"
+                                   class="input input-bordered w-full bg-base-300 pr-10" 
+                                   value="{{ current_user.fal_key or '' }}"
+                                   placeholder="Your FAL API key">
+                            <button type="button" onclick="toggleVisibility('fal_key')"
+                                    class="absolute inset-y-0 right-0 px-3 flex items-center">
+                                <svg class="h-5 w-5 text-base-content/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
                         <label class="label">
                             <span class="label-text-alt text-base-content/70">Required for image generation. Get your key from FAL dashboard.</span>
                         </label>
@@ -101,4 +123,15 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+        input.type = "text";
+    } else {
+        input.type = "password";
+    }
+}
+</script>
 {% endblock %}

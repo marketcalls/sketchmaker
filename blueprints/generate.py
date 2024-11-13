@@ -46,28 +46,66 @@ def generate_image_route():
         if not data or 'prompt' not in data:
             return jsonify({'error': 'No prompt provided'}), 400
 
+        # Get all parameters from request
         prompt = data['prompt']
         art_style = data.get('artStyle')
+        model = data.get('model')
+
+        print("\n=== Image Generation Request ===")
+        print(f"Requested Model: {model}")
+        print(f"Request Data: {data}")
+        print("==============================\n")
         
-        # Parse image size
-        try:
-            image_size = data.get('image_size', {
-                'width': 1024,
-                'height': 1024
-            })
-        except (ValueError, AttributeError):
-            image_size = {
-                'width': 1024,
-                'height': 1024
-            }
-        
-        print(f"Generating image with prompt: {prompt}, art_style: {art_style}, size: {image_size}")  # Debug log
+        if not model:
+            model = 'fal-ai/flux-pro/v1.1'
+            print(f"No model specified, using default: {model}")
         
         # Add art style to prompt if provided
         full_prompt = f"{prompt} in {art_style} style" if art_style else prompt
         
+        # Prepare generation parameters
+        generation_params = {
+            'prompt': full_prompt,
+            'model': model,
+            'num_images': data.get('num_images', 1),
+            'enable_safety_checker': data.get('enable_safety_checker', True),
+            'seed': data.get('seed')
+        }
+
+        # Add model-specific parameters
+        if model != 'fal-ai/flux-pro/v1.1-ultra':
+            # All models except Ultra use image_size
+            generation_params['image_size'] = data.get('image_size', {
+                'width': 1024,
+                'height': 1024
+            })
+
+        if model in ['fal-ai/flux-lora', 'fal-ai/flux-realism']:
+            # Add parameters specific to Lora and Realism models
+            generation_params.update({
+                'num_inference_steps': data.get('num_inference_steps', 28),
+                'guidance_scale': data.get('guidance_scale', 3.5)
+            })
+
+        if model == 'fal-ai/flux-lora' and data.get('loras'):
+            # Add LoRA specific parameters
+            generation_params['loras'] = data.get('loras')
+
+        if model == 'fal-ai/flux-realism':
+            # Add Realism specific parameters
+            generation_params['strength'] = data.get('strength', 1)
+
+        if model == 'fal-ai/flux-pro/v1.1-ultra':
+            # Add Ultra specific parameters
+            generation_params['aspect_ratio'] = data.get('aspect_ratio', '16:9')
+        
+        print("\n=== Generation Parameters ===")
+        print(f"Using Model: {model}")
+        print(f"Parameters: {generation_params}")
+        print("==========================\n")
+        
         # Generate the image
-        result = generate_image(full_prompt, image_size)
+        result = generate_image(generation_params)
         
         if not result or 'image_url' not in result:
             raise ValueError("Failed to generate image: Invalid response from image generator")
@@ -112,8 +150,8 @@ def generate_image_route():
                     filename=png_filename,  # Store PNG as the primary filename
                     prompt=prompt,
                     art_style=art_style,
-                    width=image_size['width'],
-                    height=image_size['height'],
+                    width=result.get('width'),
+                    height=result.get('height'),
                     user_id=current_user.id
                 )
                 db.session.add(new_image)
@@ -138,13 +176,21 @@ def generate_image_route():
         
         db.session.commit()
 
-        return jsonify({
+        response_data = {
             'images': saved_images,
             'prompt': prompt,
             'art_style': art_style,
-            'width': image_size['width'],
-            'height': image_size['height']
-        })
+            'model': model
+        }
+
+        # Add dimension info if available
+        if 'width' in result and 'height' in result:
+            response_data.update({
+                'width': result['width'],
+                'height': result['height']
+            })
+
+        return jsonify(response_data)
     except APIKeyError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
