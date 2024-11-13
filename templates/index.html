@@ -4,30 +4,6 @@
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300">
-    <!-- Navbar -->
-    <nav class="navbar bg-base-200/50 backdrop-blur-lg border-b border-base-content/10">
-        <div class="container mx-auto px-4">
-            <div class="flex-1">
-                <div class="flex items-center space-x-2">
-                    <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span class="text-xl font-bold">Sketch Maker AI</span>
-                </div>
-            </div>
-            <div class="flex-none gap-2">
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost btn-sm">Dashboard</a>
-                    <a href="{{ url_for('gallery.gallery') }}" class="btn btn-ghost btn-sm">Gallery</a>
-                    <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-sm text-error">Logout</a>
-                {% else %}
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-sm">Login</a>
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Get Started</a>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
-
     <!-- Hero Section -->
     <section class="py-12 md:py-24">
         <div class="container mx-auto px-4">
