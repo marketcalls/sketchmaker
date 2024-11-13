@@ -22,8 +22,16 @@ def login():
             flash('Please check your login details and try again.')
             return redirect(url_for('auth.login'))
 
+        if not user.is_active:
+            flash('Your account has been deactivated. Please contact an administrator.')
+            return redirect(url_for('auth.login'))
+
         login_user(user, remember=remember)
         next_page = request.args.get('next')
+        
+        # Redirect admin users to manage page if they're trying to access it
+        if user.is_admin() and next_page and 'manage' in next_page:
+            return redirect(next_page)
         return redirect(next_page or url_for('core.dashboard'))
 
     return render_template('auth/login.html')
@@ -45,16 +53,26 @@ def register():
             flash('Email address already exists')
             return redirect(url_for('auth.register'))
 
+        # Check if this is the first user
+        is_first_user = User.query.first() is None
+
         # Create new user
         new_user = User(
             email=email,
             username=username,
-            password_hash=generate_password_hash(password, method='pbkdf2:sha256')
+            password_hash=generate_password_hash(password, method='pbkdf2:sha256'),
+            role='admin' if is_first_user else 'user',  # First user becomes admin
+            is_active=True
         )
 
         db.session.add(new_user)
         db.session.commit()
 
+        if is_first_user:
+            flash('You have been registered as the administrator.')
+        else:
+            flash('Registration successful. Please login.')
+            
         return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html')

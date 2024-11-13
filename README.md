@@ -25,6 +25,14 @@ A modern web application that uses AI to generate artwork from text descriptions
   - Dark/Light theme support
   - Responsive modern UI using daisyUI and Tailwind CSS
 
+- Admin Features:
+  - Role-based access control (admin/user roles)
+  - First registered user automatically becomes admin
+  - User management interface at /manage
+  - Ability to promote/demote users to admin role
+  - User account activation/deactivation
+  - Secure admin-only routes
+
 - Technical Features:
   - Rate limiting to prevent abuse
   - Graceful error handling for API failures
@@ -78,6 +86,8 @@ The application will be available at `http://localhost:5000`
 ## Usage
 
 1. Register for an account or login if you already have one
+   - The first user to register automatically becomes an administrator
+   - Subsequent users are registered as regular users
 2. Add your API keys in the settings page:
    - OpenAI API key for prompt enhancement
    - FAL API key for image generation
@@ -96,6 +106,19 @@ The application will be available at `http://localhost:5000`
 8. Download your image in your preferred format (WebP, PNG, or JPEG)
 9. View all your generated images in your personal gallery
 
+## Admin Usage
+
+1. Access the admin panel at `/manage`
+2. View all registered users in a table format
+3. Manage user roles:
+   - Promote users to admin role
+   - Demote admins to regular users
+   - Cannot modify your own role
+4. Manage user accounts:
+   - Activate/deactivate user accounts
+   - Deactivated users cannot log in
+5. Monitor user creation dates and status
+
 ## Project Structure
 
 ```
@@ -104,6 +127,7 @@ sketchmaker/
 ├── models.py           # Database models
 ├── requirements.txt    # Project dependencies
 ├── blueprints/        # Route handlers
+│   ├── admin.py       # Admin routes and user management
 │   ├── auth.py        # Authentication routes
 │   ├── core.py        # Core routes
 │   ├── download.py    # Image download handling
@@ -117,6 +141,7 @@ sketchmaker/
 │   ├── js/           # JavaScript files
 │   └── images/       # Generated images
 └── templates/         # HTML templates
+    ├── admin/        # Admin templates
     ├── auth/         # Authentication templates
     ├── partials/     # Reusable template parts
     └── *.html        # Main templates
@@ -140,6 +165,8 @@ The application includes comprehensive error handling for:
 - Network failures
 - Invalid parameters
 - Server errors
+- Authentication and authorization errors
+- Role-based access control violations
 
 Each error is handled gracefully with clear user feedback and guidance for resolution.
 

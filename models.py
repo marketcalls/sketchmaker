@@ -14,6 +14,8 @@ class User(UserMixin, db.Model):
     openai_api_key = db.Column(db.String(255))
     fal_key = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    role = db.Column(db.String(20), default='user')  # 'admin' or 'user'
+    is_active = db.Column(db.Boolean, default=True)
     images = db.relationship('Image', backref='user', lazy=True)
 
     def get_api_keys(self):
@@ -26,6 +28,15 @@ class User(UserMixin, db.Model):
     def has_required_api_keys(self):
         """Check if user has both required API keys"""
         return bool(self.openai_api_key and self.fal_key)
+
+    def is_admin(self):
+        """Check if user is an admin"""
+        return self.role == 'admin'
+
+    @staticmethod
+    def get_first_user():
+        """Get the first user in the database"""
+        return User.query.order_by(User.id.asc()).first()
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)

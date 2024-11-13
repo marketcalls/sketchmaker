@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Admin{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-2xl mb-6">User Management</h2>
+            <div class="overflow-x-auto">
+                <table class="table table-zebra w-full">
+                    <thead>
+                        <tr>
+                            <th class="bg-base-300">ID</th>
+                            <th class="bg-base-300">Username</th>
+                            <th class="bg-base-300">Email</th>
+                            <th class="bg-base-300">Role</th>
+                            <th class="bg-base-300">Status</th>
+                            <th class="bg-base-300">Created At</th>
+                            <th class="bg-base-300">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <div class="badge badge-{{ 'primary' if user.role == 'admin' else 'ghost' }}">
+                                    {{ user.role }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="badge badge-{{ 'success' if user.is_active else 'error' }}">
+                                    {{ "Active" if user.is_active else "Inactive" }}
+                                </div>
+                            </td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                {% if user != current_user %}
+                                <div class="flex gap-2">
+                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST">
+                                        <input type="hidden" name="action" value="toggle_role">
+                                        <button type="submit" class="btn btn-warning btn-xs">
+                                            Toggle Role
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST">
+                                        <input type="hidden" name="action" value="toggle_status">
+                                        <button type="submit" class="btn btn-xs {{ 'btn-error' if user.is_active else 'btn-success' }}">
+                                            {{ "Deactivate" if user.is_active else "Activate" }}
+                                        </button>
+                                    </form>
+                                </div>
+                                {% else %}
+                                <span class="text-base-content/50">Current User</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

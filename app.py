@@ -6,6 +6,7 @@ from blueprints.core import core_bp
 from blueprints.generate import generate_bp
 from blueprints.gallery import gallery_bp
 from blueprints.download import download_bp
+from blueprints.admin import admin  # Import admin blueprint
 import os
 from dotenv import load_dotenv
 
@@ -46,6 +47,7 @@ def create_app():
     app.register_blueprint(generate_bp)
     app.register_blueprint(gallery_bp)
     app.register_blueprint(download_bp)
+    app.register_blueprint(admin)  # Register admin blueprint
     
     # Error handlers
     @app.errorhandler(404)
