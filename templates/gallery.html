@@ -1,60 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mx-auto px-4">
-    <h1 class="text-3xl font-bold mb-8">Your Gallery</h1>
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Gallery</h1>
     
-    <div class="grid grid-cols-1 gap-8">
+    {% if images %}
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {% for image in images %}
-        <div class="bg-base-200 rounded-lg p-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Image with download options -->
-                <div class="relative group">
-                    <img src="{{ image.get_url('png') }}" 
-                         alt="Generated image" 
-                         class="w-full rounded-lg shadow-lg">
-                    <div class="absolute bottom-0 left-0 right-0 p-2 bg-black/50 backdrop-blur-sm rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div class="flex justify-end space-x-2">
-                            <a href="{{ image.get_url('webp') }}" download class="btn btn-sm btn-ghost">WebP</a>
-                            <a href="{{ image.get_url('png') }}" download class="btn btn-sm btn-ghost">PNG</a>
-                            <a href="{{ image.get_url('jpeg') }}" download class="btn btn-sm btn-ghost">JPEG</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Image details -->
-                <div class="space-y-4">
-                    <div>
-                        <h3 class="text-lg font-semibold mb-2">Generation Details</h3>
-                        <div class="whitespace-pre-wrap">{{ image.prompt }}</div>
-                    </div>
-                    
-                    {% if image.art_style %}
-                    <div>
-                        <span class="font-semibold">Style:</span> {{ image.art_style }}
-                    </div>
-                    {% endif %}
-                    
-                    <div>
-                        <span class="font-semibold">Created:</span> 
-                        {{ image.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
-                    </div>
-                    
-                    {% if image.width and image.height %}
-                    <div>
-                        <span class="font-semibold">Dimensions:</span> 
-                        {{ image.width }}x{{ image.height }}
-                    </div>
-                    {% endif %}
-                </div>
+        <a href="{{ url_for('gallery.view_image', image_id=image.id) }}" 
+           class="aspect-square relative group">
+            <img src="{{ image.get_url('webp') }}" 
+                 alt="Generated image" 
+                 class="w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-[1.02]">
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                <span class="text-white text-sm">View Details</span>
             </div>
-        </div>
-        {% else %}
-        <div class="text-center py-8">
-            <p class="text-lg">No images in your gallery yet.</p>
-            <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary mt-4">Generate Images</a>
-        </div>
+        </a>
         {% endfor %}
     </div>
+    {% else %}
+    <div class="text-center py-16">
+        <div class="max-w-md mx-auto">
+            <h3 class="text-xl font-semibold mb-4">No images yet</h3>
+            <p class="text-base-content/70 mb-8">Start creating amazing artwork with AI</p>
+            <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary">Generate Images</a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

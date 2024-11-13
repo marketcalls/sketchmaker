@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, abort
 from flask_login import login_required, current_user
 from models import Image
 import markdown2
@@ -13,16 +13,17 @@ def view_gallery():
                        .order_by(Image.created_at.desc())\
                        .all()
     
-    # Create markdown filter
-    def markdown_filter(text):
-        return markdown2.markdown(text)
+    return render_template('gallery.html', images=images)
+
+@gallery_bp.route('/gallery/<int:image_id>')
+@login_required
+def view_image(image_id):
+    # Get the specific image and verify ownership
+    image = Image.query.get_or_404(image_id)
+    if image.user_id != current_user.id:
+        abort(403)  # Forbidden if not owner
     
-    # Register markdown filter for the template
-    view_gallery.markdown = markdown_filter
-    
-    return render_template('gallery.html', 
-                         images=images,
-                         markdown=markdown_filter)
+    return render_template('image.html', image=image)
 
 # Register markdown filter for all templates using this blueprint
 @gallery_bp.app_template_filter('markdown')

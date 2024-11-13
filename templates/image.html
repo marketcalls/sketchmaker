@@ -1,47 +1,67 @@
 {% extends "base.html" %}
 
-{% block title %}Full Screen Image - Sketch Maker AI{% endblock %}
-
 {% block content %}
-<div id="image-container" class="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-between z-50">
-    <!-- Image Area -->
-    <div class="max-w-4xl w-full mx-4 flex justify-center flex-grow items-center">
-        <!-- Image is restricted to 70% of the screen height -->
-        <img id="full-screen-image" src="{{ url_for('static', filename='images/' + filename) }}" alt="Full-screen image" 
-             class="full-screen-image max-h-[70vh] object-contain opacity-0">
-    </div>
-    <!-- Buttons Area: Always Visible Below the Image -->
-    <div class="w-full max-w-4xl mx-4 flex justify-between items-center py-4">
-        <a href="{{ url_for('gallery.gallery') }}" class="btn-primary">
-            <i class="fas fa-arrow-left mr-2"></i> Back to Gallery
-        </a>
-        <a href="{{ url_for('core.index') }}" class="btn-primary ml-auto">
-            <i class="fas fa-home mr-2"></i> Home Page
-        </a>
-        <a href="{{ url_for('static', filename='images/' + filename) }}" download class="btn-primary ml-4">
-            <i class="fas fa-download mr-2"></i> Download Image
-        </a>
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto">
+        <!-- Back to Gallery Link -->
+        <div class="mb-6">
+            <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-ghost gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Gallery
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Image Section -->
+            <div class="space-y-6">
+                <div class="relative">
+                    <img src="{{ image.get_url('webp') }}" 
+                         alt="Generated image" 
+                         class="w-full rounded-lg shadow-lg">
+                    <!-- Dimensions Badge -->
+                    <div class="absolute top-4 right-4">
+                        <div class="badge badge-lg bg-base-300/80 backdrop-blur-sm text-base-content px-3 py-3">
+                            {{ image.width }}x{{ image.height }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Download Options -->
+                <div class="flex flex-wrap gap-4">
+                    <a href="{{ image.get_url('webp') }}" download class="btn btn-primary">
+                        Download WebP
+                    </a>
+                    <a href="{{ image.get_url('png') }}" download class="btn btn-primary">
+                        Download PNG
+                    </a>
+                    <a href="{{ image.get_url('jpeg') }}" download class="btn btn-primary">
+                        Download JPEG
+                    </a>
+                </div>
+            </div>
+
+            <!-- Details Section -->
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Prompt</h3>
+                    <p class="text-base-content/80 whitespace-pre-wrap">{{ image.prompt }}</p>
+                </div>
+                
+                {% if image.art_style %}
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Style</h3>
+                    <p class="text-base-content/80">{{ image.art_style }}</p>
+                </div>
+                {% endif %}
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Created</h3>
+                    <p class="text-base-content/80">{{ image.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const fullScreenImage = document.getElementById('full-screen-image');
-        
-        // Ensure the image is fully loaded before displaying it with animation
-        fullScreenImage.addEventListener('load', () => {
-            // Fade in the image smoothly without affecting the layout
-            gsap.to(fullScreenImage, { duration: 0.5, opacity: 1, ease: 'power2.out' });
-            // Fade in the buttons immediately after the image starts to fade in
-            gsap.from('.btn-primary', { duration: 0.5, opacity: 0, ease: 'power2.out', stagger: 0.1 });
-        });
-
-        // Fallback for cached images (if the image is already loaded)
-        if (fullScreenImage.complete) {
-            fullScreenImage.dispatchEvent(new Event('load'));
-        }
-    });
-</script>
 {% endblock %}

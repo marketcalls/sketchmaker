@@ -1,12 +1,13 @@
 from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required, current_user
 from models import db, User, APIProvider, AIModel
+from datetime import datetime
 
 core_bp = Blueprint('core', __name__)
 
 @core_bp.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', current_year=datetime.now().year)
 
 @core_bp.route('/dashboard')
 @login_required
