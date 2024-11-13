@@ -8,6 +8,7 @@ import os
 from PIL import Image as PILImage
 import uuid
 import traceback
+from fal_client.client import FalClientError
 
 generate_bp = Blueprint('generate', __name__)
 
@@ -24,41 +25,52 @@ def generate_prompt_route():
 
     try:
         if not current_user.has_required_api_keys():
-            return jsonify({'error': 'API keys are required. Please add them in your settings.'}), 400
+            return jsonify({
+                'error': 'API keys are required',
+                'details': 'Please add your API keys in settings',
+                'type': 'missing_keys'
+            }), 400
 
         prompt = generate_prompt(data['topic'])
         return jsonify({'prompt': prompt})
     except APIKeyError as e:
-        return jsonify({'error': str(e)}), 400
+        return jsonify({
+            'error': str(e),
+            'details': 'Please check your API keys in settings',
+            'type': 'api_key_error'
+        }), 400
     except Exception as e:
         print(f"Error generating prompt: {str(e)}")
         print(traceback.format_exc())
-        return jsonify({'error': str(e)}), 500
+        return jsonify({
+            'error': 'Failed to generate prompt',
+            'details': str(e),
+            'type': 'generation_error'
+        }), 500
 
 @generate_bp.route('/generate/image', methods=['POST'])
 @login_required
 def generate_image_route():
     try:
         if not current_user.has_required_api_keys():
-            return jsonify({'error': 'API keys are required. Please add them in your settings.'}), 400
+            return jsonify({
+                'error': 'API keys are required',
+                'details': 'Please add your API keys in settings',
+                'type': 'missing_keys'
+            }), 400
 
         data = request.get_json()
         if not data or 'prompt' not in data:
-            return jsonify({'error': 'No prompt provided'}), 400
+            return jsonify({
+                'error': 'No prompt provided',
+                'details': 'A prompt is required to generate an image',
+                'type': 'missing_prompt'
+            }), 400
 
         # Get all parameters from request
         prompt = data['prompt']
         art_style = data.get('artStyle')
-        model = data.get('model')
-
-        print("\n=== Image Generation Request ===")
-        print(f"Requested Model: {model}")
-        print(f"Request Data: {data}")
-        print("==============================\n")
-        
-        if not model:
-            model = 'fal-ai/flux-pro/v1.1'
-            print(f"No model specified, using default: {model}")
+        model = data.get('model', 'fal-ai/flux-pro/v1.1')
         
         # Add art style to prompt if provided
         full_prompt = f"{prompt} in {art_style} style" if art_style else prompt
@@ -99,16 +111,43 @@ def generate_image_route():
             # Add Ultra specific parameters
             generation_params['aspect_ratio'] = data.get('aspect_ratio', '16:9')
         
-        print("\n=== Generation Parameters ===")
-        print(f"Using Model: {model}")
-        print(f"Parameters: {generation_params}")
-        print("==========================\n")
+        print(f"Generating image with parameters: {generation_params}")
         
         # Generate the image
-        result = generate_image(generation_params)
+        try:
+            result = generate_image(generation_params)
+        except FalClientError as e:
+            if "No user found for Key ID and Secret" in str(e):
+                return jsonify({
+                    'error': 'Invalid FAL API key',
+                    'details': 'Please check your FAL API key in settings',
+                    'type': 'invalid_fal_key'
+                }), 401
+            elif "rate limit" in str(e).lower():
+                return jsonify({
+                    'error': 'Rate limit exceeded',
+                    'details': 'Please try again later',
+                    'type': 'rate_limit'
+                }), 429
+            else:
+                return jsonify({
+                    'error': 'FAL API error',
+                    'details': str(e),
+                    'type': 'fal_api_error'
+                }), 400
+        except Exception as e:
+            return jsonify({
+                'error': 'Failed to generate image',
+                'details': str(e),
+                'type': 'generation_error'
+            }), 500
         
         if not result or 'image_url' not in result:
-            raise ValueError("Failed to generate image: Invalid response from image generator")
+            return jsonify({
+                'error': 'Invalid response from image generator',
+                'details': 'The image generation service returned an invalid response',
+                'type': 'invalid_response'
+            }), 500
         
         # Save each generated image to database
         saved_images = []
@@ -117,7 +156,7 @@ def generate_image_route():
             base_name = os.path.splitext(filename)[0]
             
             try:
-                print(f"Processing image: {filename}")  # Debug log
+                print(f"Processing image: {filename}")
                 
                 # Load the original image
                 original_filepath = get_absolute_path(filename)
@@ -162,7 +201,7 @@ def generate_image_route():
                     'jpeg_url': f'/static/images/{jpeg_filename}'
                 })
                 
-                print(f"Successfully processed image: {filename}")  # Debug log
+                print(f"Successfully processed image: {filename}")
             except FileNotFoundError as e:
                 print(f"File not found error: {str(e)}")
                 continue
@@ -172,7 +211,11 @@ def generate_image_route():
                 continue
         
         if not saved_images:
-            raise ValueError("No images were successfully processed")
+            return jsonify({
+                'error': 'No images were successfully processed',
+                'details': 'Failed to save generated images',
+                'type': 'processing_error'
+            }), 500
         
         db.session.commit()
 
@@ -192,9 +235,17 @@ def generate_image_route():
 
         return jsonify(response_data)
     except APIKeyError as e:
-        return jsonify({'error': str(e)}), 400
+        return jsonify({
+            'error': str(e),
+            'details': 'Please check your API keys in settings',
+            'type': 'api_key_error'
+        }), 400
     except Exception as e:
         print(f"Error in generate_image_route: {str(e)}")
         print(traceback.format_exc())
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({
+            'error': 'An unexpected error occurred',
+            'details': str(e),
+            'type': 'unexpected_error'
+        }), 500

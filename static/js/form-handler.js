@@ -7,6 +7,60 @@ export function initializeForm() {
     const guidanceScaleControls = document.getElementById('guidanceScale').closest('.form-control');
     const loraInputs = document.getElementById('loraInputs');
 
+    // Function to show error message
+    function showError(message, details) {
+        const errorAlert = document.createElement('div');
+        errorAlert.className = 'alert alert-error mb-4';
+        
+        // Create error icon
+        const icon = document.createElement('svg');
+        icon.className = 'h-6 w-6 shrink-0';
+        icon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        icon.setAttribute('fill', 'none');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('stroke', 'currentColor');
+        
+        const path = document.createElement('path');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('d', 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z');
+        
+        icon.appendChild(path);
+        errorAlert.appendChild(icon);
+
+        // Create error message
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'flex flex-col';
+        
+        const title = document.createElement('span');
+        title.className = 'font-bold';
+        title.textContent = message;
+        messageDiv.appendChild(title);
+
+        if (details) {
+            const detailsSpan = document.createElement('span');
+            detailsSpan.className = 'text-sm';
+            detailsSpan.textContent = details;
+            messageDiv.appendChild(detailsSpan);
+        }
+
+        errorAlert.appendChild(messageDiv);
+
+        // Add close button
+        const closeButton = document.createElement('button');
+        closeButton.className = 'btn btn-circle btn-ghost btn-sm';
+        closeButton.innerHTML = '✕';
+        closeButton.onclick = () => errorAlert.remove();
+        errorAlert.appendChild(closeButton);
+
+        // Insert error alert at the top of the form
+        form.insertBefore(errorAlert, form.firstChild);
+
+        // Auto-remove after 10 seconds
+        setTimeout(() => errorAlert.remove(), 10000);
+    }
+
     // Function to update visible controls based on selected model
     function updateFormControls(modelValue) {
         console.log('Updating controls for model:', modelValue);
@@ -62,6 +116,17 @@ export function initializeForm() {
         // Get the prompt from either enhanced or original input
         const prompt = document.getElementById('enhancedPromptText').value || document.getElementById('userInput').value;
         
+        if (!prompt.trim()) {
+            showError('No prompt provided', 'Please enter a prompt or enhance the existing one.');
+            return;
+        }
+
+        // Show loading state
+        const generateButton = document.getElementById('generateImage');
+        const originalText = generateButton.textContent;
+        generateButton.disabled = true;
+        generateButton.innerHTML = '<span class="loading loading-spinner"></span> Generating...';
+        
         // Prepare the base form data
         const formData = {
             prompt: prompt,
@@ -109,7 +174,8 @@ export function initializeForm() {
             });
 
             const data = await response.json();
-            if (data.error) {
+            
+            if (!response.ok) {
                 throw new Error(data.error);
             }
             
@@ -121,7 +187,23 @@ export function initializeForm() {
             }
         } catch (error) {
             console.error('Error generating image:', error);
-            // Handle error...
+            let errorMessage = 'Failed to generate image';
+            let errorDetails = error.message;
+
+            // Handle specific error types
+            if (error.message.includes('API key')) {
+                errorMessage = 'API Key Error';
+                errorDetails = 'Please check your API keys in settings';
+            } else if (error.message.includes('rate limit')) {
+                errorMessage = 'Rate Limit Exceeded';
+                errorDetails = 'Please try again later';
+            }
+
+            showError(errorMessage, errorDetails);
+        } finally {
+            // Reset button state
+            generateButton.disabled = false;
+            generateButton.textContent = originalText;
         }
     });
 
