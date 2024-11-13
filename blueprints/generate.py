@@ -40,12 +40,14 @@ def generate_prompt_route():
             # Pass the model to generate_prompt for model-specific prompt generation
             model = data.get('model')
             prompt = generate_prompt(data['topic'], model)
+            
             return jsonify({'prompt': prompt})
+            
         except AuthenticationError as e:
             return jsonify({
-                'error': 'Invalid OpenAI API key',
-                'details': 'Please check your OpenAI API key in settings',
-                'type': 'invalid_openai_key'
+                'error': 'Invalid API key',
+                'details': 'Please check your API key in settings',
+                'type': 'invalid_key'
             }), 401
         except OpenAIError as e:
             error_message = str(e)
@@ -57,9 +59,9 @@ def generate_prompt_route():
                 }), 429
             else:
                 return jsonify({
-                    'error': 'OpenAI API error',
+                    'error': 'API error',
                     'details': error_message,
-                    'type': 'openai_api_error'
+                    'type': 'api_error'
                 }), 400
 
     except APIKeyError as e:

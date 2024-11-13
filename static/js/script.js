@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const form = document.getElementById('imageGenForm');
-    const loadingIndicator = document.getElementById('loadingIndicator');
     const imageResultContainer = document.getElementById('imageResultContainer');
     const imageContainer = document.getElementById('imageContainer');
     const modelSelect = document.getElementById('model');
@@ -205,8 +204,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        showLoading(loadingIndicator);
-        imageResultContainer.classList.add('hidden');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        if (loadingIndicator) {
+            loadingIndicator.classList.remove('hidden');
+        }
+        if (imageResultContainer) {
+            imageResultContainer.classList.add('hidden');
+        }
 
         const imageSizeKey = document.getElementById('imageSize').value;
         const dimensions = IMAGE_SIZES[imageSizeKey] || IMAGE_SIZES.square;
@@ -277,19 +281,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error generating image:', error);
             handleAPIError(error);
         } finally {
-            hideLoading(loadingIndicator);
+            if (loadingIndicator) {
+                loadingIndicator.classList.add('hidden');
+            }
         }
     }
 
-    function showLoading(loadingIndicator) {
-        loadingIndicator.classList.remove('hidden');
-    }
-
-    function hideLoading(loadingIndicator) {
-        loadingIndicator.classList.add('hidden');
-    }
-
     function displayGeneratedImage(data) {
+        if (!imageContainer) return;
+        
         imageContainer.innerHTML = '';
         
         data.images.forEach(image => {
@@ -339,17 +339,21 @@ document.addEventListener('DOMContentLoaded', () => {
             imageContainer.appendChild(imgContainer);
         });
         
-        imageResultContainer.classList.remove('hidden');
-        window.scrollTo({
-            top: imageResultContainer.offsetTop,
-            behavior: 'smooth'
-        });
+        if (imageResultContainer) {
+            imageResultContainer.classList.remove('hidden');
+            window.scrollTo({
+                top: imageResultContainer.offsetTop,
+                behavior: 'smooth'
+            });
+        }
     }
 
     // Initialize controls based on default model
     window.addEventListener('DOMContentLoaded', function() {
         const model = document.getElementById('model');
-        const event = new Event('change');
-        model.dispatchEvent(event);
+        if (model) {
+            const event = new Event('change');
+            model.dispatchEvent(event);
+        }
     });
 });

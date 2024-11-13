@@ -1,9 +1,53 @@
-<div id="resultContainer" class="hidden mt-8">
-    <h2 class="text-2xl font-semibold mb-4 gradient-text">Generated Prompt</h2>
-    <p id="generatedPrompt" class="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg whitespace-pre-wrap"></p>
-    
-    <div id="promptReviewContainer" class="mb-4 flex space-x-4">
-        <button onclick="generateImages()" class="flex-1 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300">Approve Prompt</button>
-        <button onclick="generatePrompt(true)" class="flex-1 bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300">Regenerate Prompt</button>
+<div class="bg-base-200 rounded-lg p-4 mb-4">
+    <h2 class="text-xl font-semibold mb-2">Enhanced Prompt</h2>
+    <div class="whitespace-pre-wrap" id="enhancedPrompt">
+        <!-- Prompt content will be inserted here -->
+    </div>
+    <div class="mt-4 flex justify-end">
+        <button onclick="copyPrompt()" class="btn btn-sm btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
+            </svg>
+            Copy
+        </button>
     </div>
 </div>
+
+<script>
+// Function to update the prompt display
+function updatePromptDisplay(response) {
+    const promptContainer = document.getElementById('enhancedPrompt');
+    promptContainer.textContent = response.prompt;
+    promptContainer.dataset.originalPrompt = response.prompt;
+}
+
+// Function to copy the prompt
+function copyPrompt() {
+    const promptContainer = document.getElementById('enhancedPrompt');
+    const textToCopy = promptContainer.dataset.originalPrompt;
+    
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        // Show success message
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success fixed top-4 right-4 w-auto';
+        alert.innerHTML = `
+            <span>Prompt copied to clipboard!</span>
+            <button onclick="this.parentElement.remove()" class="btn btn-ghost btn-sm">×</button>
+        `;
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 3000);
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        // Show error message
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-error fixed top-4 right-4 w-auto';
+        alert.innerHTML = `
+            <span>Failed to copy prompt</span>
+            <button onclick="this.parentElement.remove()" class="btn btn-ghost btn-sm">×</button>
+        `;
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 3000);
+    });
+}
+</script>

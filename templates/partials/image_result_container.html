@@ -1,56 +1,41 @@
-<div id="imageResultContainer" class="hidden mt-8">
-    <div class="card bg-base-200/50 backdrop-blur-lg border border-base-content/10">
-        <div class="card-body">
-            <h2 class="card-title text-base-content mb-6">Generated Image</h2>
-            <div id="imageContainer" class="space-y-8">
-                <!-- Images will be dynamically inserted here -->
-            </div>
-        </div>
-    </div>
-
-    <div class="text-center mt-8">
-        <a href="{{ url_for('gallery.gallery') }}" class="btn btn-primary btn-lg gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
-            </svg>
-            View My Gallery
-        </a>
+<!-- Loading Indicator -->
+<div id="loadingIndicator" class="hidden">
+    <div class="bg-base-200 rounded-lg p-8 mb-8 text-center">
+        <div class="loading loading-spinner loading-lg mb-4"></div>
+        <h3 class="text-xl font-semibold">Crafting your masterpiece...</h3>
+        <p class="text-base-content/70">This might take a moment.</p>
     </div>
 </div>
 
-<template id="imageCardTemplate">
-    <div class="card bg-base-300/50 backdrop-blur-lg border border-base-content/10">
-        <figure class="px-4 pt-4">
-            <img src="" alt="Generated artwork" class="rounded-xl w-full h-auto object-cover">
-        </figure>
-        <div class="card-body">
-            <div class="flex flex-wrap gap-2 mb-4">
-                <div class="badge badge-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
-                    </svg>
-                    <span class="dimensions"></span>
-                </div>
-                <div class="badge badge-secondary art-style"></div>
-            </div>
-            
-            <p class="text-sm text-base-content/70 prompt"></p>
-            
-            <div class="card-actions justify-end mt-4">
-                <div class="dropdown dropdown-end">
-                    <div tabindex="0" role="button" class="btn btn-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                        </svg>
-                        Download
+<!-- Image Results -->
+<div id="imageResultContainer" class="hidden">
+    <div class="bg-base-200 rounded-lg p-4 mb-8">
+        <div id="imageContainer" class="grid grid-cols-1 gap-4">
+            {% for image in images %}
+            <div class="relative group mx-auto max-w-4xl">
+                <img src="{{ image.image_url }}" 
+                     alt="Generated image" 
+                     class="w-full h-auto rounded-lg shadow-lg">
+                <div class="absolute bottom-0 left-0 right-0 p-2 bg-black/50 backdrop-blur-sm rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="flex justify-end space-x-2">
+                        <a href="{{ image.webp_url }}" download="generated_image.webp" class="btn btn-sm btn-ghost">WebP</a>
+                        <a href="{{ image.image_url }}" download="generated_image.png" class="btn btn-sm btn-ghost">PNG</a>
+                        <a href="{{ image.jpeg_url }}" download="generated_image.jpeg" class="btn btn-sm btn-ghost">JPEG</a>
                     </div>
-                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-200 rounded-box w-52">
-                        <li><a class="download-png">PNG</a></li>
-                        <li><a class="download-webp">WebP</a></li>
-                        <li><a class="download-jpeg">JPEG</a></li>
-                    </ul>
                 </div>
             </div>
+            {% endfor %}
+        </div>
+
+        <!-- Prompt Display -->
+        <div class="mt-6 max-w-4xl mx-auto">
+            <h3 class="text-lg font-semibold mb-2">Generation Details</h3>
+            <div class="whitespace-pre-wrap">{{ prompt }}</div>
+            {% if art_style %}
+            <div class="mt-2">
+                <span class="font-semibold">Style:</span> {{ art_style }}
+            </div>
+            {% endif %}
         </div>
     </div>
-</template>
+</div>

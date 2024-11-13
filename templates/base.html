@@ -92,7 +92,7 @@
         <div class="flex-1">
             <a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost text-xl">Sketchmaker</a>
             <a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost">Dashboard</a>
-            <a href="{{ url_for('gallery.gallery') }}" class="btn btn-ghost">Gallery</a>
+            <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-ghost">Gallery</a>
             {% if current_user.is_admin() %}
             <a href="{{ url_for('admin.manage') }}" class="btn btn-ghost">Manage Users</a>
             {% endif %}

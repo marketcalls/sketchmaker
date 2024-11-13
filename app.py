@@ -1,12 +1,12 @@
 from flask import Flask, render_template
 from flask_login import LoginManager
-from models import db, User
+from models import db, User, APIProvider, AIModel
 from blueprints.auth import auth_bp
 from blueprints.core import core_bp
 from blueprints.generate import generate_bp
 from blueprints.gallery import gallery_bp
 from blueprints.download import download_bp
-from blueprints.admin import admin  # Import admin blueprint
+from blueprints.admin import admin
 import os
 from dotenv import load_dotenv
 
@@ -21,10 +21,6 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sketchmaker.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
-    # Set OpenAI model
-    app.config['OPENAI_MODEL'] = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
-    app.config['FLUX_PRO_MODEL'] = os.getenv('FLUX_PRO_MODEL', 'fal-ai/flux-pro/v1.1')
-
     # Ensure required environment variables are set
     required_vars = ['SECRET_KEY']
     missing_vars = [var for var in required_vars if not os.getenv(var)]
@@ -37,9 +33,10 @@ def create_app():
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
     
-    # Create database tables
+    # Create database tables and initialize providers
     with app.app_context():
         db.create_all()
+        init_api_providers(app)
     
     # Register blueprints
     app.register_blueprint(auth_bp)
@@ -47,7 +44,7 @@ def create_app():
     app.register_blueprint(generate_bp)
     app.register_blueprint(gallery_bp)
     app.register_blueprint(download_bp)
-    app.register_blueprint(admin)  # Register admin blueprint
+    app.register_blueprint(admin)
     
     # Error handlers
     @app.errorhandler(404)
@@ -57,10 +54,54 @@ def create_app():
     # User loader
     @login_manager.user_loader
     def load_user(user_id):
-        # Use Session.get() instead of Query.get()
         return db.session.get(User, int(user_id))
     
     return app
+
+def init_api_providers(app):
+    """Initialize default API providers and models"""
+    with app.app_context():
+        # Only initialize if no providers exist
+        if APIProvider.query.first() is None:
+            # Create providers
+            openai = APIProvider(name="OpenAI")
+            anthropic = APIProvider(name="Anthropic")
+            gemini = APIProvider(name="Google Gemini")
+            db.session.add_all([openai, anthropic, gemini])
+            db.session.commit()
+
+            # OpenAI models
+            openai_models = [
+                "gpt-4o",
+                "gpt-4o-mini",
+                "o1-preview",
+                "o1-mini"
+            ]
+            for model in openai_models:
+                db.session.add(AIModel(name=model, provider_id=openai.id))
+
+            # Anthropic models
+            anthropic_models = [
+                "claude-3-5-sonnet-20241022",
+                "claude-3-5-haiku-20241022",
+                "claude-3-opus-20240229",
+                "claude-3-haiku-20240307"
+            ]
+            for model in anthropic_models:
+                db.session.add(AIModel(name=model, provider_id=anthropic.id))
+
+            # Google Gemini models
+            gemini_models = [
+                "gemini-1.5-flash-002",
+                "gemini-1.5-flash-exp-0827",
+                "gemini-1.5-flash-8b-exp-0827",
+                "gemini-1.5-pro-002",
+                "gemini-1.5-pro-exp-0827"
+            ]
+            for model in gemini_models:
+                db.session.add(AIModel(name=model, provider_id=gemini.id))
+
+            db.session.commit()
 
 # Create the application instance for gunicorn
 app = create_app()

@@ -1,18 +1,133 @@
 from openai import OpenAI
-from flask import current_app, g
+from flask import current_app
 from flask_login import current_user
 import fal_client
+import anthropic
+import google.generativeai as genai
 
 class APIKeyError(Exception):
     """Exception raised when required API keys are missing"""
     pass
 
-def get_openai_client():
-    """Get OpenAI client with user's API key"""
-    api_keys = current_user.get_api_keys()
-    if not api_keys['openai_api_key']:
-        raise APIKeyError("OpenAI API key is required. Please add it in your settings.")
-    return OpenAI(api_key=api_keys['openai_api_key'])
+class BaseAIClient:
+    """Base class for AI clients"""
+    def __init__(self, api_key):
+        if not api_key:
+            raise APIKeyError(f"{self.__class__.__name__} API key is required")
+        self.api_key = api_key
+
+class OpenAIClient(BaseAIClient):
+    def __init__(self, api_key):
+        super().__init__(api_key)
+        self.client = OpenAI(api_key=api_key)
+
+    def generate_completion(self, system_content, user_content, model, temperature=0.7, max_tokens=500):
+        response = self.client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_content},
+                {"role": "user", "content": user_content}
+            ],
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=0.9,
+            frequency_penalty=0.2,
+            presence_penalty=0.2,
+            response_format={"type": "text"}
+        )
+        return response.choices[0].message.content.strip()
+
+class AnthropicClient(BaseAIClient):
+    def __init__(self, api_key):
+        super().__init__(api_key)
+        self.client = anthropic.Anthropic(api_key=api_key)
+
+    def generate_completion(self, system_content, user_content, model, temperature=0.7, max_tokens=500):
+        message = self.client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            system=system_content,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": user_content
+                        }
+                    ]
+                }
+            ]
+        )
+        # Extract just the text from the response
+        if isinstance(message.content, list) and len(message.content) > 0:
+            for content in message.content:
+                if isinstance(content, dict) and content.get('type') == 'text':
+                    return content.get('text', '').strip()
+        return str(message.content[0].text) if message.content else ''
+
+class GeminiClient(BaseAIClient):
+    def __init__(self, api_key):
+        super().__init__(api_key)
+        genai.configure(api_key=api_key)
+
+    def generate_completion(self, system_content, user_content, model, temperature=0.7, max_tokens=500):
+        generation_config = {
+            "temperature": temperature,
+            "top_p": 0.9,
+            "top_k": 40,
+            "max_output_tokens": max_tokens,
+        }
+
+        model = genai.GenerativeModel(
+            model_name=model,
+            generation_config=generation_config,
+            system_instruction=system_content,
+        )
+
+        chat = model.start_chat(history=[])
+        response = chat.send_message(user_content)
+        return response.text
+
+def get_ai_client():
+    """Get the appropriate AI client based on user's selected provider"""
+    from models import APIProvider, AIModel
+    
+    user = current_user
+    if not user:
+        raise APIKeyError("User not authenticated")
+
+    provider = APIProvider.query.get(user.selected_provider_id)
+    if not provider:
+        raise APIKeyError("No AI provider selected")
+
+    api_key = user.get_selected_provider_key()
+    if not api_key:
+        raise APIKeyError(f"{provider.name} API key is required")
+
+    if provider.name == "OpenAI":
+        return OpenAIClient(api_key)
+    elif provider.name == "Anthropic":
+        return AnthropicClient(api_key)
+    elif provider.name == "Google Gemini":
+        return GeminiClient(api_key)
+    else:
+        raise ValueError(f"Unsupported AI provider: {provider.name}")
+
+def get_selected_model():
+    """Get the user's selected AI model"""
+    from models import AIModel
+    
+    user = current_user
+    if not user or not user.selected_model_id:
+        raise APIKeyError("No AI model selected")
+
+    model = AIModel.query.get(user.selected_model_id)
+    if not model:
+        raise APIKeyError("Invalid model selection")
+
+    return model.name
 
 def init_fal_client():
     """Initialize FAL client with user's API key"""
@@ -23,7 +138,6 @@ def init_fal_client():
         raise APIKeyError("FAL API key is required. Please add it in your settings.")
     
     try:
-        # Create a sync client with the API key
         client = fal_client.SyncClient(key=fal_key)
         return client
     except Exception as e:
@@ -40,7 +154,6 @@ def test_fal_client(client):
                 for log in update.logs:
                     print(f"FAL log: {log['message']}")
 
-        # Use the dev model for testing as it's simpler
         result = client.subscribe(
             "fal-ai/flux/dev",
             arguments={
@@ -64,7 +177,3 @@ def test_fal_client(client):
     except Exception as e:
         print(f"Error testing FAL client: {str(e)}")
         raise APIKeyError(f"Error testing FAL client: {str(e)}")
-
-def get_openai_model():
-    """Get OpenAI model name"""
-    return current_app.config.get('OPENAI_MODEL', 'gpt-4o-mini')

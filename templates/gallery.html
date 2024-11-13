@@ -1,66 +1,60 @@
 {% extends "base.html" %}
 
-{% block title %}My Gallery - Sketch Maker AI{% endblock %}
-
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl font-bold">My Gallery</h1>
-    </div>
-
-    {% if images %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold mb-8">Your Gallery</h1>
+    
+    <div class="grid grid-cols-1 gap-8">
         {% for image in images %}
-        <div class="card bg-base-100 shadow-xl">
-            <figure class="px-4 pt-4">
-                <img src="{{ url_for('static', filename='images/' + image.filename) }}" 
-                     alt="Generated artwork" 
-                     class="rounded-xl w-full h-auto object-cover"
-                     loading="lazy">
-            </figure>
-            <div class="card-body">
-                <div class="flex justify-between items-center mb-2">
-                    <div class="badge badge-primary">{{ image.dimensions.width }}x{{ image.dimensions.height }}</div>
-                    {% if image.art_style %}
-                    <div class="badge badge-secondary">{{ image.art_style }}</div>
-                    {% endif %}
-                </div>
-                <p class="text-sm text-base-content/70">{{ image.prompt }}</p>
-                <div class="card-actions justify-end mt-4">
-                    <div class="dropdown dropdown-end">
-                        <div tabindex="0" role="button" class="btn btn-primary">Download</div>
-                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                            <li>
-                                <a href="{{ url_for('static', filename='images/' + image.filename) }}" 
-                                   download="{{ image.filename }}">
-                                   PNG ({{ image.dimensions.width }}x{{ image.dimensions.height }})
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('static', filename='images/' + image.filename|replace('.png', '.webp')) }}" 
-                                   download="{{ image.filename|replace('.png', '.webp') }}">
-                                   WebP ({{ image.dimensions.width }}x{{ image.dimensions.height }})
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url_for('static', filename='images/' + image.filename|replace('.png', '.jpeg')) }}" 
-                                   download="{{ image.filename|replace('.png', '.jpeg') }}">
-                                   JPEG ({{ image.dimensions.width }}x{{ image.dimensions.height }})
-                                </a>
-                            </li>
-                        </ul>
+        <div class="bg-base-200 rounded-lg p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Image with download options -->
+                <div class="relative group">
+                    <img src="{{ image.get_url('png') }}" 
+                         alt="Generated image" 
+                         class="w-full rounded-lg shadow-lg">
+                    <div class="absolute bottom-0 left-0 right-0 p-2 bg-black/50 backdrop-blur-sm rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="flex justify-end space-x-2">
+                            <a href="{{ image.get_url('webp') }}" download class="btn btn-sm btn-ghost">WebP</a>
+                            <a href="{{ image.get_url('png') }}" download class="btn btn-sm btn-ghost">PNG</a>
+                            <a href="{{ image.get_url('jpeg') }}" download class="btn btn-sm btn-ghost">JPEG</a>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Image details -->
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Generation Details</h3>
+                        <div class="whitespace-pre-wrap">{{ image.prompt }}</div>
+                    </div>
+                    
+                    {% if image.art_style %}
+                    <div>
+                        <span class="font-semibold">Style:</span> {{ image.art_style }}
+                    </div>
+                    {% endif %}
+                    
+                    <div>
+                        <span class="font-semibold">Created:</span> 
+                        {{ image.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </div>
+                    
+                    {% if image.width and image.height %}
+                    <div>
+                        <span class="font-semibold">Dimensions:</span> 
+                        {{ image.width }}x{{ image.height }}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
+        {% else %}
+        <div class="text-center py-8">
+            <p class="text-lg">No images in your gallery yet.</p>
+            <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary mt-4">Generate Images</a>
+        </div>
         {% endfor %}
     </div>
-    {% else %}
-    <div class="text-center py-12">
-        <h3 class="text-xl mb-4">Your gallery is empty</h3>
-        <p class="mb-6">Start creating some amazing artwork!</p>
-        <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary">Create Artwork</a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
