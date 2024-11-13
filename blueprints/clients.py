@@ -4,6 +4,7 @@ from flask_login import current_user
 import fal_client
 import anthropic
 import google.generativeai as genai
+from google.api_core import exceptions as google_exceptions
 
 class APIKeyError(Exception):
     """Exception raised when required API keys are missing"""
@@ -78,22 +79,29 @@ class GeminiClient(BaseAIClient):
         genai.configure(api_key=api_key)
 
     def generate_completion(self, system_content, user_content, model, temperature=0.7, max_tokens=500):
-        generation_config = {
-            "temperature": temperature,
-            "top_p": 0.9,
-            "top_k": 40,
-            "max_output_tokens": max_tokens,
-        }
+        try:
+            generation_config = {
+                "temperature": temperature,
+                "top_p": 0.9,
+                "top_k": 40,
+                "max_output_tokens": max_tokens,
+            }
 
-        model = genai.GenerativeModel(
-            model_name=model,
-            generation_config=generation_config,
-            system_instruction=system_content,
-        )
+            model = genai.GenerativeModel(
+                model_name=model,
+                generation_config=generation_config,
+                system_instruction=system_content,
+            )
 
-        chat = model.start_chat(history=[])
-        response = chat.send_message(user_content)
-        return response.text
+            chat = model.start_chat(history=[])
+            response = chat.send_message(user_content)
+            return response.text
+        except google_exceptions.InvalidArgument as e:
+            if "API key not valid" in str(e):
+                raise APIKeyError("Invalid Google Gemini API key. Please check your API key in settings.")
+            raise APIKeyError(f"Error with Google Gemini API: {str(e)}")
+        except Exception as e:
+            raise APIKeyError(f"Error generating completion with Google Gemini: {str(e)}")
 
 def get_ai_client():
     """Get the appropriate AI client based on user's selected provider"""

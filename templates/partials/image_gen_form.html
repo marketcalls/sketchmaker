@@ -3,7 +3,7 @@
         <h2 class="text-2xl font-semibold mb-4">Image Description</h2>
         <div class="relative">
             <textarea id="userInput" name="message" rows="4" 
-                class="textarea textarea-bordered w-full bg-base-200 text-base-content placeholder-base-content/50" 
+                class="textarea textarea-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
                 placeholder="Describe your image content in detail."></textarea>
             <div id="characterCount" class="absolute bottom-2 right-2 text-sm opacity-70 hidden">
                 <span id="currentCount">0</span>/<span id="maxCount">1000</span>
@@ -19,7 +19,7 @@
             <label class="label">
                 <span class="label-text">Model</span>
             </label>
-            <select id="model" name="model" class="select select-bordered w-full bg-base-200">
+            <select id="model" name="model" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
                 <option value="fal-ai/flux-pro/v1.1">Flux Pro</option>
                 <option value="fal-ai/flux-pro/v1.1-ultra">Flux Pro Ultra</option>
                 <option value="fal-ai/flux-lora">Flux Lora</option>
@@ -34,7 +34,7 @@
             <label class="label">
                 <span class="label-text">Recraft Style</span>
             </label>
-            <select id="recraftStyle" name="recraft_style" class="select select-bordered w-full bg-base-200">
+            <select id="recraftStyle" name="recraft_style" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
                 <option value="any">Default</option>
                 <option value="realistic_image">Realistic Image</option>
                 <option value="digital_illustration">Digital Illustration</option>
@@ -77,7 +77,7 @@
             <label class="label">
                 <span class="label-text">Image Size</span>
             </label>
-            <select id="imageSize" name="image_size" class="select select-bordered w-full bg-base-200">
+            <select id="imageSize" name="image_size" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
                 <option value="youtube_thumbnail">YouTube Thumbnail (1280x704)</option>
                 <option value="landscape_4_3">Landscape 4:3 (1280x960)</option>
                 <option value="landscape_16_9">Landscape 16:9 (1280x720)</option>
@@ -100,14 +100,20 @@
             <label class="label">
                 <span class="label-text">Aspect Ratio</span>
             </label>
-            <select id="aspectRatio" name="aspect_ratio" class="select select-bordered w-full bg-base-200">
+            <select id="aspectRatio" name="aspect_ratio" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
                 <option value="16:9">16:9</option>
+                <option value="16:10">16:10</option>
                 <option value="21:9">21:9</option>
+                <option value="4:3">5:4</option>
                 <option value="4:3">4:3</option>
+                <option value="4:3">3:2</option>
                 <option value="1:1">1:1</option>
-                <option value="3:4">3:4</option>
-                <option value="9:16">9:16</option>
-                <option value="9:21">9:21</option>
+                <option value="3:4">2:3</option>
+                <option value="9:16">3:4</option>
+                <option value="9:21">4:5</option>
+                <option value="16:9">9:21</option>
+                <option value="16:10">10:16</option>
+                <option value="21:9">9:16</option>
             </select>
         </div>
 
@@ -115,7 +121,7 @@
             <label class="label">
                 <span class="label-text">Artistic Style</span>
             </label>
-            <select id="artStyle" name="art_style" class="select select-bordered w-full bg-base-200" onchange="showArtStyleDescription()">
+            <select id="artStyle" name="art_style" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" onchange="showArtStyleDescription()">
                 <option value="None">None</option>
                 <option value="Impressionism">Impressionism</option>
                 <option value="Cubism">Cubism</option>
@@ -143,14 +149,14 @@
                 <option value="Bauhaus">Bauhaus</option>
                 <option value="Illustrative">Illustrative</option>
             </select>
-            <div id="artStyleTooltip" class="hidden absolute z-10 w-64 p-3 mt-1 text-sm bg-base-300 rounded-lg shadow-xl border border-base-content/10"></div>
+            <div id="artStyleTooltip" class="hidden absolute z-10 w-64 p-3 mt-1 text-sm bg-base-200/90 backdrop-blur-md rounded-lg shadow-xl border border-base-content/10"></div>
         </div>
 
         <div class="form-control">
             <label class="label">
                 <span class="label-text">Color Scheme</span>
             </label>
-            <select id="colorScheme" name="color_scheme" class="select select-bordered w-full bg-base-200">
+            <select id="colorScheme" name="color_scheme" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
                 <option value="None">None</option>
                 <option value="Warm">Warm</option>
                 <option value="Cool">Cool</option>
@@ -166,7 +172,7 @@
             <label class="label">
                 <span class="label-text">Lighting and Mood</span>
             </label>
-            <select id="lightingMood" name="lighting_mood" class="select select-bordered w-full bg-base-200">
+            <select id="lightingMood" name="lighting_mood" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
                 <option value="None">None</option>
                 <option value="Natural Light">Natural Light</option>
                 <option value="Studio Light">Studio Light</option>
@@ -182,7 +188,7 @@
             <label class="label">
                 <span class="label-text">Subject Focus</span>
             </label>
-            <select id="subjectFocus" name="subject_focus" class="select select-bordered w-full bg-base-200">
+            <select id="subjectFocus" name="subject_focus" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
                 <option value="None">None</option>
                 <option value="People">People</option>
                 <option value="Nature">Nature</option>
@@ -197,7 +203,7 @@
             <label class="label">
                 <span class="label-text">Background Style</span>
             </label>
-            <select id="backgroundStyle" name="background_style" class="select select-bordered w-full bg-base-200">
+            <select id="backgroundStyle" name="background_style" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
                 <option value="None">None</option>
                 <option value="Plain">Plain</option>
                 <option value="Gradient">Gradient</option>
@@ -212,7 +218,7 @@
             <label class="label">
                 <span class="label-text">Effects and Filters</span>
             </label>
-            <select id="effectsFilters" name="effects_filters" class="select select-bordered w-full bg-base-200">
+            <select id="effectsFilters" name="effects_filters" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
                 <option value="None">None</option>
                 <option value="Vintage">Vintage</option>
                 <option value="Black and White">Black and White</option>
@@ -229,7 +235,7 @@
                 <span class="label-text">Number of Inference Steps</span>
             </label>
             <input type="number" id="numInferenceSteps" name="num_inference_steps" 
-                class="input input-bordered w-full bg-base-200" 
+                class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
                 value="28" min="1" max="50">
         </div>
 
@@ -238,7 +244,7 @@
                 <span class="label-text">Guidance Scale</span>
             </label>
             <input type="number" id="guidanceScale" name="guidance_scale" 
-                class="input input-bordered w-full bg-base-200" 
+                class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
                 value="3.5" min="0" max="20" step="0.1">
         </div>
 
@@ -247,7 +253,7 @@
                 <span class="label-text">Seed (optional)</span>
             </label>
             <input type="number" id="seed" name="seed" 
-                class="input input-bordered w-full bg-base-200" 
+                class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
                 min="0">
         </div>
     </div>
@@ -258,14 +264,14 @@
                 <span class="label-text">LoRA Path (safetensors)</span>
             </label>
             <input type="text" id="loraPath" name="lora_path" 
-                class="input input-bordered w-full bg-base-200">
+                class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
         </div>
         <div class="form-control">
             <label class="label">
                 <span class="label-text">LoRA Scale</span>
             </label>
             <input type="number" id="loraScale" name="lora_scale" 
-                class="input input-bordered w-full bg-base-200" 
+                class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
                 value="1" min="0" max="1" step="0.1">
         </div>
     </div>
@@ -278,12 +284,12 @@
 </form>
 
 <div id="enhancedPromptContainer" class="mt-8 hidden">
-    <div class="card bg-base-200">
+    <div class="card bg-base-200/80 backdrop-blur-md border border-base-300/30">
         <div class="card-body">
             <h3 class="card-title text-base-content">Enhanced Prompt</h3>
             <div class="relative">
                 <textarea id="enhancedPromptText" 
-                    class="textarea textarea-bordered w-full bg-base-300 text-base-content min-h-[200px]" 
+                    class="textarea textarea-bordered w-full bg-base-100/80 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/95 transition-all duration-200 min-h-[200px]" 
                     rows="10"></textarea>
                 <div id="enhancedCharacterCount" class="absolute bottom-2 right-2 text-sm opacity-70 hidden">
                     <span id="enhancedCurrentCount">0</span>/<span id="enhancedMaxCount">1000</span>

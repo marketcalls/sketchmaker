@@ -11,6 +11,7 @@ import traceback
 from fal_client.client import FalClientError
 from openai import AuthenticationError, OpenAIError
 import anthropic
+from google.api_core import exceptions as google_exceptions
 
 generate_bp = Blueprint('generate', __name__)
 
@@ -44,7 +45,10 @@ def generate_prompt_route():
             
             return jsonify({'prompt': prompt})
             
-        except (AuthenticationError, anthropic.AuthenticationError) as e:
+        except (AuthenticationError, anthropic.AuthenticationError, google_exceptions.InvalidArgument) as e:
+            # Handle authentication errors from all providers
+            if isinstance(e, google_exceptions.InvalidArgument) and "API key not valid" not in str(e):
+                raise  # Re-raise if it's not an API key error
             return jsonify({
                 'error': 'Invalid API key',
                 'details': 'Please check your API key in settings',
