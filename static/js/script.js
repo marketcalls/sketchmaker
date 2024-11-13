@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const downloadContainer = document.createElement('div');
-            downloadContainer.className = 'card-actions justify-end mt-4';
+            downloadContainer.className = 'card-actions justify-end mt-4 space-x-4';
             
             ['webp', 'png', 'jpeg'].forEach(format => {
                 const downloadButton = document.createElement('a');

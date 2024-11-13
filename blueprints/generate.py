@@ -10,6 +10,7 @@ import uuid
 import traceback
 from fal_client.client import FalClientError
 from openai import AuthenticationError, OpenAIError
+import anthropic
 
 generate_bp = Blueprint('generate', __name__)
 
@@ -43,7 +44,7 @@ def generate_prompt_route():
             
             return jsonify({'prompt': prompt})
             
-        except AuthenticationError as e:
+        except (AuthenticationError, anthropic.AuthenticationError) as e:
             return jsonify({
                 'error': 'Invalid API key',
                 'details': 'Please check your API key in settings',
@@ -192,6 +193,7 @@ def generate_image_route():
         for image_url in result['image_url']:
             filename = image_url.split('/')[-1]
             base_name = os.path.splitext(filename)[0]
+            original_ext = os.path.splitext(filename)[1].lower()
             
             try:
                 print(f"Processing image: {filename}")
@@ -204,7 +206,7 @@ def generate_image_route():
                 
                 img = PILImage.open(original_filepath)
                 
-                # Save PNG version
+                # Always save a PNG version first
                 png_filename = f"{base_name}.png"
                 png_filepath = get_absolute_path(png_filename)
                 img.save(png_filepath, 'PNG')
@@ -222,9 +224,9 @@ def generate_image_route():
                     img = img.convert('RGB')
                 img.save(jpeg_filepath, 'JPEG')
                 
-                # Save image record to database
+                # Save image record to database with PNG as primary filename
                 new_image = Image(
-                    filename=png_filename,  # Store PNG as the primary filename
+                    filename=png_filename,  # Always store PNG as the primary filename
                     prompt=prompt,
                     art_style=art_style,
                     width=result.get('width'),
@@ -234,12 +236,18 @@ def generate_image_route():
                 db.session.add(new_image)
                 
                 saved_images.append({
-                    'image_url': f'/static/images/{png_filename}',
+                    'png_url': f'/static/images/{png_filename}',  # Changed from image_url to png_url
                     'webp_url': f'/static/images/{webp_filename}',
-                    'jpeg_url': f'/static/images/{jpeg_filename}'
+                    'jpeg_url': f'/static/images/{jpeg_filename}',
+                    'image_url': f'/static/images/{png_filename}'  # Keep image_url for backward compatibility
                 })
                 
                 print(f"Successfully processed image: {filename}")
+                
+                # Clean up original file if it's not PNG
+                if original_ext != '.png' and os.path.exists(original_filepath):
+                    os.remove(original_filepath)
+                
             except FileNotFoundError as e:
                 print(f"File not found error: {str(e)}")
                 continue

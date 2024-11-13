@@ -43,29 +43,34 @@ class AnthropicClient(BaseAIClient):
         self.client = anthropic.Anthropic(api_key=api_key)
 
     def generate_completion(self, system_content, user_content, model, temperature=0.7, max_tokens=500):
-        message = self.client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            system=system_content,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": user_content
-                        }
-                    ]
-                }
-            ]
-        )
-        # Extract just the text from the response
-        if isinstance(message.content, list) and len(message.content) > 0:
-            for content in message.content:
-                if isinstance(content, dict) and content.get('type') == 'text':
-                    return content.get('text', '').strip()
-        return str(message.content[0].text) if message.content else ''
+        try:
+            message = self.client.messages.create(
+                model=model,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                system=system_content,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": user_content
+                            }
+                        ]
+                    }
+                ]
+            )
+            # Extract just the text from the response
+            if isinstance(message.content, list) and len(message.content) > 0:
+                for content in message.content:
+                    if isinstance(content, dict) and content.get('type') == 'text':
+                        return content.get('text', '').strip()
+            return str(message.content[0].text) if message.content else ''
+        except anthropic.AuthenticationError as e:
+            raise APIKeyError("Invalid Anthropic API key. Please check your API key in settings.")
+        except Exception as e:
+            raise APIKeyError(f"Error generating completion with Anthropic: {str(e)}")
 
 class GeminiClient(BaseAIClient):
     def __init__(self, api_key):
