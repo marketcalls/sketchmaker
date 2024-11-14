@@ -58,13 +58,17 @@ echo "Checking static directory structure..."
 # Check main static directory
 check_dir_permissions "$STATIC_ROOT" "755"
 
-# Check css directory
+# Check css directory and files
 check_dir_permissions "$STATIC_ROOT/css" "755"
-find "$STATIC_ROOT/css" -type f -exec bash -c 'check_file_permissions "$0" "644"' {} \;
+if [ -d "$STATIC_ROOT/css" ]; then
+    find "$STATIC_ROOT/css" -type f -exec bash -c 'check_file_permissions "$1" "644"' _ {} \;
+fi
 
-# Check js directory
+# Check js directory and files
 check_dir_permissions "$STATIC_ROOT/js" "755"
-find "$STATIC_ROOT/js" -type f -exec bash -c 'check_file_permissions "$0" "644"' {} \;
+if [ -d "$STATIC_ROOT/js" ]; then
+    find "$STATIC_ROOT/js" -type f -exec bash -c 'check_file_permissions "$1" "644"' _ {} \;
+fi
 
 # Check and fix writable directories
 for dir in "images" "uploads" "training_files"; do
@@ -81,8 +85,8 @@ for dir in "images" "uploads" "training_files"; do
     check_dir_permissions "$DIR_PATH" "775"
     
     # Set permissions for all files in the directory
-    if [ -n "$(ls -A $DIR_PATH 2>/dev/null)" ]; then
-        find "$DIR_PATH" -type f -exec bash -c 'check_file_permissions "$0" "664"' {} \;
+    if [ -d "$DIR_PATH" ] && [ -n "$(ls -A $DIR_PATH 2>/dev/null)" ]; then
+        find "$DIR_PATH" -type f -exec bash -c 'check_file_permissions "$1" "664"' _ {} \;
     fi
 done
 
@@ -122,6 +126,25 @@ if command -v getenforce >/dev/null 2>&1; then
     fi
 fi
 
+# Check socket file permissions
+SOCKET_FILE="$APP_ROOT/sketchmaker.sock"
+if [ -S "$SOCKET_FILE" ]; then
+    echo "Checking socket file permissions..."
+    check_file_permissions "$SOCKET_FILE" "660"
+fi
+
+# Check gunicorn service user
+if [ -f "/etc/systemd/system/sketchmaker.service" ]; then
+    echo "Checking gunicorn service configuration..."
+    grep "User=" "/etc/systemd/system/sketchmaker.service"
+fi
+
+# Check nginx user
+if [ -f "/etc/nginx/nginx.conf" ]; then
+    echo "Checking nginx user configuration..."
+    grep "user" "/etc/nginx/nginx.conf"
+fi
+
 echo "Permission check complete!"
 echo "If you're still having issues, check the following:"
 echo "1. Gunicorn service user matches $WEB_USER"
@@ -131,3 +154,8 @@ echo "4. Firewall and SELinux settings"
 echo "5. Check logs at:"
 echo "   - /var/log/nginx/error.log"
 echo "   - /var/log/gunicorn/gunicorn.error.log"
+
+# Final check of gunicorn and nginx services
+echo -e "\nChecking service status:"
+systemctl status gunicorn.service | grep "Active:"
+systemctl status nginx.service | grep "Active:"
