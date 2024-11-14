@@ -35,10 +35,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    async function checkTrainingStatus(trainingId) {
+        try {
+            const response = await fetch(`/api/training/${trainingId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch training status');
+            }
+
+            const data = await response.json();
+            
+            // Update logs if available
+            if (data.logs) {
+                logsContainer.textContent = data.logs;
+                logsContainer.scrollTop = logsContainer.scrollHeight;
+                
+                // Extract progress from logs
+                const progressMatch = data.logs.match(/(\d+)%\|/);
+                if (progressMatch) {
+                    const progress = parseInt(progressMatch[1]);
+                    progressBar.style.width = `${progress}%`;
+                    progressText.textContent = `Training Progress: ${progress}%`;
+                }
+            }
+            
+            // Check training status
+            if (data.status === 'completed') {
+                clearInterval(statusCheckInterval);
+                showResults(data);
+                return true;
+            } else if (data.status === 'failed') {
+                clearInterval(statusCheckInterval);
+                showError('Training failed. Please check the logs for details.');
+                return true;
+            }
+            
+            return false;
+        } catch (error) {
+            console.error('Status check error:', error);
+            // Don't clear interval - keep checking
+            return false;
+        }
+    }
+
     // Handle form submission
     form.addEventListener('submit', async function(e) {
-        e.preventDefault(); // Prevent normal form submission
-
+        e.preventDefault();
+        
         const files = imageUpload.files;
         if (files.length < 5 || files.length > 20) {
             alert('Please select between 5 and 20 images');
@@ -53,24 +95,24 @@ document.addEventListener('DOMContentLoaded', function() {
         progressText.textContent = 'Uploading images...';
         progressBar.style.width = '10%';
         logsContainer.textContent = 'Starting upload...\n';
-
+        
         try {
             // First, upload images
             const formData = new FormData();
             Array.from(files).forEach(file => {
                 formData.append('files[]', file);
             });
-
+            
             const uploadResponse = await fetch('/api/training/upload', {
                 method: 'POST',
                 body: formData
             });
-
+            
             if (!uploadResponse.ok) {
                 const errorData = await uploadResponse.json();
                 throw new Error(errorData.error || 'Upload failed');
             }
-
+            
             const uploadResult = await uploadResponse.json();
             if (uploadResult.error) {
                 throw new Error(uploadResult.error);
@@ -79,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
             progressText.textContent = 'Starting training...';
             progressBar.style.width = '20%';
             logsContainer.textContent += 'Upload complete. Starting training...\n';
-
+            
             // Start training
             const trainingResponse = await fetch('/api/training/start', {
                 method: 'POST',
@@ -94,12 +136,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     create_masks: document.getElementById('createMasks').checked
                 })
             });
-
+            
             if (!trainingResponse.ok) {
                 const errorData = await trainingResponse.json();
-                throw new Error(errorData.error || 'Training failed');
+                throw new Error(errorData.error || 'Training failed to start');
             }
-
+            
             const result = await trainingResponse.json();
             if (result.error) {
                 throw new Error(result.error);
@@ -107,53 +149,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Start polling for status updates
             const trainingId = result.training_id;
-            statusCheckInterval = setInterval(async () => {
-                try {
-                    const statusResponse = await fetch(`/api/training/${trainingId}`);
-                    if (!statusResponse.ok) {
-                        throw new Error('Failed to fetch training status');
-                    }
-
-                    const statusData = await statusResponse.json();
-                    
-                    // Update logs if available
-                    if (statusData.logs) {
-                        logsContainer.textContent = statusData.logs;
-                        logsContainer.scrollTop = logsContainer.scrollHeight;
-
-                        // Extract progress from logs
-                        const progressMatch = statusData.logs.match(/(\d+)%\|/);
-                        if (progressMatch) {
-                            const progress = parseInt(progressMatch[1]);
-                            progressBar.style.width = `${progress}%`;
-                            progressText.textContent = `Training Progress: ${progress}%`;
-                        }
-                    }
-
-                    // Check if training is complete
-                    if (statusData.status === 'completed') {
-                        clearInterval(statusCheckInterval);
-                        showResults(statusData);
-                    } else if (statusData.status === 'failed') {
-                        clearInterval(statusCheckInterval);
-                        throw new Error('Training failed. Please check the logs for details.');
-                    }
-                } catch (error) {
-                    console.error('Status check error:', error);
-                    logsContainer.textContent += `\nError: ${error.message}`;
-                }
-            }, 5000);
-
+            statusCheckInterval = setInterval(() => checkTrainingStatus(trainingId), 5000);
+            
         } catch (error) {
             console.error('Training error:', error);
-            progressText.textContent = `Error: ${error.message}`;
-            progressText.classList.add('text-error');
-            logsContainer.textContent += `\nError: ${error.message}`;
+            showError(error.message);
             startButton.disabled = false;
             spinner.classList.add('hidden');
-            clearInterval(statusCheckInterval);
         }
     });
+
+    function showError(message) {
+        progressText.textContent = `Error: ${message}`;
+        progressText.classList.add('text-error');
+        logsContainer.textContent += `\nError: ${message}`;
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+    }
+
+    function showResults(data) {
+        resultsSection.classList.remove('hidden');
+        startButton.disabled = false;
+        spinner.classList.add('hidden');
+        
+        if (data.config_url) {
+            document.getElementById('configUrl').textContent = data.config_url;
+        }
+        if (data.weights_url) {
+            document.getElementById('weightsUrl').textContent = data.weights_url;
+        }
+        if (data.result) {
+            document.getElementById('outputJson').textContent = JSON.stringify(data.result, null, 2);
+        }
+        
+        // Reload the page after 2 seconds to show updated history
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+    }
 
     // Copy text to clipboard
     window.copyText = function(text) {
@@ -197,25 +229,4 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Error loading training details');
         }
     };
-
-    function showResults(data) {
-        resultsSection.classList.remove('hidden');
-        startButton.disabled = false;
-        spinner.classList.add('hidden');
-
-        if (data.config_url) {
-            document.getElementById('configUrl').textContent = data.config_url;
-        }
-        if (data.weights_url) {
-            document.getElementById('weightsUrl').textContent = data.weights_url;
-        }
-        if (data.result) {
-            document.getElementById('outputJson').textContent = JSON.stringify(data.result, null, 2);
-        }
-
-        // Reload the page after 2 seconds to show updated history
-        setTimeout(() => {
-            window.location.reload();
-        }, 2000);
-    }
 });

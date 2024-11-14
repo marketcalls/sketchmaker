@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify, request, current_app
+from flask import Blueprint, render_template, jsonify, request, current_app, url_for
 from flask_login import login_required, current_user
 from extensions import limiter, get_rate_limit_string, db
 from .clients import init_fal_client
@@ -13,8 +13,23 @@ import base64
 import fal_client
 from models import TrainingHistory
 import traceback
+import hmac
+import hashlib
 
 training_bp = Blueprint('training', __name__)
+
+def generate_webhook_secret():
+    """Generate a unique webhook secret for this training job"""
+    return os.urandom(24).hex()
+
+def verify_webhook_signature(secret, signature, body):
+    """Verify the webhook signature"""
+    expected = hmac.new(
+        secret.encode('utf-8'),
+        body,
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
 
 def allowed_file(filename):
     """Check if file has an allowed extension"""
@@ -99,27 +114,21 @@ def start_training():
             current_app.logger.error(f"FAL client error: {str(e)}\n{traceback.format_exc()}")
             return jsonify({'error': 'Failed to initialize FAL client'}), 500
 
+        # Generate webhook secret and URL
+        webhook_secret = generate_webhook_secret()
+        webhook_url = url_for('training.webhook', _external=True)
+
         # Create training record
         training_record = TrainingHistory(
             user_id=current_user.id,
             training_id=os.urandom(16).hex(),
             trigger_word=data['trigger_word'],
             status='in_progress',
-            logs=''
+            logs='',
+            webhook_secret=webhook_secret
         )
         db.session.add(training_record)
         db.session.commit()
-
-        def on_queue_update(update):
-            try:
-                if isinstance(update, fal_client.InProgress):
-                    for log in update.logs:
-                        log_message = log['message']
-                        current_app.logger.info(f"Training log: {log_message}")
-                        training_record.logs = (training_record.logs or '') + f"{log_message}\n"
-                        db.session.commit()
-            except Exception as e:
-                current_app.logger.error(f"Queue update error: {str(e)}\n{traceback.format_exc()}")
 
         # Prepare training arguments
         training_args = {
@@ -127,33 +136,28 @@ def start_training():
             'trigger_word': data['trigger_word'],
             'create_masks': data.get('create_masks', True),
             'steps': data.get('steps', 1000),
-            'data_archive_format': 'zip'
+            'data_archive_format': 'zip',
+            'webhook': {
+                'url': webhook_url,
+                'secret': webhook_secret
+            }
         }
 
         try:
-            result = client.subscribe(
+            # Start training with webhook
+            queue_id = client.submit(
                 "fal-ai/flux-lora-fast-training",
-                arguments=training_args,
-                with_logs=True,
-                on_queue_update=on_queue_update
+                training_args
             )
-
-            if not result:
-                raise Exception("No result returned from training")
-
-            # Update training record
-            training_record.status = 'completed'
-            training_record.completed_at = datetime.utcnow()
-            training_record.result = result
-            training_record.config_url = result.get('config_file', {}).get('url')
-            training_record.weights_url = result.get('diffusers_lora_file', {}).get('url')
+            
+            # Store queue ID in training record
+            training_record.queue_id = queue_id
             db.session.commit()
 
             return jsonify({
                 'status': 'success',
-                'message': 'Training completed successfully',
-                'training_id': training_record.training_id,
-                'result': result
+                'message': 'Training started successfully',
+                'training_id': training_record.training_id
             })
 
         except Exception as e:
@@ -165,6 +169,52 @@ def start_training():
 
     except Exception as e:
         current_app.logger.error(f"Training error: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({'error': str(e)}), 500
+
+@training_bp.route('/api/training/webhook', methods=['POST'])
+def webhook():
+    try:
+        # Get webhook signature from headers
+        signature = request.headers.get('X-FAL-Signature')
+        if not signature:
+            return jsonify({'error': 'No signature provided'}), 400
+
+        # Get request body as bytes
+        body = request.get_data()
+        
+        # Parse the JSON data
+        data = request.get_json()
+        if not data or 'queue_id' not in data:
+            return jsonify({'error': 'Invalid webhook data'}), 400
+
+        # Find the training record
+        training = TrainingHistory.query.filter_by(queue_id=data['queue_id']).first()
+        if not training:
+            return jsonify({'error': 'Training record not found'}), 404
+
+        # Verify webhook signature
+        if not verify_webhook_signature(training.webhook_secret, signature, body):
+            return jsonify({'error': 'Invalid signature'}), 401
+
+        # Update training record based on webhook data
+        if data.get('status') == 'completed':
+            training.status = 'completed'
+            training.completed_at = datetime.utcnow()
+            training.result = data.get('result', {})
+            training.config_url = data.get('result', {}).get('config_file', {}).get('url')
+            training.weights_url = data.get('result', {}).get('diffusers_lora_file', {}).get('url')
+        elif data.get('status') == 'failed':
+            training.status = 'failed'
+            training.logs = (training.logs or '') + f"\nError: {data.get('error', 'Unknown error')}"
+        elif data.get('status') == 'in_progress':
+            if 'logs' in data:
+                training.logs = (training.logs or '') + f"\n{data['logs']}"
+
+        db.session.commit()
+        return jsonify({'status': 'success'}), 200
+
+    except Exception as e:
+        current_app.logger.error(f"Webhook error: {str(e)}\n{traceback.format_exc()}")
         return jsonify({'error': str(e)}), 500
 
 @training_bp.route('/api/training/<training_id>')

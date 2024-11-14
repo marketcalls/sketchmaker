@@ -99,7 +99,7 @@ class Image(db.Model):
         """Get image dimensions from file if not stored in database"""
         if not self.width or not self.height:
             try:
-                filepath = os.path.join('sketchmaker', 'static', 'images', self.filename)
+                filepath = os.path.join('static', 'images', self.filename)
                 with PILImage.open(filepath) as img:
                     self.width, self.height = img.size
                     db.session.commit()
@@ -117,27 +117,29 @@ class Image(db.Model):
 
 class TrainingHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    training_id = db.Column(db.String(32), unique=True, nullable=False)
+    queue_id = db.Column(db.String(100), unique=True)  # FAL queue ID
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    training_id = db.Column(db.String(255), nullable=False)  # The FAL training ID
-    trigger_word = db.Column(db.String(255), nullable=False)
-    status = db.Column(db.String(50), default='in_progress')  # in_progress, completed, failed
-    logs = db.Column(db.Text)  # Store training logs
-    config_url = db.Column(db.String(500))  # URL to config.json
-    weights_url = db.Column(db.String(500))  # URL to pytorch_lora_weights.safetensors
-    result = db.Column(db.JSON)  # Store complete training result
+    trigger_word = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.String(20), default='pending')  # pending, in_progress, completed, failed
+    logs = db.Column(db.Text)
+    result = db.Column(db.JSON)
+    config_url = db.Column(db.String(500))
+    weights_url = db.Column(db.String(500))
+    webhook_secret = db.Column(db.String(48))  # For webhook verification
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     completed_at = db.Column(db.DateTime)
 
     def to_dict(self):
         return {
-            'id': self.id,
             'training_id': self.training_id,
+            'queue_id': self.queue_id,
             'trigger_word': self.trigger_word,
             'status': self.status,
             'logs': self.logs,
             'config_url': self.config_url,
             'weights_url': self.weights_url,
-            'result': self.result,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'completed_at': self.completed_at.isoformat() if self.completed_at else None
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+            'result': self.result
         }
