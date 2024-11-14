@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const startButton = document.getElementById('startTraining');
     const spinner = startButton.querySelector('.loading');
     let statusCheckInterval = null;
+    let consecutiveErrorCount = 0;
+    const MAX_ERRORS = 5;
 
     // Handle image preview
     imageUpload.addEventListener('change', function() {
@@ -69,10 +71,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 return true;
             }
             
+            // Reset error count on successful status check
+            consecutiveErrorCount = 0;
             return false;
         } catch (error) {
             console.error('Status check error:', error);
-            // Don't clear interval - keep checking
+            consecutiveErrorCount++;
+            
+            // If we've had too many consecutive errors, stop checking
+            if (consecutiveErrorCount >= MAX_ERRORS) {
+                clearInterval(statusCheckInterval);
+                showError('Lost connection to server. Please check the training status in your history.');
+            }
             return false;
         }
     }
@@ -147,9 +157,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(result.error);
             }
 
+            // Reset error count
+            consecutiveErrorCount = 0;
+
             // Start polling for status updates
             const trainingId = result.training_id;
-            statusCheckInterval = setInterval(() => checkTrainingStatus(trainingId), 5000);
+            statusCheckInterval = setInterval(() => checkTrainingStatus(trainingId), 10000); // Check every 10 seconds
+            
+            // Do an immediate check
+            await checkTrainingStatus(trainingId);
             
         } catch (error) {
             console.error('Training error:', error);
