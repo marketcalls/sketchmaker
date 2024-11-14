@@ -16,24 +16,33 @@ document.addEventListener('DOMContentLoaded', function() {
     function extractProgressFromLogs(logs) {
         if (!logs) return null;
         
-        // Handle array of log objects
-        if (Array.isArray(logs)) {
-            for (const log of logs) {
-                if (typeof log === 'object' && log.message) {
-                    const match = log.message.match(/(\d+)%\|/);
-                    if (match) {
-                        return parseInt(match[1]);
-                    }
+        // Convert logs to string if it's not already
+        const logsStr = typeof logs === 'string' ? logs : formatLogs(logs);
+        
+        // Look for completion indicators
+        if (logsStr.includes('Model saved to')) {
+            return 100;
+        }
+        
+        // Look for progress patterns
+        const progressPatterns = [
+            /(\d+)\/100\s+\[[\d:]+<?,\s+[\d.]+s\/it\]/,  // Matches "95/100 [01:43<00:05, 1.13s/it]"
+            /(\d+)%\|/,  // Matches "95%|"
+            /(\d+)\/100/  // Simple fraction match
+        ];
+        
+        for (const pattern of progressPatterns) {
+            const match = logsStr.match(new RegExp(pattern, 'g'));
+            if (match) {
+                // Get the last (most recent) match
+                const lastMatch = match[match.length - 1];
+                const progressMatch = lastMatch.match(/\d+/);
+                if (progressMatch) {
+                    return parseInt(progressMatch[0]);
                 }
             }
         }
-        // Handle string logs
-        else if (typeof logs === 'string') {
-            const match = logs.match(/(\d+)%\|/);
-            if (match) {
-                return parseInt(match[1]);
-            }
-        }
+        
         return null;
     }
 
@@ -73,15 +82,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 logsContainer.scrollTop = logsContainer.scrollHeight;
                 
                 // Extract progress
-                const progress = extractProgressFromLogs(data.logs);
+                const progress = extractProgressFromLogs(formattedLogs);
                 if (progress !== null) {
                     progressBar.style.width = `${progress}%`;
                     progressText.textContent = `Training Progress: ${progress}%`;
+                    
+                    // Check for completion based on logs
+                    if (progress === 100 && formattedLogs.includes('Model saved to')) {
+                        clearInterval(statusCheckInterval);
+                        data.status = 'completed';
+                    }
                 }
             }
             
             // Check training status
-            if (data.status === 'completed') {
+            if (data.status === 'completed' || (data.logs && data.logs.includes('Model saved to'))) {
                 clearInterval(statusCheckInterval);
                 showResults(data);
                 return true;

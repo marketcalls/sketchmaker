@@ -19,6 +19,23 @@ import time
 
 training_bp = Blueprint('training', __name__)
 
+def is_training_completed(logs):
+    """Check if training is completed based on logs"""
+    if not logs:
+        return False
+    
+    # Convert logs to string if needed
+    logs_str = logs if isinstance(logs, str) else format_logs(logs)
+    
+    # Check for completion indicators
+    completion_indicators = [
+        'Model saved to',
+        '100/100',
+        'Training completed'
+    ]
+    
+    return any(indicator in logs_str for indicator in completion_indicators)
+
 def format_logs(logs):
     """Format logs into a string"""
     if not logs:
@@ -40,8 +57,17 @@ def check_training_status(client, request_id):
     """Check training status and get logs"""
     try:
         status = client.status("fal-ai/flux-lora-fast-training", request_id, with_logs=True)
+        current_app.logger.info(f"Status check response: {status}")
+        
+        # Format logs if present
         if hasattr(status, 'logs'):
-            status.logs = format_logs(status.logs)
+            formatted_logs = format_logs(status.logs)
+            status.logs = formatted_logs
+            
+            # Check for completion in logs
+            if is_training_completed(formatted_logs):
+                status.status = 'completed'
+                
         return status
     except Exception as e:
         current_app.logger.error(f"Error checking status: {str(e)}")
@@ -51,6 +77,7 @@ def get_training_result(client, request_id):
     """Get training result once completed"""
     try:
         result = client.result("fal-ai/flux-lora-fast-training", request_id)
+        current_app.logger.info(f"Got training result: {result}")
         return result
     except Exception as e:
         current_app.logger.error(f"Error getting result: {str(e)}")
@@ -246,8 +273,8 @@ def get_training_status(training_id):
                     if hasattr(status, 'logs'):
                         training.logs = format_logs(status.logs)
                     
-                    # Check if completed
-                    if getattr(status, 'status', None) == 'completed':
+                    # Check for completion
+                    if getattr(status, 'status', None) == 'completed' or is_training_completed(training.logs):
                         result = get_training_result(client, training.queue_id)
                         if result:
                             training.status = 'completed'
@@ -255,6 +282,7 @@ def get_training_status(training_id):
                             training.result = result
                             training.config_url = result.get('config_file', {}).get('url')
                             training.weights_url = result.get('diffusers_lora_file', {}).get('url')
+                            current_app.logger.info(f"Training completed. Result: {result}")
                     elif getattr(status, 'status', None) == 'failed':
                         training.status = 'failed'
                         training.logs += f"\nTraining failed: {getattr(status, 'error', 'Unknown error')}"
@@ -312,7 +340,7 @@ def webhook():
         current_app.logger.info(f"Processing webhook data: {data}")
 
         # Update training record based on webhook data
-        if data.get('status') == 'completed':
+        if data.get('status') == 'completed' or is_training_completed(data.get('logs')):
             training.status = 'completed'
             training.completed_at = datetime.utcnow()
             training.result = data.get('result', {})
