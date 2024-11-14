@@ -2,9 +2,8 @@
 
 {% block title %}LoRA Training - Sketch Maker AI{% endblock %}
 
-{% block head %}
-{{ super() }}
-<script src="{{ url_for('static', filename='js/training.js') }}" defer></script>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/training.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -15,7 +14,7 @@
             <h2 class="card-title text-2xl mb-4">Train Custom LoRA Model</h2>
             
             <!-- Training Form -->
-            <form id="trainingForm" class="space-y-6">
+            <form id="trainingForm" class="space-y-6" onsubmit="return false;">
                 <!-- Image Upload -->
                 <div class="form-control">
                     <label class="label">

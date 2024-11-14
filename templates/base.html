@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}{% endblock %}</title>
+    {% block head %}
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -84,6 +85,7 @@
             letter-spacing: -0.025em;
         }
     </style>
+    {% endblock %}
     {% block extra_css %}{% endblock %}
 </head>
 <body class="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300">
@@ -152,6 +154,6 @@
         // Apply theme from localStorage
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme'));
     </script>
-    {% block extra_js %}{% endblock %}
+    {% block scripts %}{% endblock %}
 </body>
 </html>
