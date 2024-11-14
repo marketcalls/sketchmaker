@@ -30,10 +30,15 @@ ENV/
 *.db
 *.sqlite3
 *.sqlite
+instance/
 
-# Generated Images
+# Generated Files
 static/images/*
 !static/images/.gitkeep
+static/training_files/*
+!static/training_files/.gitkeep
+static/uploads/*
+!static/uploads/.gitkeep
 
 # IDE
 .idea/
@@ -48,6 +53,8 @@ static/images/*
 .DS_Store
 Thumbs.db
 *.log
+
+# Environment files
 .env.*
 !.env.sample
 
@@ -64,6 +71,20 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+
+# Logs
+/var/log/
+*.log
+gunicorn.*
+
+# Server
+*.sock
+*.pid
+
+# Backup files
+*.bak
+*.backup
+*~
 
 # Distribution / packaging
 .Python

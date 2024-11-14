@@ -51,7 +51,10 @@
                             Prompt API Key
                         {% endif %}
                     </span>
-                    <span class="label-text-alt text-error hidden" id="promptKeyError">API key is required</span>
+                    <span class="flex items-center gap-2">
+                        <span class="label-text-alt text-error hidden" id="promptKeyError">API key is required</span>
+                        <a href="" id="getKeysLink" target="_blank" class="label-text-alt link link-primary">Get Keys</a>
+                    </span>
                 </label>
                 <div class="relative">
                     <input type="password" id="promptApiKey" name="prompt_api_key" 
@@ -69,7 +72,10 @@
             <div class="form-control w-full max-w-md">
                 <label class="label">
                     <span class="label-text text-lg">Image Generation API Key (FAL)</span>
-                    <span class="label-text-alt text-error hidden" id="falKeyError">FAL API key is required</span>
+                    <span class="flex items-center gap-2">
+                        <span class="label-text-alt text-error hidden" id="falKeyError">FAL API key is required</span>
+                        <a href="https://fal.ai/dashboard/keys" target="_blank" class="label-text-alt link link-primary">Get Keys</a>
+                    </span>
                 </label>
                 <div class="relative">
                     <input type="password" id="falKey" name="fal_key" 
@@ -102,6 +108,13 @@ let apiKeys = {
     fal_key: '{{ api_keys.fal_key }}',
     current_provider_key: '{{ api_keys.current_provider_key }}',
     current_provider_name: '{{ api_keys.current_provider_name }}'
+};
+
+const providerKeyLinks = {
+    'OpenAI': 'https://platform.openai.com/settings/organization/api-keys',
+    'Anthropic': 'https://console.anthropic.com/settings/keys',
+    'Google Gemini': 'https://aistudio.google.com/apikey',
+    'Groq': 'https://console.groq.com/keys'
 };
 
 console.log('Initial API Keys:', apiKeys);
@@ -287,8 +300,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const modelSelect = document.getElementById('aiModel');
     const promptKeyInput = document.getElementById('promptApiKey');
     const promptKeyLabel = document.getElementById('promptKeyLabel');
+    const getKeysLink = document.getElementById('getKeysLink');
     
-    if (!providerSelect || !modelSelect || !promptKeyInput || !promptKeyLabel) {
+    if (!providerSelect || !modelSelect || !promptKeyInput || !promptKeyLabel || !getKeysLink) {
         console.error('Required form elements not found');
         return;
     }
@@ -299,6 +313,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const providerName = selectedProvider.text;
             promptKeyLabel.textContent = `${providerName} API Key`;
             promptKeyInput.placeholder = `Enter ${providerName} API Key`;
+            
+            // Update "Get Keys" link
+            if (providerKeyLinks[providerName]) {
+                getKeysLink.href = providerKeyLinks[providerName];
+                getKeysLink.classList.remove('hidden');
+            } else {
+                getKeysLink.classList.add('hidden');
+            }
             
             // Set the API key value based on the selected provider
             let keyValue = '';
@@ -327,6 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
             promptKeyLabel.textContent = 'Prompt API Key';
             promptKeyInput.placeholder = 'Select a provider first';
             promptKeyInput.value = '';
+            getKeysLink.classList.add('hidden');
         }
     }
     

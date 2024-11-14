@@ -33,6 +33,15 @@ A modern web application that uses AI to generate artwork from text descriptions
   - Custom style IDs support
   - Optimized prompt handling for better results
 
+- LoRA Training Features (New):
+  - Custom model training with 5-20 images
+  - Automatic mask generation
+  - Configurable training steps
+  - Real-time training progress monitoring
+  - Training history management
+  - Easy access to trained model files
+  - Copy functionality for trigger words and logs
+
 - User Experience:
   - Secure API key management with show/hide functionality
   - Comprehensive error handling for API issues
@@ -57,7 +66,7 @@ A modern web application that uses AI to generate artwork from text descriptions
   - Automatic image format conversion
   - Smart prompt length management for different models
 
-## Setup
+## Local Development Setup
 
 1. Clone the repository:
 ```bash
@@ -101,6 +110,28 @@ python app.py
 
 The application will be available at `http://localhost:5000`
 
+## Production Deployment
+
+For production deployment on Ubuntu server, we provide comprehensive setup instructions:
+
+1. Server Requirements:
+   - Ubuntu 20.04 LTS or newer
+   - Python 3.8+
+   - Nginx
+   - Gunicorn
+
+2. Automated Setup:
+   - Use the provided `prestart.sh` script for automated setup
+   - Handles directory creation and permissions
+   - Sets up logging
+   - Configures SELinux if enabled
+
+3. Detailed Instructions:
+   - See [server/setup.md](server/setup.md) for complete deployment guide
+   - Includes Nginx and Gunicorn configuration
+   - Covers security best practices
+   - Details backup procedures
+
 ## Usage
 
 1. Register for an account or login if you already have one
@@ -140,6 +171,7 @@ sketchmaker/
 ├── app.py              # Main application file
 ├── models.py           # Database models
 ├── requirements.txt    # Project dependencies
+├── prestart.sh        # Server setup script
 ├── blueprints/        # Route handlers
 │   ├── admin.py       # Admin routes and user management
 │   ├── auth.py        # Authentication routes
@@ -147,18 +179,23 @@ sketchmaker/
 │   ├── download.py    # Image download handling
 │   ├── gallery.py     # Gallery routes
 │   ├── generate.py    # Image generation routes
+│   ├── training.py    # LoRA training functionality
 │   ├── clients.py     # API client handling
 │   ├── image_generator.py  # Image generation logic
 │   └── prompt_generator.py # Prompt enhancement logic
 ├── static/            # Static files
 │   ├── css/          # Stylesheets
 │   ├── js/           # JavaScript files
-│   └── images/       # Generated images
-└── templates/         # HTML templates
-    ├── admin/        # Admin templates
-    ├── auth/         # Authentication templates
-    ├── partials/     # Reusable template parts
-    └── *.html        # Main templates
+│   ├── images/       # Generated images
+│   ├── uploads/      # Temporary uploads
+│   └── training_files/# Training outputs
+├── templates/         # HTML templates
+│   ├── admin/        # Admin templates
+│   ├── auth/         # Authentication templates
+│   ├── partials/     # Reusable template parts
+│   └── *.html        # Main templates
+└── server/           # Server configuration
+    └── setup.md      # Deployment guide
 ```
 
 ## Technologies Used
@@ -180,6 +217,8 @@ sketchmaker/
   - Recraft V3
 - daisyUI & Tailwind CSS (UI components)
 - Pillow (PIL) (Image processing)
+- Gunicorn (WSGI HTTP Server)
+- Nginx (Web Server)
 
 ## Error Handling
 
@@ -192,6 +231,8 @@ The application includes comprehensive error handling for:
 - Authentication and authorization errors
 - Role-based access control violations
 - Model-specific limitations (e.g., prompt length)
+- File permission issues
+- Training process failures
 
 Each error is handled gracefully with clear user feedback and guidance for resolution.
 
