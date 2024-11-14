@@ -272,6 +272,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const startButton = document.getElementById('startTraining');
     const spinner = startButton.querySelector('.loading');
     const modal = document.getElementById('trainingDetailsModal');
+    let trainingId = null;
+    let statusCheckInterval = null;
 
     // Handle image preview
     imageUpload.addEventListener('change', function() {
@@ -296,6 +298,77 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.readAsDataURL(file);
         });
     });
+
+    // Function to check training status
+    async function checkTrainingStatus() {
+        if (!trainingId) return;
+        
+        try {
+            const response = await fetch(`/api/training/${trainingId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch training status');
+            }
+            
+            const data = await response.json();
+            
+            // Update logs if available
+            if (data.logs) {
+                logsContainer.textContent = data.logs;
+                logsContainer.scrollTop = logsContainer.scrollHeight;
+                
+                // Extract progress from logs
+                const progressMatch = data.logs.match(/(\d+)%\|/);
+                if (progressMatch) {
+                    const progress = parseInt(progressMatch[1]);
+                    progressBar.style.width = `${progress}%`;
+                    progressText.textContent = `Training Progress: ${progress}%`;
+                }
+            }
+            
+            // Check if training is complete
+            if (data.status === 'completed') {
+                clearInterval(statusCheckInterval);
+                showResults(data);
+            } else if (data.status === 'failed') {
+                clearInterval(statusCheckInterval);
+                showError('Training failed. Please check the logs for details.');
+            }
+            
+        } catch (error) {
+            console.error('Status check error:', error);
+            // Don't clear the interval - let it keep trying
+        }
+    }
+
+    // Function to show results
+    function showResults(data) {
+        resultsSection.classList.remove('hidden');
+        startButton.disabled = false;
+        spinner.classList.add('hidden');
+        
+        if (data.config_url) {
+            document.getElementById('configUrl').textContent = data.config_url;
+        }
+        if (data.weights_url) {
+            document.getElementById('weightsUrl').textContent = data.weights_url;
+        }
+        if (data.result) {
+            document.getElementById('outputJson').textContent = JSON.stringify(data.result, null, 2);
+        }
+        
+        // Reload the page after 2 seconds to show updated history
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+    }
+
+    // Function to show error
+    function showError(message) {
+        progressText.textContent = `Error: ${message}`;
+        progressText.classList.add('text-error');
+        startButton.disabled = false;
+        spinner.classList.add('hidden');
+    }
 
     // Handle form submission
     form.addEventListener('submit', async function(e) {
@@ -357,7 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!trainingResponse.ok) {
                 const errorData = await trainingResponse.json();
-                throw new Error(errorData.details || 'Training failed');
+                throw new Error(errorData.error || 'Training failed');
             }
             
             const result = await trainingResponse.json();
@@ -365,36 +438,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(result.error);
             }
             
-            // Update progress
-            progressBar.style.width = '100%';
-            progressText.textContent = 'Training completed!';
-            
-            // Show results
-            resultsSection.classList.remove('hidden');
-            document.getElementById('outputJson').textContent = JSON.stringify(result.result, null, 2);
-            document.getElementById('configUrl').textContent = result.result.config_file.url;
-            document.getElementById('weightsUrl').textContent = result.result.diffusers_lora_file.url;
-            
-            // Reload the page after 2 seconds to show updated history
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            // Start polling for status updates
+            trainingId = result.training_id;
+            statusCheckInterval = setInterval(checkTrainingStatus, 5000);
             
         } catch (error) {
             console.error('Training error:', error);
-            progressText.textContent = `Error: ${error.message}`;
-            logsContainer.textContent += `Error: ${error.message}\n`;
-            alert('Training failed: ' + error.message);
-        } finally {
-            startButton.disabled = false;
-            spinner.classList.add('hidden');
+            showError(error.message);
         }
     });
 
     // Copy text to clipboard
     window.copyText = function(text) {
         navigator.clipboard.writeText(text).then(() => {
-            // Show toast or some feedback
             alert('Copied to clipboard!');
         });
     };
@@ -419,13 +475,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(`/api/training/${trainingId}`);
             const data = await response.json();
             
-            // Set trigger word
             document.getElementById('modalTriggerWord').textContent = data.trigger_word;
-            
-            // Set logs
             document.getElementById('modalLogs').textContent = data.logs || 'No logs available';
-            
-            // Set file URLs
             document.getElementById('modalConfigUrl').textContent = data.config_url || '';
             document.getElementById('modalWeightsUrl').textContent = data.weights_url || '';
             
