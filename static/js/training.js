@@ -13,29 +13,49 @@ document.addEventListener('DOMContentLoaded', function() {
     let consecutiveErrorCount = 0;
     const MAX_ERRORS = 5;
 
-    // Handle image preview
-    imageUpload.addEventListener('change', function() {
-        imagePreview.innerHTML = '';
-        if (this.files.length < 5 || this.files.length > 20) {
-            alert('Please select between 5 and 20 images');
-            this.value = '';
-            return;
+    function extractProgressFromLogs(logs) {
+        if (!logs) return null;
+        
+        // Handle array of log objects
+        if (Array.isArray(logs)) {
+            for (const log of logs) {
+                if (typeof log === 'object' && log.message) {
+                    const match = log.message.match(/(\d+)%\|/);
+                    if (match) {
+                        return parseInt(match[1]);
+                    }
+                }
+            }
         }
+        // Handle string logs
+        else if (typeof logs === 'string') {
+            const match = logs.match(/(\d+)%\|/);
+            if (match) {
+                return parseInt(match[1]);
+            }
+        }
+        return null;
+    }
 
-        Array.from(this.files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const div = document.createElement('div');
-                div.className = 'relative aspect-square';
-                div.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview" 
-                         class="w-full h-full object-cover rounded-lg" />
-                `;
-                imagePreview.appendChild(div);
-            };
-            reader.readAsDataURL(file);
-        });
-    });
+    function formatLogs(logs) {
+        if (!logs) return '';
+        
+        // Handle array of log objects
+        if (Array.isArray(logs)) {
+            return logs.map(log => {
+                if (typeof log === 'object' && log.message) {
+                    return log.message;
+                }
+                return JSON.stringify(log);
+            }).join('\n');
+        }
+        // Handle string logs
+        else if (typeof logs === 'string') {
+            return logs;
+        }
+        // Handle other types
+        return JSON.stringify(logs, null, 2);
+    }
 
     async function checkTrainingStatus(trainingId) {
         try {
@@ -48,13 +68,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update logs if available
             if (data.logs) {
-                logsContainer.textContent = data.logs;
+                const formattedLogs = formatLogs(data.logs);
+                logsContainer.textContent = formattedLogs;
                 logsContainer.scrollTop = logsContainer.scrollHeight;
                 
-                // Extract progress from logs
-                const progressMatch = data.logs.match(/(\d+)%\|/);
-                if (progressMatch) {
-                    const progress = parseInt(progressMatch[1]);
+                // Extract progress
+                const progress = extractProgressFromLogs(data.logs);
+                if (progress !== null) {
                     progressBar.style.width = `${progress}%`;
                     progressText.textContent = `Training Progress: ${progress}%`;
                 }
@@ -235,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             document.getElementById('modalTriggerWord').textContent = data.trigger_word;
-            document.getElementById('modalLogs').textContent = data.logs || 'No logs available';
+            document.getElementById('modalLogs').textContent = formatLogs(data.logs) || 'No logs available';
             document.getElementById('modalConfigUrl').textContent = data.config_url || '';
             document.getElementById('modalWeightsUrl').textContent = data.weights_url || '';
             

@@ -19,10 +19,29 @@ import time
 
 training_bp = Blueprint('training', __name__)
 
+def format_logs(logs):
+    """Format logs into a string"""
+    if not logs:
+        return ''
+    
+    # Handle array of log objects
+    if isinstance(logs, list):
+        return '\n'.join([
+            log.get('message', str(log)) if isinstance(log, dict) else str(log)
+            for log in logs
+        ])
+    # Handle string logs
+    elif isinstance(logs, str):
+        return logs
+    # Handle other types
+    return str(logs)
+
 def check_training_status(client, request_id):
     """Check training status and get logs"""
     try:
         status = client.status("fal-ai/flux-lora-fast-training", request_id, with_logs=True)
+        if hasattr(status, 'logs'):
+            status.logs = format_logs(status.logs)
         return status
     except Exception as e:
         current_app.logger.error(f"Error checking status: {str(e)}")
@@ -181,13 +200,13 @@ def start_training():
             request_id = handler.request_id
             training_record.queue_id = request_id
             current_app.logger.info(f"Training started with request_id: {request_id}")
-            db.session.commit()
-
-            # Initial status check
+            
+            # Get initial status
             status = check_training_status(client, request_id)
             if status:
-                training_record.logs = f"Training started. Status: {status}"
-                db.session.commit()
+                training_record.logs = format_logs(getattr(status, 'logs', ''))
+            
+            db.session.commit()
 
             return jsonify({
                 'status': 'success',
@@ -225,10 +244,10 @@ def get_training_status(training_id):
                 if status:
                     # Update logs
                     if hasattr(status, 'logs'):
-                        training.logs = status.logs
+                        training.logs = format_logs(status.logs)
                     
                     # Check if completed
-                    if status.status == 'completed':
+                    if getattr(status, 'status', None) == 'completed':
                         result = get_training_result(client, training.queue_id)
                         if result:
                             training.status = 'completed'
@@ -236,9 +255,9 @@ def get_training_status(training_id):
                             training.result = result
                             training.config_url = result.get('config_file', {}).get('url')
                             training.weights_url = result.get('diffusers_lora_file', {}).get('url')
-                    elif status.status == 'failed':
+                    elif getattr(status, 'status', None) == 'failed':
                         training.status = 'failed'
-                        training.logs += f"\nTraining failed: {status.error if hasattr(status, 'error') else 'Unknown error'}"
+                        training.logs += f"\nTraining failed: {getattr(status, 'error', 'Unknown error')}"
                     
                     db.session.commit()
             except Exception as e:
@@ -306,8 +325,8 @@ def webhook():
             current_app.logger.error(f"Training failed: {data.get('error', 'Unknown error')}")
         elif data.get('status') == 'in_progress':
             if 'logs' in data:
-                training.logs = (training.logs or '') + f"\n{data['logs']}"
-                current_app.logger.info(f"Training progress update: {data['logs']}")
+                training.logs = format_logs(data['logs'])
+                current_app.logger.info(f"Training progress update: {training.logs}")
 
         db.session.commit()
         return jsonify({'status': 'success'}), 200
