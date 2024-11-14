@@ -145,13 +145,13 @@ def start_training():
 
         try:
             # Start training with webhook
-            queue_id = client.submit(
+            result = client.submit(
                 "fal-ai/flux-lora-fast-training",
                 training_args
             )
             
-            # Store queue ID in training record
-            training_record.queue_id = queue_id
+            # Store request ID in queue_id
+            training_record.queue_id = result.request_id
             db.session.commit()
 
             return jsonify({
