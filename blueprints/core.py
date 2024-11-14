@@ -25,9 +25,36 @@ def settings():
     providers = APIProvider.query.filter_by(is_active=True).all()
     models = AIModel.query.filter_by(is_active=True).all()
     
+    # Get current provider and its key
+    current_provider = None
+    current_provider_key = None
+    if current_user.selected_provider_id:
+        current_provider = APIProvider.query.get(current_user.selected_provider_id)
+        if current_provider:
+            if current_provider.name == 'OpenAI':
+                current_provider_key = current_user.openai_api_key
+            elif current_provider.name == 'Anthropic':
+                current_provider_key = current_user.anthropic_api_key
+            elif current_provider.name == 'Google Gemini':
+                current_provider_key = current_user.gemini_api_key
+            elif current_provider.name == 'Groq':
+                current_provider_key = current_user.groq_api_key
+    
+    # Get user's API keys
+    api_keys = {
+        'openai_api_key': current_user.openai_api_key or '',
+        'anthropic_api_key': current_user.anthropic_api_key or '',
+        'gemini_api_key': current_user.gemini_api_key or '',
+        'groq_api_key': current_user.groq_api_key or '',
+        'fal_key': current_user.fal_key or '',
+        'current_provider_key': current_provider_key or '',
+        'current_provider_name': current_provider.name if current_provider else ''
+    }
+    
     return render_template('settings.html', 
                          providers=providers,
-                         models=models)
+                         models=models,
+                         api_keys=api_keys)
 
 @core_bp.route('/settings/update', methods=['POST'])
 @limiter.limit(get_rate_limit_string())
@@ -70,7 +97,32 @@ def update_settings():
         
         db.session.commit()
         
-        return jsonify({'message': 'Settings updated successfully'})
+        # Get the current provider's key after update
+        current_provider_key = None
+        if provider.name == 'OpenAI':
+            current_provider_key = current_user.openai_api_key
+        elif provider.name == 'Anthropic':
+            current_provider_key = current_user.anthropic_api_key
+        elif provider.name == 'Google Gemini':
+            current_provider_key = current_user.gemini_api_key
+        elif provider.name == 'Groq':
+            current_provider_key = current_user.groq_api_key
+        
+        # Return updated API keys in response
+        response_data = {
+            'message': 'Settings updated successfully',
+            'api_keys': {
+                'openai_api_key': current_user.openai_api_key or '',
+                'anthropic_api_key': current_user.anthropic_api_key or '',
+                'gemini_api_key': current_user.gemini_api_key or '',
+                'groq_api_key': current_user.groq_api_key or '',
+                'fal_key': current_user.fal_key or '',
+                'current_provider_key': current_provider_key or '',
+                'current_provider_name': provider.name
+            }
+        }
+        
+        return jsonify(response_data)
         
     except Exception as e:
         db.session.rollback()

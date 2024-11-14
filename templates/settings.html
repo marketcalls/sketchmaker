@@ -44,13 +44,20 @@
             <!-- Prompt API Key -->
             <div id="promptKeyContainer" class="form-control w-full max-w-md">
                 <label class="label">
-                    <span id="promptKeyLabel" class="label-text text-lg">Prompt API Key</span>
+                    <span id="promptKeyLabel" class="label-text text-lg">
+                        {% if api_keys.current_provider_name %}
+                            {{ api_keys.current_provider_name }} API Key
+                        {% else %}
+                            Prompt API Key
+                        {% endif %}
+                    </span>
                     <span class="label-text-alt text-error hidden" id="promptKeyError">API key is required</span>
                 </label>
                 <div class="relative">
                     <input type="password" id="promptApiKey" name="prompt_api_key" 
                            class="input input-bordered w-full pr-20" 
-                           placeholder="Enter API Key">
+                           placeholder="Enter API Key"
+                           value="{{ api_keys.current_provider_key }}">
                     <button type="button" class="btn btn-ghost btn-sm absolute right-2 top-1/2 transform -translate-y-1/2"
                             onclick="togglePassword('promptApiKey')">
                         Show
@@ -67,7 +74,7 @@
                 <div class="relative">
                     <input type="password" id="falKey" name="fal_key" 
                            class="input input-bordered w-full pr-20" 
-                           value="{{ current_user.fal_key or '' }}"
+                           value="{{ api_keys.fal_key }}"
                            placeholder="Enter FAL API Key">
                     <button type="button" class="btn btn-ghost btn-sm absolute right-2 top-1/2 transform -translate-y-1/2"
                             onclick="togglePassword('falKey')">
@@ -87,6 +94,17 @@
 <script>
 let currentProvider = '{{ current_user.selected_provider_id }}';
 let currentModel = '{{ current_user.selected_model_id }}';
+let apiKeys = {
+    openai_api_key: '{{ api_keys.openai_api_key }}',
+    anthropic_api_key: '{{ api_keys.anthropic_api_key }}',
+    gemini_api_key: '{{ api_keys.gemini_api_key }}',
+    groq_api_key: '{{ api_keys.groq_api_key }}',
+    fal_key: '{{ api_keys.fal_key }}',
+    current_provider_key: '{{ api_keys.current_provider_key }}',
+    current_provider_name: '{{ api_keys.current_provider_name }}'
+};
+
+console.log('Initial API Keys:', apiKeys);
 
 function togglePassword(inputId) {
     const input = document.getElementById(inputId);
@@ -197,10 +215,27 @@ async function handleSubmit() {
         });
         
         if (response.ok) {
+            const data = await response.json();
             showToast('Settings saved successfully', 'success');
-            // Update current values after successful save
+            
+            // Update current values and API keys
             currentProvider = formData.provider_id;
             currentModel = formData.model_id;
+            apiKeys = { ...apiKeys, ...data.api_keys };
+            
+            console.log('Updated API Keys:', apiKeys);
+            
+            // Update the prompt API key input and label
+            const promptKeyInput = document.getElementById('promptApiKey');
+            const promptKeyLabel = document.getElementById('promptKeyLabel');
+            
+            if (promptKeyInput && apiKeys.current_provider_key) {
+                promptKeyInput.value = apiKeys.current_provider_key;
+            }
+            
+            if (promptKeyLabel && apiKeys.current_provider_name) {
+                promptKeyLabel.textContent = `${apiKeys.current_provider_name} API Key`;
+            }
         } else {
             const data = await response.json();
             showToast(data.error || 'Failed to save settings', 'error');
@@ -265,25 +300,25 @@ document.addEventListener('DOMContentLoaded', function() {
             promptKeyLabel.textContent = `${providerName} API Key`;
             promptKeyInput.placeholder = `Enter ${providerName} API Key`;
             
-            if (currentProvider !== selectedProvider.value) {
-                switch(providerName) {
-                    case 'OpenAI':
-                        promptKeyInput.value = '{{ current_user.openai_api_key or "" }}';
-                        break;
-                    case 'Anthropic':
-                        promptKeyInput.value = '{{ current_user.anthropic_api_key or "" }}';
-                        break;
-                    case 'Google Gemini':
-                        promptKeyInput.value = '{{ current_user.gemini_api_key or "" }}';
-                        break;
-                    case 'Groq':
-                        promptKeyInput.value = '{{ current_user.groq_api_key or "" }}';
-                        break;
-                    default:
-                        promptKeyInput.value = '';
-                }
-                currentProvider = selectedProvider.value;
+            // Set the API key value based on the selected provider
+            let keyValue = '';
+            switch(providerName) {
+                case 'OpenAI':
+                    keyValue = apiKeys.openai_api_key;
+                    break;
+                case 'Anthropic':
+                    keyValue = apiKeys.anthropic_api_key;
+                    break;
+                case 'Google Gemini':
+                    keyValue = apiKeys.gemini_api_key;
+                    break;
+                case 'Groq':
+                    keyValue = apiKeys.groq_api_key;
+                    break;
             }
+            
+            console.log('Setting key for provider:', providerName, 'Key:', keyValue);
+            promptKeyInput.value = keyValue;
             
             if (promptKeyInput.value) {
                 showError('promptKeyError', false);
@@ -345,7 +380,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Initialize the form with saved values
     updateModelOptions();
+    
+    // Set initial API key if available
+    if (apiKeys.current_provider_key) {
+        console.log('Setting initial API key:', apiKeys.current_provider_key);
+        promptKeyInput.value = apiKeys.current_provider_key;
+    }
 });
 </script>
 {% endblock %}
