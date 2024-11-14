@@ -3,6 +3,8 @@ from extensions import db
 from models import User, APIProvider, AIModel, Image, TrainingHistory
 import os
 from dotenv import load_dotenv
+import sqlite3
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -14,45 +16,102 @@ def create_app():
     db.init_app(app)
     return app
 
+def backup_training_data(db_path):
+    """Backup existing training data"""
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Get existing training data
+    try:
+        cursor.execute("SELECT * FROM training_history")
+        training_data = cursor.fetchall()
+        
+        # Get column names
+        cursor.execute("PRAGMA table_info(training_history)")
+        columns = [col[1] for col in cursor.fetchall()]
+        
+        return columns, training_data
+    except sqlite3.OperationalError:
+        return None, None
+    finally:
+        conn.close()
+
+def restore_training_data(columns, data, app):
+    """Restore training data with new schema"""
+    if not columns or not data:
+        return
+    
+    with app.app_context():
+        for row in data:
+            training = TrainingHistory()
+            
+            # Map existing columns to new schema
+            for i, col in enumerate(columns):
+                if hasattr(TrainingHistory, col):
+                    setattr(training, col, row[i])
+            
+            # Set default values for new columns
+            if 'queue_id' not in columns:
+                training.queue_id = None
+            if 'webhook_secret' not in columns:
+                training.webhook_secret = None
+            
+            db.session.add(training)
+        
+        db.session.commit()
+
 def update_schema():
     app = create_app()
-    with app.app_context():
-        # Create backup of existing database
-        import sqlite3
-        from datetime import datetime
-        backup_path = f"instance/sketchmaker_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+    db_path = 'instance/sketchmaker.db'
+    backup_path = f"instance/sketchmaker_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+    
+    try:
+        # Create backup
+        if os.path.exists(db_path):
+            print("Creating database backup...")
+            # Backup existing training data
+            columns, training_data = backup_training_data(db_path)
+            
+            # Create full database backup
+            conn = sqlite3.connect(db_path)
+            with sqlite3.connect(backup_path) as backup:
+                conn.backup(backup)
+            conn.close()
+            print(f"Backup created at {backup_path}")
+            
+            # Drop existing training_history table
+            with app.app_context():
+                db.session.execute('DROP TABLE IF EXISTS training_history')
+                db.session.commit()
         
-        try:
-            # Create backup
-            if os.path.exists('instance/sketchmaker.db'):
-                print("Creating database backup...")
-                conn = sqlite3.connect('instance/sketchmaker.db')
-                with sqlite3.connect(backup_path) as backup:
-                    conn.backup(backup)
-                conn.close()
-                print(f"Backup created at {backup_path}")
-            
-            # Update schema
-            print("Updating database schema...")
+        # Update schema
+        print("Updating database schema...")
+        with app.app_context():
             db.create_all()
-            print("Schema update complete!")
             
-            print("\nNext steps:")
-            print("1. Verify the application works correctly")
-            print("2. If everything is working, you can delete the backup")
-            print(f"   rm {backup_path}")
-            print("3. If there are issues, restore the backup:")
-            print(f"   cp {backup_path} instance/sketchmaker.db")
-            
-        except Exception as e:
-            print(f"Error updating schema: {str(e)}")
-            if os.path.exists(backup_path):
-                print("\nRestoring from backup...")
-                if os.path.exists('instance/sketchmaker.db'):
-                    os.remove('instance/sketchmaker.db')
-                os.rename(backup_path, 'instance/sketchmaker.db')
-                print("Backup restored!")
-            raise
+            # Restore training data with new schema
+            if columns and training_data:
+                print("Restoring training data...")
+                restore_training_data(columns, training_data, app)
+        
+        print("Schema update complete!")
+        
+        print("\nNext steps:")
+        print("1. Verify the application works correctly")
+        print("2. If everything is working, you can delete the backup")
+        print(f"   rm {backup_path}")
+        print("3. If there are issues, restore the backup:")
+        print(f"   cp {backup_path} {db_path}")
+        
+    except Exception as e:
+        print(f"Error updating schema: {str(e)}")
+        if os.path.exists(backup_path):
+            print("\nRestoring from backup...")
+            if os.path.exists(db_path):
+                os.remove(db_path)
+            os.rename(backup_path, db_path)
+            print("Backup restored!")
+        raise
 
 if __name__ == '__main__':
     update_schema()
