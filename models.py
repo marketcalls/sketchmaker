@@ -26,6 +26,7 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), default='user')  # 'admin' or 'user'
     is_active = db.Column(db.Boolean, default=True)
     images = db.relationship('Image', backref='user', lazy=True)
+    training_history = db.relationship('TrainingHistory', backref='user', lazy=True)
     
     # API Provider settings
     selected_provider_id = db.Column(db.Integer, db.ForeignKey('api_provider.id'))
@@ -113,3 +114,30 @@ class Image(db.Model):
     def get_url(self, format='png'):
         base_filename = os.path.splitext(self.filename)[0]
         return f'/static/images/{base_filename}.{format}'
+
+class TrainingHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    training_id = db.Column(db.String(255), nullable=False)  # The FAL training ID
+    trigger_word = db.Column(db.String(255), nullable=False)
+    status = db.Column(db.String(50), default='in_progress')  # in_progress, completed, failed
+    logs = db.Column(db.Text)  # Store training logs
+    config_url = db.Column(db.String(500))  # URL to config.json
+    weights_url = db.Column(db.String(500))  # URL to pytorch_lora_weights.safetensors
+    result = db.Column(db.JSON)  # Store complete training result
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'training_id': self.training_id,
+            'trigger_word': self.trigger_word,
+            'status': self.status,
+            'logs': self.logs,
+            'config_url': self.config_url,
+            'weights_url': self.weights_url,
+            'result': self.result,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None
+        }

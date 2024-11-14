@@ -13,12 +13,20 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_PATH', 'sqlite:///sketchmaker.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 32MB max file size
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
+    app.config['TRAINING_FILES_FOLDER'] = os.path.join(app.root_path, 'static', 'training_files')
     
     # Ensure required environment variables are set
     required_vars = ['SECRET_KEY']
     missing_vars = [var for var in required_vars if not os.getenv(var)]
     if missing_vars:
         raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
+    
+    # Create required directories
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['TRAINING_FILES_FOLDER'], exist_ok=True)
+    os.makedirs(os.path.join(app.root_path, 'static', 'images'), exist_ok=True)
     
     # Initialize extensions
     db.init_app(app)
@@ -36,6 +44,7 @@ def create_app():
         from blueprints.gallery import gallery_bp
         from blueprints.download import download_bp
         from blueprints.admin import admin
+        from blueprints.training import training_bp
         
         # Register blueprints
         app.register_blueprint(auth_bp)
@@ -44,11 +53,21 @@ def create_app():
         app.register_blueprint(gallery_bp)
         app.register_blueprint(download_bp)
         app.register_blueprint(admin)
+        app.register_blueprint(training_bp)
         
         # Error handlers
         @app.errorhandler(404)
         def page_not_found(e):
             return render_template('errors/404.html'), 404
+
+        @app.errorhandler(413)
+        def request_entity_too_large(e):
+            if request.path.startswith('/api/'):
+                return jsonify({
+                    "error": "File too large",
+                    "message": "The uploaded file exceeds the maximum allowed size.",
+                }), 413
+            return render_template('errors/413.html'), 413
 
         @app.errorhandler(429)
         def ratelimit_handler(e):

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}File Too Large - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center">
+    <div class="card bg-base-200 shadow-xl max-w-lg w-full mx-4">
+        <div class="card-body text-center">
+            <div class="text-error mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold mb-4">File Too Large</h1>
+            <p class="text-base-content/70 mb-6">
+                The file you're trying to upload exceeds the maximum allowed size of 32MB.
+                Please try again with a smaller file or compress your images before uploading.
+            </p>
+            <div class="space-y-4">
+                <button class="btn btn-primary w-full" onclick="window.history.back()">
+                    Go Back
+                </button>
+                <a href="{{ url_for('core.dashboard') }}" class="btn btn-outline w-full">
+                    Return to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
