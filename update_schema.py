@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import sqlite3
 from datetime import datetime
+from sqlalchemy import text
 
 # Load environment variables
 load_dotenv()
@@ -36,6 +37,15 @@ def backup_training_data(db_path):
     finally:
         conn.close()
 
+def parse_sqlite_datetime(dt_str):
+    """Parse SQLite datetime string to Python datetime object"""
+    if not dt_str:
+        return None
+    try:
+        return datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+    except (ValueError, TypeError):
+        return None
+
 def restore_training_data(columns, data, app):
     """Restore training data with new schema"""
     if not columns or not data:
@@ -43,12 +53,20 @@ def restore_training_data(columns, data, app):
     
     with app.app_context():
         for row in data:
+            row_dict = dict(zip(columns, row))
             training = TrainingHistory()
             
-            # Map existing columns to new schema
-            for i, col in enumerate(columns):
-                if hasattr(TrainingHistory, col):
-                    setattr(training, col, row[i])
+            # Handle datetime fields specially
+            if 'created_at' in row_dict:
+                training.created_at = parse_sqlite_datetime(row_dict['created_at'])
+            if 'completed_at' in row_dict:
+                training.completed_at = parse_sqlite_datetime(row_dict['completed_at'])
+            
+            # Handle other fields
+            for col in columns:
+                if col not in ['created_at', 'completed_at']:
+                    if hasattr(TrainingHistory, col):
+                        setattr(training, col, row_dict[col])
             
             # Set default values for new columns
             if 'queue_id' not in columns:
@@ -58,7 +76,12 @@ def restore_training_data(columns, data, app):
             
             db.session.add(training)
         
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            print(f"Error committing data: {str(e)}")
+            db.session.rollback()
+            raise
 
 def update_schema():
     app = create_app()
@@ -81,12 +104,14 @@ def update_schema():
             
             # Drop existing training_history table
             with app.app_context():
-                db.session.execute('DROP TABLE IF EXISTS training_history')
+                # Use SQLAlchemy text() for raw SQL
+                db.session.execute(text('DROP TABLE IF EXISTS training_history'))
                 db.session.commit()
         
         # Update schema
         print("Updating database schema...")
         with app.app_context():
+            # Create tables
             db.create_all()
             
             # Restore training data with new schema
