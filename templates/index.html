@@ -13,7 +13,7 @@
                         Transform Text Into Art
                     </h1>
                     <p class="text-lg md:text-xl text-base-content/80 mb-8 max-w-2xl">
-                        Harness the power of AI to turn your descriptions into stunning visual masterpieces. Choose from 25+ artistic styles and create unique, professional artwork instantly.
+                        Create stunning visuals with multiple AI models including OpenAI, Anthropic, Google Gemini, and Groq. Generate custom banners, train your own models, and bring your ideas to life with advanced image generation powered by FAL.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                         {% if current_user.is_authenticated %}
@@ -51,36 +51,69 @@
         <div class="container mx-auto px-4">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Key Features</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- AI-Powered Generation -->
+                <!-- Multiple AI Providers -->
                 <div class="card bg-base-100 shadow-xl">
                     <div class="card-body">
                         <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        <h3 class="card-title text-xl mb-2">AI-Powered Generation</h3>
-                        <p class="text-base-content/70">Transform your text descriptions into stunning visual artwork using advanced AI technology.</p>
+                        <h3 class="card-title text-xl mb-2">Multiple AI Providers</h3>
+                        <p class="text-base-content/70">Choose from OpenAI, Anthropic, Google Gemini, or Groq for advanced prompt enhancement and generation.</p>
                     </div>
                 </div>
 
-                <!-- Multiple Styles -->
+                <!-- Advanced Generation -->
                 <div class="card bg-base-100 shadow-xl">
                     <div class="card-body">
                         <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <h3 class="card-title text-xl mb-2">25+ Artistic Styles</h3>
-                        <p class="text-base-content/70">Choose from a wide range of artistic styles to create unique and personalized artwork.</p>
+                        <h3 class="card-title text-xl mb-2">Advanced Generation</h3>
+                        <p class="text-base-content/70">Create images, banners, and SVGs with FAL models including Flux Pro, Recraft V3, and custom LoRA training.</p>
                     </div>
                 </div>
 
-                <!-- Instant Results -->
+                <!-- Custom Training -->
                 <div class="card bg-base-100 shadow-xl">
                     <div class="card-body">
                         <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
-                        <h3 class="card-title text-xl mb-2">Instant Results</h3>
-                        <p class="text-base-content/70">Get your artwork generated within seconds, ready to download in multiple formats.</p>
+                        <h3 class="card-title text-xl mb-2">Custom Training</h3>
+                        <p class="text-base-content/70">Train your own models with 5-20 images, monitor progress in real-time, and use your custom styles.</p>
+                    </div>
+                </div>
+
+                <!-- Multiple Formats -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        <h3 class="card-title text-xl mb-2">Multiple Formats</h3>
+                        <p class="text-base-content/70">Download your creations in WebP, PNG, JPEG formats with optimized quality and compression.</p>
+                    </div>
+                </div>
+
+                <!-- Personal Gallery -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <h3 class="card-title text-xl mb-2">Personal Gallery</h3>
+                        <p class="text-base-content/70">Store and manage your generated artwork in a personal gallery with easy access and sharing options.</p>
+                    </div>
+                </div>
+
+                <!-- Smart Prompts -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h3 class="card-title text-xl mb-2">Smart Prompts</h3>
+                        <p class="text-base-content/70">Enhance your prompts with AI-powered suggestions and optimizations for better results.</p>
                     </div>
                 </div>
             </div>
@@ -92,7 +125,7 @@
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Create?</h2>
             <p class="text-lg md:text-xl text-base-content/80 mb-8 max-w-2xl mx-auto">
-                Join now and start transforming your ideas into beautiful artwork with the power of AI.
+                Join now and start transforming your ideas into beautiful artwork with advanced AI technology.
             </p>
             {% if current_user.is_authenticated %}
                 <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-lg">
