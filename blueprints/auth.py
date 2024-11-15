@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User
+from models import db, User, SystemSettings
 from extensions import limiter, get_rate_limit_string
 
 auth_bp = Blueprint('auth', __name__)
@@ -26,6 +26,10 @@ def login():
 
         if not user.is_active:
             flash('Your account has been deactivated. Please contact an administrator.')
+            return redirect(url_for('auth.login'))
+
+        if not user.is_approved:
+            flash('Your account is pending approval. Please wait for administrator approval.')
             return redirect(url_for('auth.login'))
 
         login_user(user, remember=remember)
@@ -56,27 +60,40 @@ def register():
             flash('Email address already exists')
             return redirect(url_for('auth.register'))
 
+        user = User.query.filter_by(username=username).first()
+        if user:
+            flash('Username already exists')
+            return redirect(url_for('auth.register'))
+
         # Check if this is the first user
         is_first_user = User.query.first() is None
+
+        # Get system settings for manual approval
+        settings = SystemSettings.get_settings()
+        requires_approval = settings.require_manual_approval and not is_first_user
 
         # Create new user
         new_user = User(
             email=email,
             username=username,
             password_hash=generate_password_hash(password, method='pbkdf2:sha256'),
-            role='admin' if is_first_user else 'user',  # First user becomes admin
-            is_active=True
+            role='superadmin' if is_first_user else 'user',  # First user becomes superadmin
+            is_active=True,
+            is_approved=not requires_approval  # First user or auto-approved
         )
 
         db.session.add(new_user)
         db.session.commit()
 
         if is_first_user:
-            flash('You have been registered as the administrator.')
+            flash('You have been registered as the super administrator.')
+            return redirect(url_for('auth.login'))
+        elif requires_approval:
+            flash('Registration successful. Please wait for administrator approval.')
+            return redirect(url_for('auth.login'))
         else:
             flash('Registration successful. Please login.')
-            
-        return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html')
 

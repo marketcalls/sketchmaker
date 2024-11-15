@@ -1,68 +1,256 @@
 {% extends "base.html" %}
 
-{% block title %}User Management - Admin{% endblock %}
+{% block title %}Manage Users{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <div class="card bg-base-200 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title text-2xl mb-6">User Management</h2>
-            <div class="overflow-x-auto">
-                <table class="table table-zebra w-full">
-                    <thead>
-                        <tr>
-                            <th class="bg-base-300">ID</th>
-                            <th class="bg-base-300">Username</th>
-                            <th class="bg-base-300">Email</th>
-                            <th class="bg-base-300">Role</th>
-                            <th class="bg-base-300">Status</th>
-                            <th class="bg-base-300">Created At</th>
-                            <th class="bg-base-300">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td>{{ user.id }}</td>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>
-                                <div class="badge badge-{{ 'primary' if user.role == 'admin' else 'ghost' }}">
-                                    {{ user.role }}
-                                </div>
-                            </td>
-                            <td>
-                                <div class="badge badge-{{ 'success' if user.is_active else 'error' }}">
-                                    {{ "Active" if user.is_active else "Inactive" }}
-                                </div>
-                            </td>
-                            <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                            <td>
-                                {% if user != current_user %}
-                                <div class="flex gap-2">
-                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST">
-                                        <input type="hidden" name="action" value="toggle_role">
-                                        <button type="submit" class="btn btn-warning btn-xs">
-                                            Toggle Role
-                                        </button>
-                                    </form>
+    <div class="flex flex-col gap-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">User Management</h1>
+                <p class="text-base-content/70">Total Users: {{ total_users }}</p>
+            </div>
+            <div class="flex gap-4">
+                <!-- Search -->
+                <div class="form-control">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" placeholder="Search users..." class="input input-bordered w-64" value="{{ search_query }}">
+                        <button class="btn btn-square" onclick="searchUsers()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- Add User Button -->
+                <button class="btn btn-primary" onclick="document.getElementById('add-user-modal').showModal()">Add User</button>
+            </div>
+        </div>
+
+        <!-- Settings Card -->
+        <div class="card bg-base-200">
+            <div class="card-body">
+                <h2 class="card-title">System Settings</h2>
+                <div class="form-control">
+                    <label class="label cursor-pointer">
+                        <span class="label-text">Require Manual Approval for New Users</span>
+                        <input type="checkbox" class="toggle toggle-primary" 
+                               {% if settings.require_manual_approval %}checked{% endif %}
+                               onchange="updateApprovalSetting(this.checked)" />
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Approval</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="badge {% if user.is_superadmin() %}badge-secondary{% elif user.is_admin() %}badge-primary{% else %}badge-ghost{% endif %}">
+                                {{ user.role }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if user.is_active %}badge-success{% else %}badge-error{% endif %}">
+                                {{ 'Active' if user.is_active else 'Inactive' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge {% if user.is_approved %}badge-success{% else %}badge-warning{% endif %}">
+                                {{ 'Approved' if user.is_approved else 'Pending' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="flex gap-2">
+                                {% if not user.is_superadmin() or current_user.is_superadmin() %}
+                                    <!-- Role Management -->
+                                    <div class="dropdown dropdown-end">
+                                        <label tabindex="0" class="btn btn-sm">Role</label>
+                                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                                            {% if current_user.is_superadmin() %}
+                                                <li>
+                                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST" class="w-full">
+                                                        <input type="hidden" name="action" value="toggle_role">
+                                                        <input type="hidden" name="role" value="user">
+                                                        <button type="submit" class="w-full text-left">Set as User</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST" class="w-full">
+                                                        <input type="hidden" name="action" value="toggle_role">
+                                                        <input type="hidden" name="role" value="admin">
+                                                        <button type="submit" class="w-full text-left">Set as Admin</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST" class="w-full">
+                                                        <input type="hidden" name="action" value="toggle_role">
+                                                        <input type="hidden" name="role" value="superadmin">
+                                                        <button type="submit" class="w-full text-left">Set as Superadmin</button>
+                                                    </form>
+                                                </li>
+                                            {% else %}
+                                                <li>
+                                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST" class="w-full">
+                                                        <input type="hidden" name="action" value="toggle_role">
+                                                        <button type="submit" class="w-full text-left">
+                                                            Toggle Admin
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+
+                                    <!-- Status Toggle -->
                                     <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST">
                                         <input type="hidden" name="action" value="toggle_status">
-                                        <button type="submit" class="btn btn-xs {{ 'btn-error' if user.is_active else 'btn-success' }}">
-                                            {{ "Deactivate" if user.is_active else "Activate" }}
+                                        <button type="submit" class="btn btn-sm {% if user.is_active %}btn-error{% else %}btn-success{% endif %}">
+                                            {{ 'Deactivate' if user.is_active else 'Activate' }}
                                         </button>
                                     </form>
-                                </div>
-                                {% else %}
-                                <span class="text-base-content/50">Current User</span>
+
+                                    <!-- Approval Toggle -->
+                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST">
+                                        <input type="hidden" name="action" value="toggle_approval">
+                                        <button type="submit" class="btn btn-sm {% if user.is_approved %}btn-warning{% else %}btn-success{% endif %}">
+                                            {{ 'Unapprove' if user.is_approved else 'Approve' }}
+                                        </button>
+                                    </form>
+
+                                    <!-- Password Reset -->
+                                    <button class="btn btn-sm btn-info" 
+                                            onclick="document.getElementById('reset-password-modal-{{ user.id }}').showModal()">
+                                        Reset Password
+                                    </button>
+
+                                    <!-- Delete User -->
+                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST" 
+                                          onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                        <input type="hidden" name="action" value="delete">
+                                        <button type="submit" class="btn btn-sm btn-error">Delete</button>
+                                    </form>
                                 {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Password Reset Modal -->
+                    <dialog id="reset-password-modal-{{ user.id }}" class="modal">
+                        <div class="modal-box">
+                            <h3 class="font-bold text-lg">Reset Password for {{ user.username }}</h3>
+                            <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST">
+                                <input type="hidden" name="action" value="set_password">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text">New Password</span>
+                                    </label>
+                                    <input type="password" name="new_password" class="input input-bordered" required>
+                                </div>
+                                <div class="modal-action">
+                                    <button type="submit" class="btn btn-primary">Reset Password</button>
+                                    <button type="button" class="btn" onclick="document.getElementById('reset-password-modal-{{ user.id }}').close()">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </dialog>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+<!-- Add User Modal -->
+<dialog id="add-user-modal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">Add New User</h3>
+        <form action="{{ url_for('admin.add_user') }}" method="POST">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Username</span>
+                </label>
+                <input type="text" name="username" class="input input-bordered" required>
+            </div>
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Email</span>
+                </label>
+                <input type="email" name="email" class="input input-bordered" required>
+            </div>
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Password</span>
+                </label>
+                <input type="password" name="password" class="input input-bordered" required>
+            </div>
+            {% if current_user.is_superadmin() %}
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Role</span>
+                </label>
+                <select name="role" class="select select-bordered">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="superadmin">Superadmin</option>
+                </select>
+            </div>
+            {% endif %}
+            <div class="modal-action">
+                <button type="submit" class="btn btn-primary">Add User</button>
+                <button type="button" class="btn" onclick="document.getElementById('add-user-modal').close()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<script>
+function searchUsers() {
+    const query = document.getElementById('searchInput').value;
+    window.location.href = "{{ url_for('admin.manage') }}?search=" + encodeURIComponent(query);
+}
+
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        searchUsers();
+    }
+});
+
+function updateApprovalSetting(checked) {
+    fetch("{{ url_for('admin.update_settings') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `require_manual_approval=${checked}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show toast or notification
+            alert('Settings updated successfully');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update settings');
+    });
+}
+</script>
 {% endblock %}

@@ -23,8 +23,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    role = db.Column(db.String(20), default='user')  # 'admin' or 'user'
+    role = db.Column(db.String(20), default='user')  # 'superadmin', 'admin' or 'user'
     is_active = db.Column(db.Boolean, default=True)
+    is_approved = db.Column(db.Boolean, default=True)  # For manual approval process
     images = db.relationship('Image', backref='user', lazy=True)
     training_history = db.relationship('TrainingHistory', backref='user', lazy=True)
     
@@ -68,13 +69,45 @@ class User(UserMixin, db.Model):
         return bool(self.get_selected_provider_key() and self.fal_key)
 
     def is_admin(self):
-        """Check if user is an admin"""
-        return self.role == 'admin'
+        """Check if user is an admin or superadmin"""
+        return self.role in ['admin', 'superadmin']
+
+    def is_superadmin(self):
+        """Check if user is a superadmin"""
+        return self.role == 'superadmin'
 
     @staticmethod
     def get_first_user():
         """Get the first user in the database"""
         return User.query.order_by(User.id.asc()).first()
+
+    @staticmethod
+    def get_total_count():
+        """Get total number of users"""
+        return User.query.count()
+
+    @staticmethod
+    def search_users(query):
+        """Search users by username or email"""
+        return User.query.filter(
+            (User.username.ilike(f'%{query}%')) |
+            (User.email.ilike(f'%{query}%'))
+        ).all()
+
+class SystemSettings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    require_manual_approval = db.Column(db.Boolean, default=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @staticmethod
+    def get_settings():
+        """Get or create system settings"""
+        settings = SystemSettings.query.first()
+        if not settings:
+            settings = SystemSettings()
+            db.session.add(settings)
+            db.session.commit()
+        return settings
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
