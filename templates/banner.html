@@ -1,125 +1,159 @@
 {% extends "base.html" %}
 
-{% block title %}Banner Creator - Sketch Maker AI{% endblock %}
+{% block title %}SVG Banner Creator - Sketch Maker AI{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title text-2xl mb-6">Create Banner from Prompts</h2>
-            
-            {% if not current_user.get_selected_provider_key() %}
-                <div class="alert alert-warning">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                    <div>
-                        <h3 class="font-bold">Setup Required</h3>
-                        <div class="text-sm">Please configure your AI provider in <a href="{{ url_for('core.settings') }}" class="link">settings</a> first.</div>
-                    </div>
-                </div>
-            {% endif %}
-
-            <form id="bannerForm" class="space-y-6">
-                <!-- Banner Description -->
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">Banner Description</span>
-                    </label>
-                    <textarea 
-                        class="textarea textarea-bordered h-24" 
-                        name="prompt" 
-                        placeholder="Describe your banner (e.g., 'A modern tech banner with flowing gradients and geometric shapes')" 
-                        required></textarea>
-                </div>
-
-                <!-- Dimensions -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text">Width (px)</span>
-                        </label>
-                        <input 
-                            type="number" 
-                            name="width" 
-                            class="input input-bordered" 
-                            value="800" 
-                            min="200" 
-                            max="2000"
-                            required>
-                    </div>
+<div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left Column - Controls -->
+        <div class="lg:col-span-4">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body space-y-4">
+                    <h2 class="card-title text-xl">Create Banner</h2>
                     
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text">Height (px)</span>
-                        </label>
-                        <input 
-                            type="number" 
-                            name="height" 
-                            class="input input-bordered" 
-                            value="400" 
-                            min="100" 
-                            max="1000"
-                            required>
-                    </div>
-                </div>
+                    {% if not current_user.get_selected_provider_key() %}
+                        <div class="alert alert-warning text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-4 w-4" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            <span>Configure AI provider in <a href="{{ url_for('core.settings') }}" class="link">settings</a></span>
+                        </div>
+                    {% endif %}
 
-                <!-- Style Selection -->
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">Style</span>
-                    </label>
-                    <select class="select select-bordered" name="style" required>
-                        <option value="modern">Modern</option>
-                        <option value="minimalist">Minimalist</option>
-                        <option value="artistic">Artistic</option>
-                        <option value="corporate">Corporate</option>
-                        <option value="playful">Playful</option>
-                        <option value="tech">Tech</option>
-                        <option value="elegant">Elegant</option>
-                    </select>
-                </div>
+                    <form id="bannerForm" class="space-y-4">
+                        <!-- Banner Prompt -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Banner Prompt</span>
+                            </label>
+                            <textarea 
+                                class="textarea textarea-bordered h-24" 
+                                name="prompt" 
+                                placeholder="Describe your banner (e.g., 'A modern tech banner with flowing gradients and geometric shapes')" 
+                                required></textarea>
+                        </div>
 
-                <!-- Generate Button -->
-                <button 
-                    type="submit" 
-                    class="btn btn-primary w-full" 
-                    {% if not current_user.get_selected_provider_key() %}disabled{% endif %}>
-                    Generate Banner
-                </button>
-            </form>
+                        <!-- Banner Size Selection -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Banner Size</span>
+                            </label>
+                            <select class="select select-bordered w-full" name="bannerType" onchange="updateCustomSizeVisibility()">
+                                <option value="blog">Blog Banner (1200 × 630)</option>
+                                <option value="linkedin">LinkedIn Banner (1584 × 396)</option>
+                                <option value="twitter">Twitter Header (1500 × 500)</option>
+                                <option value="facebook">Facebook Cover (1640 × 624)</option>
+                                <option value="youtube">YouTube Channel Art (2560 × 1440)</option>
+                                <option value="custom">Custom Size</option>
+                            </select>
+                        </div>
 
-            <!-- Loading State -->
-            <div id="loading" class="hidden">
-                <div class="flex justify-center items-center py-8">
-                    <span class="loading loading-spinner loading-lg"></span>
+                        <!-- Custom Size Controls (hidden by default) -->
+                        <div id="customSizeControls" class="hidden space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text">Width (px)</span>
+                                    </label>
+                                    <input 
+                                        type="number" 
+                                        name="width" 
+                                        class="input input-bordered" 
+                                        value="1200" 
+                                        min="200" 
+                                        max="2560">
+                                </div>
+                                
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text">Height (px)</span>
+                                    </label>
+                                    <input 
+                                        type="number" 
+                                        name="height" 
+                                        class="input input-bordered" 
+                                        value="630" 
+                                        min="100" 
+                                        max="1440">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Style Selection -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Style</span>
+                            </label>
+                            <select class="select select-bordered w-full" name="style" required>
+                                <option value="modern">Modern</option>
+                                <option value="minimalist">Minimalist</option>
+                                <option value="artistic">Artistic</option>
+                                <option value="corporate">Corporate</option>
+                                <option value="playful">Playful</option>
+                                <option value="tech">Tech</option>
+                                <option value="elegant">Elegant</option>
+                            </select>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button 
+                            type="submit" 
+                            class="btn btn-primary w-full" 
+                            {% if not current_user.get_selected_provider_key() %}disabled{% endif %}>
+                            Generate Banner
+                        </button>
+                    </form>
                 </div>
             </div>
+        </div>
 
-            <!-- Result Section -->
-            <div id="result" class="mt-8 hidden">
-                <div class="bg-base-200 rounded-lg overflow-hidden">
-                    <div id="svgContainer" class="w-full aspect-[2/1] flex items-center justify-center p-4"></div>
-                </div>
-                <div class="flex justify-end mt-4 gap-2">
-                    <!-- View in Gallery Button -->
-                    <a id="viewInGallery" href="#" class="btn btn-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
-                        </svg>
-                        View in Gallery
-                    </a>
-                    <!-- Download Options -->
-                    <div class="dropdown dropdown-end">
-                        <label tabindex="0" class="btn btn-secondary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                            Download As
-                        </label>
-                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                            <li><a onclick="downloadBanner('svg')">SVG (Vector)</a></li>
-                            <li><a onclick="downloadBanner('png')">PNG (High Quality)</a></li>
-                            <li><a onclick="downloadBanner('webp')">WebP (Optimized)</a></li>
-                        </ul>
+        <!-- Right Column - Preview -->
+        <div class="lg:col-span-8">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h2 class="card-title text-xl mb-4">Preview</h2>
+                    
+                    <!-- Loading State -->
+                    <div id="loading" class="hidden">
+                        <div class="flex justify-center items-center py-8">
+                            <span class="loading loading-spinner loading-lg"></span>
+                        </div>
+                    </div>
+
+                    <!-- Result Section -->
+                    <div id="result" class="hidden space-y-4">
+                        <!-- Size Info -->
+                        <div class="text-sm text-base-content/70" id="sizeInfo"></div>
+                        
+                        <!-- Preview Container -->
+                        <div class="bg-base-200 rounded-lg overflow-hidden">
+                            <div id="previewContainer" class="relative w-full" style="min-height: 400px;">
+                                <div id="svgContainer" class="absolute inset-0 flex items-center justify-center p-4"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex justify-end gap-2">
+                            <!-- View in Gallery Button -->
+                            <a id="viewInGallery" href="#" class="btn btn-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                                </svg>
+                                View in Gallery
+                            </a>
+                            <!-- Download Options -->
+                            <div class="dropdown dropdown-end">
+                                <label tabindex="0" class="btn btn-secondary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                    Download As
+                                </label>
+                                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                                    <li><a id="downloadPng" href="#" download>PNG (High Quality)</a></li>
+                                    <li><a id="downloadWebp" href="#" download>WebP (Optimized)</a></li>
+                                    <li><a id="downloadJpeg" href="#" download>JPEG (Compatible)</a></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -132,6 +166,43 @@
 <script>
 let currentSvgContent = '';
 let currentImageId = null;
+let currentImageUrls = null;
+
+const BANNER_SIZES = {
+    'blog': { width: 1200, height: 630, name: 'Blog Banner' },
+    'linkedin': { width: 1584, height: 396, name: 'LinkedIn Banner' },
+    'twitter': { width: 1500, height: 500, name: 'Twitter Header' },
+    'facebook': { width: 1640, height: 624, name: 'Facebook Cover' },
+    'youtube': { width: 2560, height: 1440, name: 'YouTube Channel Art' },
+    'custom': { width: 1200, height: 630, name: 'Custom Size' }
+};
+
+function updatePreviewContainer(width, height) {
+    const container = document.getElementById('previewContainer');
+    const aspectRatio = width / height;
+    
+    // Set container padding-top based on aspect ratio
+    container.style.paddingTop = `${(1 / aspectRatio) * 100}%`;
+}
+
+function updateCustomSizeVisibility() {
+    const bannerType = document.querySelector('select[name="bannerType"]').value;
+    const customControls = document.getElementById('customSizeControls');
+    const widthInput = document.querySelector('input[name="width"]');
+    const heightInput = document.querySelector('input[name="height"]');
+    
+    if (bannerType === 'custom') {
+        customControls.classList.remove('hidden');
+    } else {
+        customControls.classList.add('hidden');
+        const size = BANNER_SIZES[bannerType];
+        widthInput.value = size.width;
+        heightInput.value = size.height;
+    }
+    
+    // Update preview container aspect ratio
+    updatePreviewContainer(parseInt(widthInput.value), parseInt(heightInput.value));
+}
 
 document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -141,16 +212,27 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     const result = document.getElementById('result');
     const svgContainer = document.getElementById('svgContainer');
     const viewInGallery = document.getElementById('viewInGallery');
+    const sizeInfo = document.getElementById('sizeInfo');
     
     // Show loading, hide result
     loading.classList.remove('hidden');
     result.classList.add('hidden');
     
+    // Get banner type and size
+    const bannerType = form.bannerType.value;
+    const width = parseInt(form.width.value);
+    const height = parseInt(form.height.value);
+    
+    // Update size info and container
+    const sizeName = BANNER_SIZES[bannerType].name;
+    sizeInfo.textContent = `${sizeName} (${width} × ${height}px)`;
+    updatePreviewContainer(width, height);
+    
     // Prepare form data
     const formData = {
         prompt: form.prompt.value,
-        width: parseInt(form.width.value),
-        height: parseInt(form.height.value),
+        width: width,
+        height: height,
         style: form.style.value
     };
     
@@ -169,13 +251,19 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
             throw new Error(data.error + (data.details ? ': ' + data.details : ''));
         }
         
-        // Store SVG content for downloads
+        // Store SVG content and image data
         currentSvgContent = data.svg;
         
-        // Store image ID and update gallery link
+        // Store image ID and update gallery link and download URLs
         if (data.image && data.image.id) {
             currentImageId = data.image.id;
+            currentImageUrls = data.image.urls;
             viewInGallery.href = `/gallery/${data.image.id}`;
+            
+            // Update download links
+            document.getElementById('downloadPng').href = currentImageUrls.png;
+            document.getElementById('downloadWebp').href = currentImageUrls.webp;
+            document.getElementById('downloadJpeg').href = currentImageUrls.jpeg;
         }
         
         // Display the SVG
@@ -187,6 +275,9 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
         if (svg) {
             svg.style.width = '100%';
             svg.style.height = '100%';
+            svg.style.maxWidth = '100%';
+            svg.style.maxHeight = '100%';
+            svg.style.objectFit = 'contain';
         }
     } catch (error) {
         console.error('Error:', error);
@@ -196,34 +287,7 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     }
 });
 
-async function downloadBanner(format) {
-    if (!currentSvgContent) return;
-    
-    try {
-        const response = await fetch(`/banner/download/${format}?svg=${encodeURIComponent(currentSvgContent)}`);
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.details || 'Download failed');
-        }
-        
-        // Create blob from response
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        
-        // Create temporary link and trigger download
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `banner.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-    } catch (error) {
-        console.error('Error:', error);
-        alert(error.message || 'Error downloading banner');
-    }
-}
+// Initialize banner type selection
+updateCustomSizeVisibility();
 </script>
 {% endblock %}
