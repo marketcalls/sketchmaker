@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}SVG Banner Creator - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-2xl mb-6">Create SVG Banner</h2>
+            
+            {% if not current_user.get_selected_provider_key() %}
+                <div class="alert alert-warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <div>
+                        <h3 class="font-bold">Setup Required</h3>
+                        <div class="text-sm">Please configure your AI provider in <a href="{{ url_for('core.settings') }}" class="link">settings</a> first.</div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form id="bannerForm" class="space-y-6">
+                <!-- Banner Description -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Banner Description</span>
+                    </label>
+                    <textarea 
+                        class="textarea textarea-bordered h-24" 
+                        name="prompt" 
+                        placeholder="Describe your banner (e.g., 'A modern tech banner with flowing gradients and geometric shapes')" 
+                        required></textarea>
+                </div>
+
+                <!-- Dimensions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Width (px)</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            name="width" 
+                            class="input input-bordered" 
+                            value="800" 
+                            min="200" 
+                            max="2000"
+                            required>
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Height (px)</span>
+                        </label>
+                        <input 
+                            type="number" 
+                            name="height" 
+                            class="input input-bordered" 
+                            value="400" 
+                            min="100" 
+                            max="1000"
+                            required>
+                    </div>
+                </div>
+
+                <!-- Style Selection -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Style</span>
+                    </label>
+                    <select class="select select-bordered" name="style" required>
+                        <option value="modern">Modern</option>
+                        <option value="minimalist">Minimalist</option>
+                        <option value="artistic">Artistic</option>
+                        <option value="corporate">Corporate</option>
+                        <option value="playful">Playful</option>
+                        <option value="tech">Tech</option>
+                        <option value="elegant">Elegant</option>
+                    </select>
+                </div>
+
+                <!-- Generate Button -->
+                <button 
+                    type="submit" 
+                    class="btn btn-primary w-full" 
+                    {% if not current_user.get_selected_provider_key() %}disabled{% endif %}>
+                    Generate Banner
+                </button>
+            </form>
+
+            <!-- Loading State -->
+            <div id="loading" class="hidden">
+                <div class="flex justify-center items-center py-8">
+                    <span class="loading loading-spinner loading-lg"></span>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div id="result" class="mt-8 hidden">
+                <div class="bg-base-200 rounded-lg overflow-hidden">
+                    <div id="svgContainer" class="w-full aspect-[2/1] flex items-center justify-center p-4"></div>
+                </div>
+                <div class="flex justify-end mt-4 gap-2">
+                    <div class="dropdown dropdown-end">
+                        <label tabindex="0" class="btn btn-secondary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            Download As
+                        </label>
+                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                            <li><a onclick="downloadBanner('svg')">SVG (Vector)</a></li>
+                            <li><a onclick="downloadBanner('png')">PNG (High Quality)</a></li>
+                            <li><a onclick="downloadBanner('webp')">WebP (Optimized)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentSvgContent = '';
+
+document.getElementById('bannerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const form = e.target;
+    const loading = document.getElementById('loading');
+    const result = document.getElementById('result');
+    const svgContainer = document.getElementById('svgContainer');
+    
+    // Show loading, hide result
+    loading.classList.remove('hidden');
+    result.classList.add('hidden');
+    
+    // Prepare form data
+    const formData = {
+        prompt: form.prompt.value,
+        width: parseInt(form.width.value),
+        height: parseInt(form.height.value),
+        style: form.style.value
+    };
+    
+    try {
+        const response = await fetch('/banner/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            throw new Error(data.error + (data.details ? ': ' + data.details : ''));
+        }
+        
+        // Store SVG content for downloads
+        currentSvgContent = data.svg;
+        
+        // Display the SVG
+        svgContainer.innerHTML = data.svg;
+        result.classList.remove('hidden');
+        
+        // Ensure SVG fills container while maintaining aspect ratio
+        const svg = svgContainer.querySelector('svg');
+        if (svg) {
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Error generating banner');
+    } finally {
+        loading.classList.add('hidden');
+    }
+});
+
+async function downloadBanner(format) {
+    if (!currentSvgContent) return;
+    
+    try {
+        const response = await fetch(`/banner/download/${format}?svg=${encodeURIComponent(currentSvgContent)}`);
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.details || 'Download failed');
+        }
+        
+        // Create blob from response
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        
+        // Create temporary link and trigger download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `banner.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Error downloading banner');
+    }
+}
+</script>
+{% endblock %}

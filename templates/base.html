@@ -102,6 +102,7 @@
                 <a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost">Dashboard</a>
                 <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-ghost">Gallery</a>
                 <a href="{{ url_for('training.training_page') }}" class="btn btn-ghost">Train LoRA</a>
+                <a href="{{ url_for('banner.banner_page') }}" class="btn btn-ghost">Banner</a>
                 {% if current_user.is_admin() %}
                     <a href="{{ url_for('admin.manage') }}" class="btn btn-ghost">Manage Users</a>
                 {% endif %}
