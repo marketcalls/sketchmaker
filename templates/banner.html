@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}SVG Banner Creator - Sketch Maker AI{% endblock %}
+{% block title %}Banner Creator - Sketch Maker AI{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8 max-w-4xl">
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-            <h2 class="card-title text-2xl mb-6">Create SVG Banner</h2>
+            <h2 class="card-title text-2xl mb-6">Create Banner from Prompts</h2>
             
             {% if not current_user.get_selected_provider_key() %}
                 <div class="alert alert-warning">
@@ -100,6 +100,14 @@
                     <div id="svgContainer" class="w-full aspect-[2/1] flex items-center justify-center p-4"></div>
                 </div>
                 <div class="flex justify-end mt-4 gap-2">
+                    <!-- View in Gallery Button -->
+                    <a id="viewInGallery" href="#" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                        </svg>
+                        View in Gallery
+                    </a>
+                    <!-- Download Options -->
                     <div class="dropdown dropdown-end">
                         <label tabindex="0" class="btn btn-secondary">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -123,6 +131,7 @@
 {% block scripts %}
 <script>
 let currentSvgContent = '';
+let currentImageId = null;
 
 document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -131,6 +140,7 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     const loading = document.getElementById('loading');
     const result = document.getElementById('result');
     const svgContainer = document.getElementById('svgContainer');
+    const viewInGallery = document.getElementById('viewInGallery');
     
     // Show loading, hide result
     loading.classList.remove('hidden');
@@ -161,6 +171,12 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
         
         // Store SVG content for downloads
         currentSvgContent = data.svg;
+        
+        // Store image ID and update gallery link
+        if (data.image && data.image.id) {
+            currentImageId = data.image.id;
+            viewInGallery.href = `/gallery/${data.image.id}`;
+        }
         
         // Display the SVG
         svgContainer.innerHTML = data.svg;

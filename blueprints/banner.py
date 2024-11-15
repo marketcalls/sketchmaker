@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, request, render_template, send_file
+from flask import Blueprint, jsonify, request, render_template, send_file, current_app
 from flask_login import login_required, current_user
-from models import AIModel
+from models import AIModel, Image, db
 import anthropic
 from openai import OpenAI
 import google.generativeai as genai
@@ -8,7 +8,10 @@ from groq import Groq
 import traceback
 from io import BytesIO
 import cairosvg
-from PIL import Image
+from PIL import Image as PILImage
+import os
+import uuid
+from datetime import datetime
 
 banner = Blueprint('banner', __name__)
 
@@ -228,6 +231,60 @@ def generate_svg(prompt, system_prompt):
     else:
         raise ValueError(f"Unsupported provider: {provider_name}")
 
+def save_banner_image(svg_content, prompt, width, height, style):
+    """Save banner as PNG and create database record"""
+    try:
+        # Generate unique filename
+        filename = f"banner_{uuid.uuid4()}"
+        
+        # Convert SVG to PNG
+        png_data = cairosvg.svg2png(bytestring=svg_content.encode())
+        
+        # Save PNG version
+        png_filename = f"{filename}.png"
+        png_path = os.path.join(current_app.root_path, 'static', 'images', png_filename)
+        with open(png_path, 'wb') as f:
+            f.write(png_data)
+        
+        # Create WebP version
+        webp_filename = f"{filename}.webp"
+        webp_path = os.path.join(current_app.root_path, 'static', 'images', webp_filename)
+        img = PILImage.open(BytesIO(png_data))
+        img.save(webp_path, 'WEBP')
+        
+        # Create JPEG version
+        jpeg_filename = f"{filename}.jpeg"
+        jpeg_path = os.path.join(current_app.root_path, 'static', 'images', jpeg_filename)
+        if img.mode in ('RGBA', 'P'):
+            img = img.convert('RGB')
+        img.save(jpeg_path, 'JPEG')
+        
+        # Create database record
+        new_image = Image(
+            filename=png_filename,  # Store PNG as primary filename
+            prompt=prompt,
+            art_style=style,
+            width=width,
+            height=height,
+            user_id=current_user.id,
+            provider_id=current_user.selected_provider_id,
+            model_id=current_user.selected_model_id,
+            created_at=datetime.utcnow()
+        )
+        db.session.add(new_image)
+        db.session.commit()
+        
+        return new_image
+        
+    except Exception as e:
+        print(f"Error saving banner: {str(e)}")
+        print(traceback.format_exc())
+        # Clean up files if there was an error
+        for path in [png_path, webp_path, jpeg_path]:
+            if os.path.exists(path):
+                os.remove(path)
+        raise
+
 @banner.route('/banner')
 @login_required
 def banner_page():
@@ -275,7 +332,20 @@ def generate_banner():
                 if 'preserveAspectRatio' not in svg_content:
                     svg_content = svg_content.replace('<svg', '<svg preserveAspectRatio="xMidYMid meet"')
 
-                return jsonify({'svg': svg_content})
+                # Save banner and create database record
+                image = save_banner_image(svg_content, prompt, width, height, style)
+                
+                return jsonify({
+                    'svg': svg_content,
+                    'image': {
+                        'id': image.id,
+                        'urls': {
+                            'png': image.get_url('png'),
+                            'webp': image.get_url('webp'),
+                            'jpeg': image.get_url('jpeg')
+                        }
+                    }
+                })
             else:
                 return jsonify({
                     'error': 'Invalid SVG',
@@ -292,77 +362,6 @@ def generate_banner():
 
     except Exception as e:
         print(f"Error in generate_banner: {str(e)}")
-        print(traceback.format_exc())
-        return jsonify({
-            'error': 'Unexpected error',
-            'details': str(e)
-        }), 500
-
-@banner.route('/banner/download/<format>')
-@login_required
-def download_banner(format):
-    """Download banner in specified format"""
-    try:
-        svg_content = request.args.get('svg')
-        if not svg_content:
-            return jsonify({
-                'error': 'No SVG content provided',
-                'details': 'SVG content is required for conversion'
-            }), 400
-
-        if format not in ['svg', 'png', 'webp']:
-            return jsonify({
-                'error': 'Invalid format',
-                'details': 'Supported formats are: svg, png, webp'
-            }), 400
-
-        # For SVG format, return directly
-        if format == 'svg':
-            return send_file(
-                BytesIO(svg_content.encode()),
-                mimetype='image/svg+xml',
-                as_attachment=True,
-                download_name='banner.svg'
-            )
-
-        # For PNG and WebP, convert SVG first
-        try:
-            # Convert SVG to PNG using cairosvg
-            png_data = cairosvg.svg2png(bytestring=svg_content.encode())
-            
-            # For PNG, return directly
-            if format == 'png':
-                return send_file(
-                    BytesIO(png_data),
-                    mimetype='image/png',
-                    as_attachment=True,
-                    download_name='banner.png'
-                )
-            
-            # For WebP, convert PNG to WebP
-            elif format == 'webp':
-                png_image = Image.open(BytesIO(png_data))
-                webp_buffer = BytesIO()
-                png_image.save(webp_buffer, 'WEBP')
-                webp_buffer.seek(0)
-                
-                return send_file(
-                    webp_buffer,
-                    mimetype='image/webp',
-                    as_attachment=True,
-                    download_name='banner.webp'
-                )
-
-        except Exception as e:
-            print(f"Error converting image: {str(e)}")
-            print(traceback.format_exc())
-            return jsonify({
-                'error': 'Conversion failed',
-                'details': str(e)
-            }), 500
-
-    except Exception as e:
-        print(f"Error in download_banner: {str(e)}")
         print(traceback.format_exc())
         return jsonify({
             'error': 'Unexpected error',
