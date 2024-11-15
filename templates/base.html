@@ -104,7 +104,13 @@
                 <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-ghost">Gallery</a>
                 <a href="{{ url_for('training.training_page') }}" class="btn btn-ghost">Train LoRA</a>
                 {% if current_user.is_admin() %}
-                    <a href="{{ url_for('admin.manage') }}" class="btn btn-ghost">Manage Users</a>
+                    <div class="dropdown dropdown-hover">
+                        <label tabindex="0" class="btn btn-ghost m-1">Admin</label>
+                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52">
+                            <li><a href="{{ url_for('admin.manage') }}">Manage Users</a></li>
+                            <li><a href="{{ url_for('admin.email_settings') }}">Email Settings</a></li>
+                        </ul>
+                    </div>
                 {% endif %}
             {% endif %}
         </div>

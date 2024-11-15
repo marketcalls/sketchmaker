@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Sketch Maker AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .header h1 {
+            color: #2563eb;
+            margin: 0;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2563eb;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            color: #666666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to Sketch Maker AI</h1>
+        </div>
+        <div class="content">
+            <p>Hello {{ username }},</p>
+            
+            <p>Welcome to Sketch Maker AI! We're excited to have you join our creative community. Your account has been successfully created{% if requires_approval %}, and it is currently pending administrator approval{% endif %}.</p>
+
+            <p>With Sketch Maker AI, you can:</p>
+            <ul>
+                <li>Generate stunning artwork using multiple AI models</li>
+                <li>Create custom banners with various styles</li>
+                <li>Train your own custom models</li>
+                <li>Manage your creations in a personal gallery</li>
+            </ul>
+
+            {% if not requires_approval %}
+            <p style="text-align: center;">
+                <a href="{{ login_url }}" class="button">Start Creating Now</a>
+            </p>
+            {% else %}
+            <p>You will receive another email once your account has been approved by an administrator.</p>
+            {% endif %}
+
+            <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+            
+            <p>Best regards,<br>The Sketch Maker AI Team</p>
+        </div>
+        <div class="footer">
+            <p>This email was sent to {{ email }}</p>
+            <p>&copy; {{ year }} Sketch Maker AI. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Email Settings{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col gap-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">Email Settings</h1>
+                <p class="text-base-content/70">Configure email service for user notifications</p>
+            </div>
+            <div class="flex gap-4">
+                <button class="btn btn-primary" onclick="testEmailSettings()">Test Settings</button>
+            </div>
+        </div>
+
+        <!-- Settings Form -->
+        <div class="card bg-base-200">
+            <div class="card-body">
+                <form id="emailSettingsForm" onsubmit="saveEmailSettings(event)">
+                    <!-- Provider Selection -->
+                    <div class="form-control mb-4">
+                        <label class="label">
+                            <span class="label-text font-bold">Email Provider</span>
+                        </label>
+                        <select name="provider" class="select select-bordered w-full" onchange="toggleProviderFields()">
+                            <option value="smtp" {% if settings.provider == 'smtp' %}selected{% endif %}>SMTP Server</option>
+                            <option value="ses" {% if settings.provider == 'ses' %}selected{% endif %}>Amazon SES</option>
+                        </select>
+                    </div>
+
+                    <!-- Service Status -->
+                    <div class="form-control mb-4">
+                        <label class="label cursor-pointer">
+                            <span class="label-text font-bold">Email Service Status</span>
+                            <input type="checkbox" name="is_active" class="toggle toggle-primary" 
+                                   {% if settings.is_active %}checked{% endif %} />
+                        </label>
+                        <label class="label">
+                            <span class="label-text-alt text-base-content/70">Enable/disable email notifications</span>
+                        </label>
+                    </div>
+
+                    <!-- SMTP Settings -->
+                    <div id="smtpSettings" class="{% if settings.provider != 'smtp' %}hidden{% endif %}">
+                        <h3 class="text-lg font-bold mb-4">SMTP Configuration</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">SMTP Host</span>
+                                </label>
+                                <input type="text" name="smtp_host" class="input input-bordered" 
+                                       value="{{ settings.smtp_host or '' }}" placeholder="smtp.example.com">
+                            </div>
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">SMTP Port</span>
+                                </label>
+                                <input type="number" name="smtp_port" class="input input-bordered" 
+                                       value="{{ settings.smtp_port or '' }}" placeholder="587">
+                            </div>
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">SMTP Username</span>
+                                </label>
+                                <input type="text" name="smtp_username" class="input input-bordered" 
+                                       value="{{ settings.smtp_username or '' }}" placeholder="username@example.com">
+                            </div>
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">SMTP Password</span>
+                                </label>
+                                <input type="password" name="smtp_password" class="input input-bordered" 
+                                       value="{{ settings.smtp_password or '' }}" placeholder="••••••••">
+                            </div>
+                        </div>
+                        <div class="form-control mt-4">
+                            <label class="label cursor-pointer">
+                                <span class="label-text">Use TLS</span>
+                                <input type="checkbox" name="smtp_use_tls" class="toggle toggle-primary" 
+                                       {% if settings.smtp_use_tls %}checked{% endif %}>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Amazon SES Settings -->
+                    <div id="sesSettings" class="{% if settings.provider != 'ses' %}hidden{% endif %}">
+                        <h3 class="text-lg font-bold mb-4">Amazon SES Configuration</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">AWS Access Key</span>
+                                </label>
+                                <input type="text" name="aws_access_key" class="input input-bordered" 
+                                       value="{{ settings.aws_access_key or '' }}" placeholder="AWS Access Key">
+                            </div>
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">AWS Secret Key</span>
+                                </label>
+                                <input type="password" name="aws_secret_key" class="input input-bordered" 
+                                       value="{{ settings.aws_secret_key or '' }}" placeholder="••••••••">
+                            </div>
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">AWS Region</span>
+                                </label>
+                                <input type="text" name="aws_region" class="input input-bordered" 
+                                       value="{{ settings.aws_region or '' }}" placeholder="us-east-1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Common Settings -->
+                    <div class="mt-8">
+                        <h3 class="text-lg font-bold mb-4">Email Settings</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">From Email</span>
+                                </label>
+                                <input type="email" name="from_email" class="input input-bordered" 
+                                       value="{{ settings.from_email or '' }}" placeholder="noreply@example.com">
+                            </div>
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">From Name</span>
+                                </label>
+                                <input type="text" name="from_name" class="input input-bordered" 
+                                       value="{{ settings.from_name or '' }}" placeholder="Sketch Maker AI">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Last Test Results -->
+                    {% if settings.last_test_date %}
+                    <div class="mt-8">
+                        <h3 class="text-lg font-bold mb-4">Last Test Results</h3>
+                        <div class="bg-base-300 p-4 rounded-lg">
+                            <p>Date: {{ settings.last_test_date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                            <p>Status: 
+                                <span class="badge {% if settings.last_test_success %}badge-success{% else %}badge-error{% endif %}">
+                                    {{ 'Success' if settings.last_test_success else 'Failed' }}
+                                </span>
+                            </p>
+                            {% if settings.last_test_message %}
+                            <p class="mt-2">Message: {{ settings.last_test_message }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-8 flex justify-end gap-4">
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test Email Modal -->
+<dialog id="testEmailModal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">Test Email Settings</h3>
+        <form id="testEmailForm" onsubmit="sendTestEmail(event)">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Test Email Address</span>
+                </label>
+                <input type="email" name="test_email" class="input input-bordered" required>
+            </div>
+            <div class="modal-action">
+                <button type="submit" class="btn btn-primary">Send Test Email</button>
+                <button type="button" class="btn" onclick="document.getElementById('testEmailModal').close()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<script>
+function toggleProviderFields() {
+    const provider = document.querySelector('select[name="provider"]').value;
+    const smtpSettings = document.getElementById('smtpSettings');
+    const sesSettings = document.getElementById('sesSettings');
+    
+    if (provider === 'smtp') {
+        smtpSettings.classList.remove('hidden');
+        sesSettings.classList.add('hidden');
+    } else {
+        smtpSettings.classList.add('hidden');
+        sesSettings.classList.remove('hidden');
+    }
+}
+
+function testEmailSettings() {
+    document.getElementById('testEmailModal').showModal();
+}
+
+async function sendTestEmail(event) {
+    event.preventDefault();
+    const form = event.target;
+    const testEmail = form.test_email.value;
+    
+    try {
+        const response = await fetch("{{ url_for('admin.test_email_settings') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ test_email: testEmail })
+        });
+        
+        const data = await response.json();
+        alert(data.message);
+        
+        if (data.success) {
+            document.getElementById('testEmailModal').close();
+            location.reload();
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to test email settings');
+    }
+}
+
+async function saveEmailSettings(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    try {
+        const response = await fetch("{{ url_for('admin.update_email_settings') }}", {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        alert(data.message);
+        
+        if (data.success) {
+            location.reload();
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to save email settings');
+    }
+}
+</script>
+{% endblock %}

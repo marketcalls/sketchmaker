@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from functools import wraps
-from models import db, User, SystemSettings
+from models import db, User, SystemSettings, EmailSettings
 from extensions import limiter, get_rate_limit_string
 from werkzeug.security import generate_password_hash
+from datetime import datetime
+import json
 
 admin = Blueprint('admin', __name__)
 
@@ -30,6 +32,103 @@ def manage():
                          total_users=total_users,
                          settings=settings,
                          search_query=search_query)
+
+@admin.route('/manage/email')
+@limiter.limit(get_rate_limit_string())
+@login_required
+@admin_required
+def email_settings():
+    settings = EmailSettings.get_settings()
+    return render_template('admin/email.html', settings=settings)
+
+@admin.route('/manage/email/update', methods=['POST'])
+@limiter.limit(get_rate_limit_string())
+@login_required
+@admin_required
+def update_email_settings():
+    settings = EmailSettings.get_settings()
+    
+    try:
+        # Update provider and status
+        settings.provider = request.form.get('provider', 'smtp')
+        settings.is_active = request.form.get('is_active') == 'on'
+        
+        # Update SMTP settings if provider is SMTP
+        if settings.provider == 'smtp':
+            settings.smtp_host = request.form.get('smtp_host') or None
+            
+            # Handle SMTP port conversion safely
+            smtp_port = request.form.get('smtp_port', '').strip()
+            settings.smtp_port = int(smtp_port) if smtp_port else None
+            
+            settings.smtp_username = request.form.get('smtp_username') or None
+            # Only update password if provided
+            if request.form.get('smtp_password'):
+                settings.smtp_password = request.form.get('smtp_password')
+            settings.smtp_use_tls = request.form.get('smtp_use_tls') == 'on'
+        
+        # Update SES settings if provider is SES
+        elif settings.provider == 'ses':
+            settings.aws_access_key = request.form.get('aws_access_key') or None
+            # Only update secret key if provided
+            if request.form.get('aws_secret_key'):
+                settings.aws_secret_key = request.form.get('aws_secret_key')
+            settings.aws_region = request.form.get('aws_region') or None
+        
+        # Update common settings
+        settings.from_email = request.form.get('from_email') or None
+        settings.from_name = request.form.get('from_name') or None
+        
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'message': 'Email settings updated successfully'
+        })
+    except ValueError as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Invalid value provided: {str(e)}'
+        }), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Failed to update email settings: {str(e)}'
+        }), 500
+
+@admin.route('/manage/email/test', methods=['POST'])
+@limiter.limit(get_rate_limit_string())
+@login_required
+@admin_required
+def test_email_settings():
+    try:
+        data = request.get_json()
+        test_email = data.get('test_email')
+        if not test_email:
+            return jsonify({
+                'success': False,
+                'message': 'Test email address is required'
+            }), 400
+        
+        settings = EmailSettings.get_settings()
+        success, message = settings.test_connection(test_email)
+        
+        # Update test results
+        settings.last_test_date = datetime.utcnow()
+        settings.last_test_success = success
+        settings.last_test_message = message
+        db.session.commit()
+        
+        return jsonify({
+            'success': success,
+            'message': message
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Failed to test email settings: {str(e)}'
+        }), 500
 
 @admin.route('/manage/user/<int:user_id>', methods=['POST'])
 @limiter.limit(get_rate_limit_string())
