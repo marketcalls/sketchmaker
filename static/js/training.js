@@ -13,6 +13,38 @@ document.addEventListener('DOMContentLoaded', function() {
     let consecutiveErrorCount = 0;
     const MAX_ERRORS = 5;
 
+    // Add image preview functionality
+    imageUpload.addEventListener('change', function(e) {
+        imagePreview.innerHTML = ''; // Clear existing previews
+        const files = e.target.files;
+
+        if (files.length < 5 || files.length > 20) {
+            alert('Please select between 5 and 20 images');
+            e.target.value = ''; // Clear the file input
+            return;
+        }
+
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) {
+                return; // Skip non-image files
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative aspect-square rounded-lg overflow-hidden bg-base-300';
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-full h-full object-cover';
+                
+                div.appendChild(img);
+                imagePreview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
     function extractProgressFromLogs(logs) {
         if (!logs) return null;
         
