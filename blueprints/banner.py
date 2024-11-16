@@ -12,6 +12,7 @@ from PIL import Image as PILImage
 import os
 import uuid
 from datetime import datetime
+from extensions import limiter, get_rate_limit_string
 
 banner = Blueprint('banner', __name__)
 
@@ -286,12 +287,14 @@ def save_banner_image(svg_content, prompt, width, height, style):
         raise
 
 @banner.route('/banner')
+@limiter.limit(get_rate_limit_string())
 @login_required
 def banner_page():
     """Render the banner generation page"""
     return render_template('banner.html')
 
 @banner.route('/banner/generate', methods=['POST'])
+@limiter.limit(get_rate_limit_string())
 @login_required
 def generate_banner():
     try:
