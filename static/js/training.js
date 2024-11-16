@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let consecutiveErrorCount = 0;
     const MAX_ERRORS = 5;
 
-    // Add image preview functionality
-    imageUpload.addEventListener('change', function(e) {
+    // Add image preview functionality with robust error handling
+    imageUpload.addEventListener('change', async function(e) {
         imagePreview.innerHTML = ''; // Clear existing previews
         const files = e.target.files;
 
@@ -24,25 +24,108 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        Array.from(files).forEach(file => {
+        // Show loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'w-full text-center p-4';
+        loadingDiv.innerHTML = '<span class="loading loading-spinner loading-md"></span> Loading previews...';
+        imagePreview.appendChild(loadingDiv);
+
+        const previewGrid = document.createElement('div');
+        previewGrid.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4';
+        imagePreview.appendChild(previewGrid);
+
+        let loadedCount = 0;
+        const totalFiles = Array.from(files).filter(file => file.type.startsWith('image/')).length;
+
+        const updateLoadingStatus = () => {
+            loadingDiv.innerHTML = `<span class="loading loading-spinner loading-md"></span> Loading previews (${loadedCount}/${totalFiles})`;
+            if (loadedCount === totalFiles) {
+                loadingDiv.remove();
+            }
+        };
+
+        // Process each file
+        for (const file of files) {
             if (!file.type.startsWith('image/')) {
-                return; // Skip non-image files
+                console.warn(`Skipping non-image file: ${file.name}`);
+                continue;
             }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const div = document.createElement('div');
-                div.className = 'relative aspect-square rounded-lg overflow-hidden bg-base-300';
-                
+            try {
+                // Create preview container
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'relative aspect-square rounded-lg overflow-hidden bg-base-300';
+
+                // Create image preview
                 const img = document.createElement('img');
-                img.src = e.target.result;
                 img.className = 'w-full h-full object-cover';
+
+                // Create loading indicator for this image
+                const imageLoading = document.createElement('div');
+                imageLoading.className = 'absolute inset-0 flex items-center justify-center bg-base-300';
+                imageLoading.innerHTML = '<span class="loading loading-spinner loading-md"></span>';
+                previewContainer.appendChild(imageLoading);
+
+                // Read file as data URL
+                const reader = new FileReader();
                 
-                div.appendChild(img);
-                imagePreview.appendChild(div);
-            };
-            reader.readAsDataURL(file);
-        });
+                reader.onload = function() {
+                    return new Promise((resolve, reject) => {
+                        img.onload = () => {
+                            imageLoading.remove();
+                            loadedCount++;
+                            updateLoadingStatus();
+                            resolve();
+                        };
+                        img.onerror = () => {
+                            console.error(`Failed to load preview for: ${file.name}`);
+                            imageLoading.innerHTML = '<span class="text-error">Error loading preview</span>';
+                            loadedCount++;
+                            updateLoadingStatus();
+                            reject();
+                        };
+                        img.src = reader.result;
+                    });
+                };
+
+                reader.onerror = function() {
+                    console.error(`Error reading file: ${file.name}`);
+                    imageLoading.innerHTML = '<span class="text-error">Error reading file</span>';
+                    loadedCount++;
+                    updateLoadingStatus();
+                };
+
+                // Add file info overlay
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1';
+                overlay.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+                previewContainer.appendChild(img);
+                previewContainer.appendChild(overlay);
+                previewGrid.appendChild(previewContainer);
+
+                // Start reading the file
+                reader.readAsDataURL(file);
+
+            } catch (error) {
+                console.error(`Error processing file ${file.name}:`, error);
+                loadedCount++;
+                updateLoadingStatus();
+            }
+        }
+
+        // Set a timeout to remove loading indicator if something goes wrong
+        setTimeout(() => {
+            if (loadingDiv.parentNode) {
+                loadingDiv.remove();
+                if (loadedCount === 0) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'w-full text-center p-4 text-error';
+                    errorDiv.textContent = 'Failed to load image previews. Please check if the images are valid.';
+                    imagePreview.insertBefore(errorDiv, previewGrid);
+                }
+            }
+        }, 30000); // 30 second timeout
     });
 
     function extractProgressFromLogs(logs) {
