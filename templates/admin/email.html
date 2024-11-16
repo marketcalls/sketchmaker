@@ -180,7 +180,29 @@
     </div>
 </dialog>
 
+<!-- Toast Container -->
+<div id="toast-container" class="toast toast-end"></div>
+
 <script>
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `alert ${type === 'error' ? 'alert-error' : type === 'success' ? 'alert-success' : 'alert-info'}`;
+    toast.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" class="btn btn-ghost btn-xs">✕</button>
+    `;
+    
+    const container = document.getElementById('toast-container');
+    container.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
 function toggleProviderFields() {
     const provider = document.querySelector('select[name="provider"]').value;
     const smtpSettings = document.getElementById('smtpSettings');
@@ -214,7 +236,7 @@ async function sendTestEmail(event) {
         });
         
         const data = await response.json();
-        alert(data.message);
+        showToast(data.message, data.success ? 'success' : 'error');
         
         if (data.success) {
             document.getElementById('testEmailModal').close();
@@ -222,7 +244,7 @@ async function sendTestEmail(event) {
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to test email settings');
+        showToast('Failed to test email settings', 'error');
     }
 }
 
@@ -238,14 +260,14 @@ async function saveEmailSettings(event) {
         });
         
         const data = await response.json();
-        alert(data.message);
+        showToast(data.message, data.success ? 'success' : 'error');
         
         if (data.success) {
             location.reload();
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Failed to save email settings');
+        showToast('Failed to save email settings', 'error');
     }
 }
 </script>

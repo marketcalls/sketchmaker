@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, SystemSettings, EmailSettings
+from models import db, User, SystemSettings, EmailSettings, PasswordResetOTP
 from extensions import limiter, get_rate_limit_string
 from jinja2 import Template
 import os
@@ -57,6 +57,60 @@ The Sketch Maker AI Team
         success, message = email_settings.send_email(
             to_email=user.email,
             subject="Welcome to Sketch Maker AI",
+            html_content=html_content,
+            text_content=text_content
+        )
+
+        return success, message
+    except Exception as e:
+        return False, str(e)
+
+def send_reset_password_email(user, otp):
+    """Send password reset email with OTP"""
+    try:
+        email_settings = EmailSettings.get_settings()
+        if not email_settings.is_active:
+            return False, "Email service is not active"
+
+        # Get the reset password email template
+        template_path = os.path.join('templates', 'email', 'reset_password.html')
+        with open(template_path, 'r') as f:
+            template_content = f.read()
+
+        # Create template object
+        template = Template(template_content)
+
+        # Render the template with user data
+        html_content = template.render(
+            username=user.username,
+            email=user.email,
+            otp=otp.otp,
+            year=datetime.utcnow().year
+        )
+
+        # Create plain text version
+        text_content = f"""
+Password Reset Request - Sketch Maker AI
+
+Hello {user.username},
+
+We received a request to reset your password for your Sketch Maker AI account.
+Your one-time password (OTP) is: {otp.otp}
+
+Please use this OTP to reset your password. This code will expire in 15 minutes.
+
+If you didn't request this password reset, please ignore this email or contact support if you have concerns about your account's security.
+
+For security reasons, please do not share this OTP with anyone.
+
+Best regards,
+The Sketch Maker AI Team
+        """
+
+        # Send the email
+        success, message = email_settings.send_email(
+            to_email=user.email,
+            subject="Reset Your Password - Sketch Maker AI",
             html_content=html_content,
             text_content=text_content
         )
@@ -161,6 +215,78 @@ def register():
             return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html')
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+@limiter.limit(get_rate_limit_string())
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('core.dashboard'))
+    
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            # Generate OTP
+            otp = PasswordResetOTP.generate_otp(user.id)
+            
+            # Send reset email
+            email_success, email_message = send_reset_password_email(user, otp)
+            if not email_success:
+                print(f"Failed to send reset email: {email_message}")
+                flash('Failed to send reset email. Please try again later.')
+                return redirect(url_for('auth.forgot_password'))
+            
+            # Store email in session for the reset page
+            session['reset_email'] = email
+            flash('Password reset code has been sent to your email.')
+            return redirect(url_for('auth.reset_password'))
+        else:
+            # Don't reveal if email exists
+            flash('If an account exists with this email, a password reset code will be sent.')
+            return redirect(url_for('auth.forgot_password'))
+    
+    return render_template('auth/forgot_password.html')
+
+@auth_bp.route('/reset-password', methods=['GET', 'POST'])
+@limiter.limit(get_rate_limit_string())
+def reset_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('core.dashboard'))
+    
+    # Get email from session
+    email = session.get('reset_email')
+    if not email and request.method == 'GET':
+        return redirect(url_for('auth.forgot_password'))
+    
+    if request.method == 'POST':
+        email = request.form.get('email')
+        otp_value = request.form.get('otp')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash('Invalid request. Please try again.')
+            return redirect(url_for('auth.forgot_password'))
+        
+        # Verify OTP
+        otp = PasswordResetOTP.verify_otp(user.id, otp_value)
+        if not otp:
+            flash('Invalid or expired code. Please request a new one.')
+            return redirect(url_for('auth.forgot_password'))
+        
+        # Update password
+        user.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
+        otp.use()  # Mark OTP as used
+        db.session.commit()
+        
+        # Clear session
+        session.pop('reset_email', None)
+        
+        flash('Your password has been reset successfully. Please login with your new password.')
+        return redirect(url_for('auth.login'))
+    
+    return render_template('auth/reset_password.html', email=email)
 
 @auth_bp.route('/logout')
 @limiter.limit(get_rate_limit_string())

@@ -1,6 +1,6 @@
 from extensions import db
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from PIL import Image as PILImage
 import smtplib
@@ -11,6 +11,7 @@ from botocore.credentials import Credentials
 from botocore.config import Config
 import json
 import requests
+import random
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from urllib.parse import urlencode
@@ -223,6 +224,59 @@ class EmailSettings(db.Model):
             db.session.commit()
         return settings
 
+class PasswordResetOTP(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    otp = db.Column(db.String(6), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    is_used = db.Column(db.Boolean, default=False)
+    
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        self.expires_at = datetime.utcnow() + timedelta(minutes=15)
+    
+    def is_valid(self):
+        """Check if OTP is valid and not expired"""
+        return not self.is_used and datetime.utcnow() <= self.expires_at
+    
+    def use(self):
+        """Mark OTP as used"""
+        self.is_used = True
+        db.session.commit()
+    
+    @staticmethod
+    def generate_otp(user_id):
+        """Generate new OTP for user"""
+        # Invalidate any existing OTPs
+        PasswordResetOTP.query.filter_by(
+            user_id=user_id, 
+            is_used=False
+        ).update({
+            'is_used': True
+        })
+        db.session.commit()
+        
+        # Create new OTP
+        otp = PasswordResetOTP(user_id)
+        db.session.add(otp)
+        db.session.commit()
+        return otp
+    
+    @staticmethod
+    def verify_otp(user_id, otp_value):
+        """Verify OTP for user"""
+        otp = PasswordResetOTP.query.filter_by(
+            user_id=user_id,
+            otp=otp_value,
+            is_used=False
+        ).first()
+        
+        if otp and otp.is_valid():
+            return otp
+        return None
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -234,6 +288,7 @@ class User(UserMixin, db.Model):
     is_approved = db.Column(db.Boolean, default=True)  # For manual approval process
     images = db.relationship('Image', backref='user', lazy=True)
     training_history = db.relationship('TrainingHistory', backref='user', lazy=True)
+    password_resets = db.relationship('PasswordResetOTP', backref='user', lazy=True)
     
     # API Provider settings
     selected_provider_id = db.Column(db.Integer, db.ForeignKey('api_provider.id'))

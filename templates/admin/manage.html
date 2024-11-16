@@ -109,9 +109,7 @@
                                                 <li>
                                                     <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST" class="w-full">
                                                         <input type="hidden" name="action" value="toggle_role">
-                                                        <button type="submit" class="w-full text-left">
-                                                            Toggle Admin
-                                                        </button>
+                                                        <button type="submit" class="w-full text-left">Toggle Admin</button>
                                                     </form>
                                                 </li>
                                             {% endif %}
@@ -119,7 +117,7 @@
                                     </div>
 
                                     <!-- Status Toggle -->
-                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST">
+                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST" class="inline">
                                         <input type="hidden" name="action" value="toggle_status">
                                         <button type="submit" class="btn btn-sm {% if user.is_active %}btn-error{% else %}btn-success{% endif %}">
                                             {{ 'Deactivate' if user.is_active else 'Activate' }}
@@ -127,7 +125,7 @@
                                     </form>
 
                                     <!-- Approval Toggle -->
-                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST">
+                                    <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST" class="inline">
                                         <input type="hidden" name="action" value="toggle_approval">
                                         <button type="submit" class="btn btn-sm {% if user.is_approved %}btn-warning{% else %}btn-success{% endif %}">
                                             {{ 'Unapprove' if user.is_approved else 'Approve' }}
@@ -142,7 +140,7 @@
 
                                     <!-- Delete User -->
                                     <form action="{{ url_for('admin.update_user', user_id=user.id) }}" method="POST" 
-                                          onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                          class="inline" onsubmit="return confirm('Are you sure you want to delete user {{ user.username }}?')">
                                         <input type="hidden" name="action" value="delete">
                                         <button type="submit" class="btn btn-sm btn-error">Delete</button>
                                     </form>
@@ -220,7 +218,29 @@
     </div>
 </dialog>
 
+<!-- Toast Container -->
+<div id="toast-container" class="toast toast-end"></div>
+
 <script>
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `alert ${type === 'error' ? 'alert-error' : type === 'success' ? 'alert-success' : 'alert-info'}`;
+    toast.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" class="btn btn-ghost btn-xs">✕</button>
+    `;
+    
+    const container = document.getElementById('toast-container');
+    container.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
 function searchUsers() {
     const query = document.getElementById('searchInput').value;
     window.location.href = "{{ url_for('admin.manage') }}?search=" + encodeURIComponent(query);
@@ -232,25 +252,52 @@ document.getElementById('searchInput').addEventListener('keypress', function(e) 
     }
 });
 
-function updateApprovalSetting(checked) {
-    fetch("{{ url_for('admin.update_settings') }}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `require_manual_approval=${checked}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Show toast or notification
-            alert('Settings updated successfully');
-        }
-    })
-    .catch(error => {
+async function updateApprovalSetting(checked) {
+    try {
+        const response = await fetch("{{ url_for('admin.update_settings') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `require_manual_approval=${checked}`
+        });
+        
+        const data = await response.json();
+        showToast(data.message, data.success ? 'success' : 'error');
+    } catch (error) {
         console.error('Error:', error);
-        alert('Failed to update settings');
-    });
+        showToast('Failed to update settings', 'error');
+    }
 }
+
+// Add event listeners to all forms to show toast messages
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch(this.action, {
+                    method: this.method,
+                    body: new FormData(this)
+                });
+                
+                const data = await response.json();
+                showToast(data.message, data.success ? 'success' : 'error');
+                
+                if (data.success) {
+                    // Close any open modals
+                    document.querySelectorAll('.modal').forEach(modal => modal.close());
+                    // Reload the page to show updated data
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while processing your request', 'error');
+            }
+        });
+    });
+});
 </script>
 {% endblock %}
