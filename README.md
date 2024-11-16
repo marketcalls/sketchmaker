@@ -197,3 +197,7 @@ This project is licensed under the AGPL v3.0 License - see the [LICENSE](LICENSE
 
 [marketcalls](https://github.com/marketcalls)
 
+## Credits
+
+### Icons and Images
+- Favicon and logo: [Sketch book icons created by RA_IC0N21 - Flaticon](https://www.flaticon.com/free-icons/sketch-book)

@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}{% endblock %}</title>
     {% block head %}
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='logo/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='logo/favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='logo/site.webmanifest') }}">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="msapplication-TileColor" content="#1a1a1a">
+    <link rel="mask-icon" href="{{ url_for('static', filename='logo/favicon.ico') }}" color="#1a1a1a">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='logo/favicon.ico') }}">
+    <meta name="apple-mobile-web-app-title" content="Sketch Maker AI">
+    <meta name="application-name" content="Sketch Maker AI">
+
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let consecutiveErrorCount = 0;
     const MAX_ERRORS = 5;
 
-    // Add image preview functionality with robust error handling
-    imageUpload.addEventListener('change', async function(e) {
+    // Add image preview functionality
+    imageUpload.addEventListener('change', function(e) {
         imagePreview.innerHTML = ''; // Clear existing previews
         const files = e.target.files;
 
@@ -24,108 +24,62 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading indicator
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'w-full text-center p-4';
-        loadingDiv.innerHTML = '<span class="loading loading-spinner loading-md"></span> Loading previews...';
-        imagePreview.appendChild(loadingDiv);
+        // Create container for images
+        const container = document.createElement('div');
+        Object.assign(container.style, {
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '12px',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+            maxWidth: '1024px',
+            margin: '0 auto',
+            padding: '16px'
+        });
+        imagePreview.appendChild(container);
 
-        const previewGrid = document.createElement('div');
-        previewGrid.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4';
-        imagePreview.appendChild(previewGrid);
-
-        let loadedCount = 0;
-        const totalFiles = Array.from(files).filter(file => file.type.startsWith('image/')).length;
-
-        const updateLoadingStatus = () => {
-            loadingDiv.innerHTML = `<span class="loading loading-spinner loading-md"></span> Loading previews (${loadedCount}/${totalFiles})`;
-            if (loadedCount === totalFiles) {
-                loadingDiv.remove();
-            }
-        };
-
-        // Process each file
-        for (const file of files) {
+        Array.from(files).forEach(file => {
             if (!file.type.startsWith('image/')) {
-                console.warn(`Skipping non-image file: ${file.name}`);
-                continue;
+                return; // Skip non-image files
             }
 
-            try {
-                // Create preview container
-                const previewContainer = document.createElement('div');
-                previewContainer.className = 'relative aspect-square rounded-lg overflow-hidden bg-base-300';
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Create fixed-size container for each image
+                const imageBox = document.createElement('div');
+                Object.assign(imageBox.style, {
+                    width: '250px',
+                    height: '250px',
+                    backgroundColor: 'var(--fallback-b3,oklch(var(--b3)))',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: '0 0 auto'
+                });
 
-                // Create image preview
+                // Create and set up image
                 const img = document.createElement('img');
-                img.className = 'w-full h-full object-cover';
+                img.src = e.target.result;
+                Object.assign(img.style, {
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    display: 'block'
+                });
 
-                // Create loading indicator for this image
-                const imageLoading = document.createElement('div');
-                imageLoading.className = 'absolute inset-0 flex items-center justify-center bg-base-300';
-                imageLoading.innerHTML = '<span class="loading loading-spinner loading-md"></span>';
-                previewContainer.appendChild(imageLoading);
+                // Assemble the components
+                imageBox.appendChild(img);
+                container.appendChild(imageBox);
+            };
 
-                // Read file as data URL
-                const reader = new FileReader();
-                
-                reader.onload = function() {
-                    return new Promise((resolve, reject) => {
-                        img.onload = () => {
-                            imageLoading.remove();
-                            loadedCount++;
-                            updateLoadingStatus();
-                            resolve();
-                        };
-                        img.onerror = () => {
-                            console.error(`Failed to load preview for: ${file.name}`);
-                            imageLoading.innerHTML = '<span class="text-error">Error loading preview</span>';
-                            loadedCount++;
-                            updateLoadingStatus();
-                            reject();
-                        };
-                        img.src = reader.result;
-                    });
-                };
+            reader.onerror = function() {
+                console.error('Error reading file:', file.name);
+            };
 
-                reader.onerror = function() {
-                    console.error(`Error reading file: ${file.name}`);
-                    imageLoading.innerHTML = '<span class="text-error">Error reading file</span>';
-                    loadedCount++;
-                    updateLoadingStatus();
-                };
-
-                // Add file info overlay
-                const overlay = document.createElement('div');
-                overlay.className = 'absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1';
-                overlay.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-
-                previewContainer.appendChild(img);
-                previewContainer.appendChild(overlay);
-                previewGrid.appendChild(previewContainer);
-
-                // Start reading the file
-                reader.readAsDataURL(file);
-
-            } catch (error) {
-                console.error(`Error processing file ${file.name}:`, error);
-                loadedCount++;
-                updateLoadingStatus();
-            }
-        }
-
-        // Set a timeout to remove loading indicator if something goes wrong
-        setTimeout(() => {
-            if (loadingDiv.parentNode) {
-                loadingDiv.remove();
-                if (loadedCount === 0) {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'w-full text-center p-4 text-error';
-                    errorDiv.textContent = 'Failed to load image previews. Please check if the images are valid.';
-                    imagePreview.insertBefore(errorDiv, previewGrid);
-                }
-            }
-        }, 30000); // 30 second timeout
+            reader.readAsDataURL(file);
+        });
     });
 
     function extractProgressFromLogs(logs) {
