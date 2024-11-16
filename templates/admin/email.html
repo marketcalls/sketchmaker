@@ -184,7 +184,19 @@
 <div id="toast-container" class="toast toast-end"></div>
 
 <script>
+let toastTimeout;
+
 function showToast(message, type = 'info') {
+    // Clear any existing timeout
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+
+    // Remove any existing toasts
+    const container = document.getElementById('toast-container');
+    container.innerHTML = '';
+
+    // Create new toast
     const toast = document.createElement('div');
     toast.className = `alert ${type === 'error' ? 'alert-error' : type === 'success' ? 'alert-success' : 'alert-info'}`;
     toast.innerHTML = `
@@ -192,15 +204,22 @@ function showToast(message, type = 'info') {
         <button onclick="this.parentElement.remove()" class="btn btn-ghost btn-xs">✕</button>
     `;
     
-    const container = document.getElementById('toast-container');
     container.appendChild(toast);
     
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (toast.parentElement) {
-            toast.remove();
-        }
+    // Set new timeout
+    toastTimeout = setTimeout(() => {
+        toast.style.transition = 'opacity 1s ease-out';
+        toast.style.opacity = '0';
+        
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 1000);
     }, 5000);
+
+    // Return a promise that resolves after the toast is shown
+    return new Promise(resolve => setTimeout(resolve, 1000));
 }
 
 function toggleProviderFields() {
@@ -236,11 +255,15 @@ async function sendTestEmail(event) {
         });
         
         const data = await response.json();
-        showToast(data.message, data.success ? 'success' : 'error');
+        document.getElementById('testEmailModal').close();
+        
+        // Show toast and wait before reloading
+        await showToast(data.message, data.success ? 'success' : 'error');
         
         if (data.success) {
-            document.getElementById('testEmailModal').close();
-            location.reload();
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
         }
     } catch (error) {
         console.error('Error:', error);
@@ -260,10 +283,14 @@ async function saveEmailSettings(event) {
         });
         
         const data = await response.json();
-        showToast(data.message, data.success ? 'success' : 'error');
+        
+        // Show toast and wait before reloading
+        await showToast(data.message, data.success ? 'success' : 'error');
         
         if (data.success) {
-            location.reload();
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
         }
     } catch (error) {
         console.error('Error:', error);
