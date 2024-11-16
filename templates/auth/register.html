@@ -42,11 +42,13 @@
                     <label class="label">
                         <span class="label-text">Password</span>
                     </label>
-                    <input type="password" name="password" id="password" placeholder="Enter your password" required 
+                    <input type="password" name="password" id="password" 
+                           placeholder="Enter your password (min. 8 chars, uppercase, lowercase, number, symbol)"
                            class="input input-bordered w-full bg-base-300"
-                           pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
-                           title="Password must be at least 8 characters long and include both letters and numbers"
-                           oninput="updatePasswordStrength(this.value)">
+                           pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                           title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
+                           oninput="updatePasswordStrength(this.value)"
+                           required>
                     <div class="mt-2">
                         <div class="w-full bg-base-300 rounded-full h-2">
                             <div id="passwordStrength" class="h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
@@ -54,6 +56,13 @@
                         <label class="label">
                             <span id="passwordStrengthText" class="label-text-alt">Password strength: Too weak</span>
                         </label>
+                        <ul class="text-xs text-base-content/70 mt-2 space-y-1">
+                            <li id="lengthCheck">✗ At least 8 characters</li>
+                            <li id="uppercaseCheck">✗ At least one uppercase letter</li>
+                            <li id="lowercaseCheck">✗ At least one lowercase letter</li>
+                            <li id="numberCheck">✗ At least one number</li>
+                            <li id="specialCheck">✗ At least one special character (@$!%*?&)</li>
+                        </ul>
                     </div>
                 </div>
 
@@ -61,8 +70,10 @@
                     <label class="label">
                         <span class="label-text">Confirm Password</span>
                     </label>
-                    <input type="password" name="confirm_password" id="confirmPassword" placeholder="Confirm your password" required 
-                           class="input input-bordered w-full bg-base-300">
+                    <input type="password" name="confirm_password" id="confirmPassword" 
+                           placeholder="Confirm your password"
+                           class="input input-bordered w-full bg-base-300" 
+                           required>
                     <label class="label">
                         <span id="passwordMatch" class="label-text-alt"></span>
                     </label>
@@ -89,38 +100,58 @@ function updatePasswordStrength(password) {
     let strengthText = '';
     let strengthColor = '';
 
+    // Update check marks
+    document.getElementById('lengthCheck').innerHTML = 
+        (password.length >= 8 ? '✓' : '✗') + ' At least 8 characters';
+    document.getElementById('uppercaseCheck').innerHTML = 
+        (/[A-Z]/.test(password) ? '✓' : '✗') + ' At least one uppercase letter';
+    document.getElementById('lowercaseCheck').innerHTML = 
+        (/[a-z]/.test(password) ? '✓' : '✗') + ' At least one lowercase letter';
+    document.getElementById('numberCheck').innerHTML = 
+        (/\d/.test(password) ? '✓' : '✗') + ' At least one number';
+    document.getElementById('specialCheck').innerHTML = 
+        (/[@$!%*?&]/.test(password) ? '✓' : '✗') + ' At least one special character (@$!%*?&)';
+
     // Length check
     if (password.length >= 8) {
-        strength += 25;
+        strength += 20;
     }
 
-    // Contains number
+    // Uppercase check
+    if (/[A-Z]/.test(password)) {
+        strength += 20;
+    }
+
+    // Lowercase check
+    if (/[a-z]/.test(password)) {
+        strength += 20;
+    }
+
+    // Number check
     if (/\d/.test(password)) {
-        strength += 25;
+        strength += 20;
     }
 
-    // Contains letter
-    if (/[a-zA-Z]/.test(password)) {
-        strength += 25;
-    }
-
-    // Contains special character
-    if (/[^A-Za-z0-9]/.test(password)) {
-        strength += 25;
+    // Special character check
+    if (/[@$!%*?&]/.test(password)) {
+        strength += 20;
     }
 
     // Set text and color based on strength
-    if (strength <= 25) {
+    if (strength <= 20) {
         strengthText = 'Too weak';
         strengthColor = 'bg-error';
-    } else if (strength <= 50) {
+    } else if (strength <= 40) {
         strengthText = 'Weak';
         strengthColor = 'bg-warning';
-    } else if (strength <= 75) {
+    } else if (strength <= 60) {
         strengthText = 'Medium';
         strengthColor = 'bg-info';
-    } else {
+    } else if (strength <= 80) {
         strengthText = 'Strong';
+        strengthColor = 'bg-success';
+    } else {
+        strengthText = 'Very Strong';
         strengthColor = 'bg-success';
     }
 
@@ -164,8 +195,9 @@ function validateForm() {
         return false;
     }
 
-    if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)) {
-        alert('Password must be at least 8 characters long and include both letters and numbers!');
+    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!pattern.test(password)) {
+        alert('Password must be at least 8 characters and include uppercase, lowercase, number, and special character');
         return false;
     }
 
