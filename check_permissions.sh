@@ -1,161 +1,52 @@
 #!/bin/bash
 
-# Exit on error
-set -e
-
-# Set variables
+# Set app root and log directory
 APP_ROOT="/var/python/sketchmaker/sketchmaker"
-STATIC_ROOT="$APP_ROOT/static"
-WEB_USER="www-data"
-WEB_GROUP="www-data"
+LOG_DIR="/var/log/gunicorn"
 
-# Function to check and fix directory permissions
-check_dir_permissions() {
-    local dir="$1"
-    local expected_perms="$2"
-    local actual_perms=$(stat -c "%a" "$dir")
-    
-    echo "Checking $dir"
-    echo "Current permissions: $actual_perms (expected: $expected_perms)"
-    echo "Owner: $(stat -c "%U" "$dir")"
-    echo "Group: $(stat -c "%G" "$dir")"
-    
-    if [ "$actual_perms" != "$expected_perms" ]; then
-        echo "Fixing permissions for $dir to $expected_perms"
-        sudo chmod "$expected_perms" "$dir"
-    fi
-    
-    if [ "$(stat -c "%U" "$dir")" != "$WEB_USER" ] || [ "$(stat -c "%G" "$dir")" != "$WEB_GROUP" ]; then
-        echo "Fixing ownership for $dir to $WEB_USER:$WEB_GROUP"
-        sudo chown "$WEB_USER:$WEB_GROUP" "$dir"
-    fi
-}
+echo "Setting up directories and permissions..."
 
-# Function to check and fix file permissions
-check_file_permissions() {
-    local file="$1"
-    local expected_perms="$2"
-    local actual_perms=$(stat -c "%a" "$file")
-    
-    echo "Checking $file"
-    echo "Current permissions: $actual_perms (expected: $expected_perms)"
-    echo "Owner: $(stat -c "%U" "$file")"
-    echo "Group: $(stat -c "%G" "$file")"
-    
-    if [ "$actual_perms" != "$expected_perms" ]; then
-        echo "Fixing permissions for $file to $expected_perms"
-        sudo chmod "$expected_perms" "$file"
-    fi
-    
-    if [ "$(stat -c "%U" "$file")" != "$WEB_USER" ] || [ "$(stat -c "%G" "$file")" != "$WEB_GROUP" ]; then
-        echo "Fixing ownership for $file to $WEB_USER:$WEB_GROUP"
-        sudo chown "$WEB_USER:$WEB_GROUP" "$file"
-    fi
-}
+# Create necessary directories
+mkdir -p "$APP_ROOT/static/images"
+mkdir -p "$APP_ROOT/static/uploads"
+mkdir -p "$APP_ROOT/static/training_files/uploads"
+mkdir -p "$APP_ROOT/static/training_files/models"
+mkdir -p "$APP_ROOT/static/training_files/temp"
+mkdir -p "$APP_ROOT/instance"
+mkdir -p "$LOG_DIR"
 
-echo "Checking static directory structure..."
+# Create log files if they don't exist
+touch "$LOG_DIR/gunicorn.error.log"
+touch "$LOG_DIR/gunicorn.access.log"
 
-# Check main static directory
-check_dir_permissions "$STATIC_ROOT" "755"
+# Set ownership
+chown -R www-data:www-data "$APP_ROOT"
+chown -R www-data:www-data "$LOG_DIR"
+chown www-data:www-data "$LOG_DIR/gunicorn.error.log"
+chown www-data:www-data "$LOG_DIR/gunicorn.access.log"
 
-# Check css directory and files
-check_dir_permissions "$STATIC_ROOT/css" "755"
-if [ -d "$STATIC_ROOT/css" ]; then
-    find "$STATIC_ROOT/css" -type f -exec bash -c 'check_file_permissions "$1" "644"' _ {} \;
-fi
+# Set directory permissions
+chmod 755 "$APP_ROOT"
+chmod -R 755 "$APP_ROOT/static"
+chmod -R 775 "$APP_ROOT/static/images"
+chmod -R 775 "$APP_ROOT/static/uploads"
+chmod -R 775 "$APP_ROOT/static/training_files"
+chmod -R 775 "$APP_ROOT/instance"
+chmod -R 775 "$LOG_DIR"
+chmod 664 "$LOG_DIR/gunicorn.error.log"
+chmod 664 "$LOG_DIR/gunicorn.access.log"
 
-# Check js directory and files
-check_dir_permissions "$STATIC_ROOT/js" "755"
-if [ -d "$STATIC_ROOT/js" ]; then
-    find "$STATIC_ROOT/js" -type f -exec bash -c 'check_file_permissions "$1" "644"' _ {} \;
-fi
+echo "Checking permissions..."
+echo "----------------------"
 
-# Check and fix writable directories
-for dir in "images" "uploads" "training_files"; do
-    DIR_PATH="$STATIC_ROOT/$dir"
-    echo "Checking $dir directory..."
-    
-    # Create directory if it doesn't exist
-    if [ ! -d "$DIR_PATH" ]; then
-        echo "Creating $DIR_PATH"
-        sudo mkdir -p "$DIR_PATH"
-    fi
-    
-    # Set permissions (775 for writable directories)
-    check_dir_permissions "$DIR_PATH" "775"
-    
-    # Set permissions for all files in the directory
-    if [ -d "$DIR_PATH" ] && [ -n "$(ls -A $DIR_PATH 2>/dev/null)" ]; then
-        find "$DIR_PATH" -type f -exec bash -c 'check_file_permissions "$1" "664"' _ {} \;
-    fi
-done
+# Check log files
+echo "Log Files:"
+ls -l "$LOG_DIR/gunicorn.error.log"
+ls -l "$LOG_DIR/gunicorn.access.log"
 
-# Check if gunicorn can write to these directories
-echo "Testing write permissions..."
-for dir in "images" "uploads" "training_files"; do
-    DIR_PATH="$STATIC_ROOT/$dir"
-    TEST_FILE="$DIR_PATH/test_write_$$"
-    
-    echo "Testing write access to $dir..."
-    if sudo -u $WEB_USER touch "$TEST_FILE" 2>/dev/null; then
-        echo "✓ Write test passed for $dir"
-        sudo rm "$TEST_FILE"
-    else
-        echo "✗ Write test failed for $dir"
-        echo "Running debug commands..."
-        ls -la "$DIR_PATH"
-        sudo -u $WEB_USER -v
-        id $WEB_USER
-        groups $WEB_USER
-    fi
-done
+# Check write permissions
+echo -e "\nTesting write permissions..."
+su www-data -s /bin/bash -c "echo 'test' >> '$LOG_DIR/gunicorn.error.log'" && echo "✓ error log is writable" || echo "✗ error log is not writable"
+su www-data -s /bin/bash -c "echo 'test' >> '$LOG_DIR/gunicorn.access.log'" && echo "✓ access log is writable" || echo "✗ access log is not writable"
 
-# Check SELinux if enabled
-if command -v getenforce >/dev/null 2>&1; then
-    echo "Checking SELinux status..."
-    SELINUX_STATUS=$(getenforce)
-    echo "SELinux is: $SELINUX_STATUS"
-    
-    if [ "$SELINUX_STATUS" = "Enforcing" ]; then
-        echo "Setting SELinux context for static directories..."
-        for dir in "images" "uploads" "training_files"; do
-            DIR_PATH="$STATIC_ROOT/$dir"
-            sudo semanage fcontext -a -t httpd_sys_rw_content_t "$DIR_PATH(/.*)?"
-            sudo restorecon -Rv "$DIR_PATH"
-        done
-    fi
-fi
-
-# Check socket file permissions
-SOCKET_FILE="$APP_ROOT/sketchmaker.sock"
-if [ -S "$SOCKET_FILE" ]; then
-    echo "Checking socket file permissions..."
-    check_file_permissions "$SOCKET_FILE" "660"
-fi
-
-# Check gunicorn service user
-if [ -f "/etc/systemd/system/sketchmaker.service" ]; then
-    echo "Checking gunicorn service configuration..."
-    grep "User=" "/etc/systemd/system/sketchmaker.service"
-fi
-
-# Check nginx user
-if [ -f "/etc/nginx/nginx.conf" ]; then
-    echo "Checking nginx user configuration..."
-    grep "user" "/etc/nginx/nginx.conf"
-fi
-
-echo "Permission check complete!"
-echo "If you're still having issues, check the following:"
-echo "1. Gunicorn service user matches $WEB_USER"
-echo "2. Nginx user matches $WEB_USER"
-echo "3. Application is running with correct permissions"
-echo "4. Firewall and SELinux settings"
-echo "5. Check logs at:"
-echo "   - /var/log/nginx/error.log"
-echo "   - /var/log/gunicorn/gunicorn.error.log"
-
-# Final check of gunicorn and nginx services
-echo -e "\nChecking service status:"
-systemctl status gunicorn.service | grep "Active:"
-systemctl status nginx.service | grep "Active:"
+echo -e "\nSetup and checks completed."
