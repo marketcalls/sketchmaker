@@ -7,14 +7,31 @@
     <div class="max-w-md w-full p-6">
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title text-2xl mb-6">Welcome Back</h2>
+                <div class="flex flex-col items-center mb-6">
+                    <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    <h2 class="card-title text-2xl">Welcome Back</h2>
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="alert alert-error mb-4">
+                    {{ messages[0] }}
+                </div>
+                {% endif %}
+                {% endwith %}
                 
                 <form method="POST" action="{{ url_for('auth.login') }}">
                     <div class="form-control">
                         <label class="label">
                             <span class="label-text">Email Address</span>
                         </label>
-                        <input type="email" name="email" class="input input-bordered" required>
+                        <input type="email" 
+                               name="email" 
+                               class="input input-bordered" 
+                               placeholder="Enter your email address"
+                               required>
                     </div>
 
                     <div class="form-control mt-4">
@@ -24,7 +41,11 @@
                                 Forgot Password?
                             </a>
                         </label>
-                        <input type="password" name="password" class="input input-bordered" required>
+                        <input type="password" 
+                               name="password" 
+                               class="input input-bordered" 
+                               placeholder="Enter your password"
+                               required>
                     </div>
 
                     <div class="form-control mt-4">

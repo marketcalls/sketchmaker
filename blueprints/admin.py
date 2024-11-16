@@ -1,13 +1,19 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from functools import wraps
-from models import db, User, SystemSettings, EmailSettings
+from models import db, User, SystemSettings, EmailSettings, PasswordResetOTP
 from extensions import limiter, get_rate_limit_string
 from werkzeug.security import generate_password_hash
 from datetime import datetime
-import json
+import re
 
 admin = Blueprint('admin', __name__)
+
+def is_valid_password(password):
+    """Check if password meets requirements"""
+    # Must have at least 8 characters, one uppercase, one lowercase, one number, and one special character
+    pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    return bool(re.match(pattern, password))
 
 def admin_required(f):
     @wraps(f)
@@ -166,8 +172,19 @@ def update_user(user_id):
             
         elif action == 'set_password':
             new_password = request.form.get('new_password')
-            if new_password:
-                user.password_hash = generate_password_hash(new_password, method='pbkdf2:sha256')
+            if not new_password:
+                return jsonify({
+                    'success': False,
+                    'message': 'New password is required.'
+                }), 400
+                
+            if not is_valid_password(new_password):
+                return jsonify({
+                    'success': False,
+                    'message': 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character.'
+                }), 400
+                
+            user.password_hash = generate_password_hash(new_password, method='pbkdf2:sha256')
             
         elif action == 'delete':
             if user.is_superadmin() and not current_user.is_superadmin():
@@ -175,6 +192,10 @@ def update_user(user_id):
                     'success': False,
                     'message': 'Only superadmins can delete superadmin accounts.'
                 }), 403
+                
+            # Delete associated password reset OTPs first
+            PasswordResetOTP.query.filter_by(user_id=user.id).delete()
+            # Delete the user
             db.session.delete(user)
         
         db.session.commit()
@@ -199,6 +220,13 @@ def add_user():
         email = request.form.get('email')
         password = request.form.get('password')
         role = request.form.get('role', 'user')
+        
+        # Validate password
+        if not is_valid_password(password):
+            return jsonify({
+                'success': False,
+                'message': 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character.'
+            }), 400
         
         # Only superadmin can create superadmin users
         if role == 'superadmin' and not current_user.is_superadmin():
@@ -250,7 +278,8 @@ def add_user():
 def update_settings():
     try:
         settings = SystemSettings.get_settings()
-        settings.require_manual_approval = request.form.get('require_manual_approval') == 'true'
+        # Convert checkbox value to boolean
+        settings.require_manual_approval = request.form.get('require_manual_approval', 'false') == 'true'
         db.session.commit()
         
         return jsonify({

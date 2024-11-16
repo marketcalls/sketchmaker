@@ -6,8 +6,15 @@ from extensions import limiter, get_rate_limit_string
 from jinja2 import Template
 import os
 from datetime import datetime
+import re
 
 auth_bp = Blueprint('auth', __name__)
+
+def is_valid_password(password):
+    """Check if password meets requirements"""
+    # Must have at least 8 characters, one uppercase, one lowercase, one number, and one special character
+    pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    return bool(re.match(pattern, password))
 
 def send_welcome_email(user, requires_approval=False):
     """Send welcome email to newly registered user"""
@@ -167,6 +174,11 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
 
+        # Validate password
+        if not is_valid_password(password):
+            flash('Password must be at least 8 characters and include uppercase, lowercase, number, and special character.')
+            return redirect(url_for('auth.register'))
+
         # Check if user already exists
         user = User.query.filter_by(email=email).first()
         if user:
@@ -274,6 +286,11 @@ def reset_password():
         if not otp:
             flash('Invalid or expired code. Please request a new one.')
             return redirect(url_for('auth.forgot_password'))
+        
+        # Validate password
+        if not is_valid_password(password):
+            flash('Password must be at least 8 characters and include uppercase, lowercase, number, and special character.')
+            return redirect(url_for('auth.reset_password'))
         
         # Update password
         user.password_hash = generate_password_hash(password, method='pbkdf2:sha256')

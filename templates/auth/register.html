@@ -21,12 +21,12 @@
             {% endif %}
             {% endwith %}
 
-            <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-4">
+            <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-4" id="registerForm" onsubmit="return validateForm()">
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">Username</span>
                     </label>
-                    <input type="text" name="username" placeholder="johndoe" required 
+                    <input type="text" name="username" placeholder="Enter your username" required 
                            class="input input-bordered w-full bg-base-300">
                 </div>
 
@@ -34,7 +34,7 @@
                     <label class="label">
                         <span class="label-text">Email</span>
                     </label>
-                    <input type="email" name="email" placeholder="email@example.com" required 
+                    <input type="email" name="email" placeholder="Enter your email address" required 
                            class="input input-bordered w-full bg-base-300">
                 </div>
 
@@ -42,12 +42,29 @@
                     <label class="label">
                         <span class="label-text">Password</span>
                     </label>
-                    <input type="password" name="password" placeholder="••••••••" required 
+                    <input type="password" name="password" id="password" placeholder="Enter your password" required 
                            class="input input-bordered w-full bg-base-300"
-                           pattern=".{8,}"
-                           title="Password must be at least 8 characters long">
+                           pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                           title="Password must be at least 8 characters long and include both letters and numbers"
+                           oninput="updatePasswordStrength(this.value)">
+                    <div class="mt-2">
+                        <div class="w-full bg-base-300 rounded-full h-2">
+                            <div id="passwordStrength" class="h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <label class="label">
+                            <span id="passwordStrengthText" class="label-text-alt">Password strength: Too weak</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-control">
                     <label class="label">
-                        <span class="label-text-alt text-info">Must be at least 8 characters</span>
+                        <span class="label-text">Confirm Password</span>
+                    </label>
+                    <input type="password" name="confirm_password" id="confirmPassword" placeholder="Confirm your password" required 
+                           class="input input-bordered w-full bg-base-300">
+                    <label class="label">
+                        <span id="passwordMatch" class="label-text-alt"></span>
                     </label>
                 </div>
 
@@ -65,4 +82,94 @@
         </div>
     </div>
 </div>
+
+<script>
+function updatePasswordStrength(password) {
+    let strength = 0;
+    let strengthText = '';
+    let strengthColor = '';
+
+    // Length check
+    if (password.length >= 8) {
+        strength += 25;
+    }
+
+    // Contains number
+    if (/\d/.test(password)) {
+        strength += 25;
+    }
+
+    // Contains letter
+    if (/[a-zA-Z]/.test(password)) {
+        strength += 25;
+    }
+
+    // Contains special character
+    if (/[^A-Za-z0-9]/.test(password)) {
+        strength += 25;
+    }
+
+    // Set text and color based on strength
+    if (strength <= 25) {
+        strengthText = 'Too weak';
+        strengthColor = 'bg-error';
+    } else if (strength <= 50) {
+        strengthText = 'Weak';
+        strengthColor = 'bg-warning';
+    } else if (strength <= 75) {
+        strengthText = 'Medium';
+        strengthColor = 'bg-info';
+    } else {
+        strengthText = 'Strong';
+        strengthColor = 'bg-success';
+    }
+
+    // Update UI
+    const strengthBar = document.getElementById('passwordStrength');
+    strengthBar.style.width = strength + '%';
+    strengthBar.className = `h-2 rounded-full transition-all duration-300 ${strengthColor}`;
+    document.getElementById('passwordStrengthText').textContent = `Password strength: ${strengthText}`;
+
+    // Check password match
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    checkPasswordMatch(password, confirmPassword);
+}
+
+function checkPasswordMatch(password, confirmPassword) {
+    const matchText = document.getElementById('passwordMatch');
+    if (confirmPassword) {
+        if (password === confirmPassword) {
+            matchText.textContent = 'Passwords match';
+            matchText.className = 'label-text-alt text-success';
+        } else {
+            matchText.textContent = 'Passwords do not match';
+            matchText.className = 'label-text-alt text-error';
+        }
+    } else {
+        matchText.textContent = '';
+    }
+}
+
+document.getElementById('confirmPassword').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    checkPasswordMatch(password, this.value);
+});
+
+function validateForm() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (password !== confirmPassword) {
+        alert('Passwords do not match!');
+        return false;
+    }
+
+    if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)) {
+        alert('Password must be at least 8 characters long and include both letters and numbers!');
+        return false;
+    }
+
+    return true;
+}
+</script>
 {% endblock %}
