@@ -11,10 +11,9 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-    app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024  # Set limit to 25MB
+    app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024  # 25MB max file size (matching nginx)
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_PATH', 'sqlite:///sketchmaker.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 32MB max file size
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
     app.config['TRAINING_FILES_FOLDER'] = os.path.join(app.root_path, 'static', 'training_files')
     
