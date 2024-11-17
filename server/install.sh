@@ -16,6 +16,12 @@ echo "███████║██║  ██╗███████╗   █
 echo "╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝"
 echo -e "${NC}"
 
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then 
+    echo -e "${RED}Please run as root (use sudo)${NC}"
+    exit 1
+fi
+
 # Function to validate domain name format
 validate_domain() {
     if [[ $1 =~ ^([a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
@@ -86,23 +92,9 @@ setup_directories_and_permissions() {
     echo "Directory setup completed."
 }
 
-# Check if running as root
-if [ "$EUID" -ne 0 ]; then 
-    echo -e "${RED}Please run as root (use sudo)${NC}"
-    exit 1
-fi
-
-# Create temporary script for domain input
-cat > /tmp/domain_input.sh <<'EOF'
-#!/bin/bash
-read -p "Domain (e.g., example.com or sub.example.com): " domain_name
-echo $domain_name
-EOF
-chmod +x /tmp/domain_input.sh
-
 # Get domain name
-server_name=$(/tmp/domain_input.sh)
-rm /tmp/domain_input.sh
+echo -e "${GREEN}Please enter your domain name for the installation:${NC}"
+read -p "Domain (e.g., example.com or sub.example.com): " server_name </dev/tty
 
 # Validate domain
 if ! validate_domain "$server_name"; then
