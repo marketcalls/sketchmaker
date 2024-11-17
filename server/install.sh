@@ -6,22 +6,6 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Print banner
-echo -e "${BLUE}"
-echo "███████╗██╗  ██╗███████╗████████╗ ██████╗██╗  ██╗███╗   ███╗ █████╗ ██╗  ██╗███████╗██████╗ "
-echo "██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝██╔════╝██║  ██║████╗ ████║██╔══██╗██║ ██╔╝██╔════╝██╔══██╗"
-echo "███████╗█████╔╝ █████╗     ██║   ██║     ███████║██╔████╔██║███████║█████╔╝ █████╗  ██████╔╝"
-echo "╚════██║██╔═██╗ ██╔══╝     ██║   ██║     ██╔══██║██║╚██╔╝██║██╔══██║██╔═██╗ ██╔══╝  ██╔══██╗"
-echo "███████║██║  ██╗███████╗   ██║   ╚██████╗██║  ██║██║ ╚═╝ ██║██║  ██║██║  ██╗███████╗██║  ██║"
-echo "╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝"
-echo -e "${NC}"
-
-# Check if running as root
-if [ "$EUID" -ne 0 ]; then 
-    echo -e "${RED}Please run as root (use sudo)${NC}"
-    exit 1
-fi
-
 # Function to validate domain name format
 validate_domain() {
     if [[ $1 =~ ^([a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
@@ -92,15 +76,49 @@ setup_directories_and_permissions() {
     echo "Directory setup completed."
 }
 
-# Get domain name
-echo -e "${GREEN}Please enter your domain name for the installation:${NC}"
-read -p "Domain (e.g., example.com or sub.example.com): " server_name </dev/tty
+# Check if script is being piped
+if [ ! -t 0 ]; then
+    # If being piped, download and execute the script properly
+    TMP_SCRIPT=$(mktemp)
+    curl -fsSL https://raw.githubusercontent.com/marketcalls/sketchmaker/master/server/install.sh -o "$TMP_SCRIPT"
+    chmod +x "$TMP_SCRIPT"
+    bash "$TMP_SCRIPT"
+    rm -f "$TMP_SCRIPT"
+    exit 0
+fi
 
-# Validate domain
-if ! validate_domain "$server_name"; then
-    echo -e "${RED}Invalid domain format: $server_name${NC}"
+# Print banner
+echo -e "${BLUE}"
+echo "███████╗██╗  ██╗███████╗████████╗ ██████╗██╗  ██╗███╗   ███╗ █████╗ ██╗  ██╗███████╗██████╗ "
+echo "██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝██╔════╝██║  ██║████╗ ████║██╔══██╗██║ ██╔╝██╔════╝██╔══██╗"
+echo "███████╗█████╔╝ █████╗     ██║   ██║     ███████║██╔████╔██║███████║█████╔╝ █████╗  ██████╔╝"
+echo "╚════██║██╔═██╗ ██╔══╝     ██║   ██║     ██╔══██║██║╚██╔╝██║██╔══██║██╔═██╗ ██╔══╝  ██╔══██╗"
+echo "███████║██║  ██╗███████╗   ██║   ╚██████╗██║  ██║██║ ╚═╝ ██║██║  ██║██║  ██╗███████╗██║  ██║"
+echo "╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝"
+echo -e "${NC}"
+
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then 
+    echo -e "${RED}Please run as root (use sudo)${NC}"
     exit 1
 fi
+
+# Get domain name
+while true; do
+    echo -e "${GREEN}Please enter your domain name for the installation:${NC}"
+    read -p "Domain (e.g., example.com or sub.example.com): " server_name
+    
+    if [ -z "$server_name" ]; then
+        echo -e "${RED}Domain name cannot be empty${NC}"
+        continue
+    fi
+    
+    if validate_domain "$server_name"; then
+        break
+    else
+        echo -e "${RED}Invalid domain format. Please enter a valid domain name.${NC}"
+    fi
+done
 
 echo -e "${GREEN}Starting installation for domain: $server_name${NC}"
 
