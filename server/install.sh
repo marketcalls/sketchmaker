@@ -25,6 +25,45 @@ validate_domain() {
     fi
 }
 
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then 
+    echo -e "${RED}Please run as root (use sudo)${NC}"
+    exit 1
+fi
+
+# Get domain name from environment variable or prompt user
+if [ -n "$DOMAIN_NAME" ]; then
+    server_name="$DOMAIN_NAME"
+    if ! validate_domain "$server_name"; then
+        echo -e "${RED}Invalid domain format provided in DOMAIN_NAME environment variable.${NC}"
+        exit 1
+    fi
+else
+    while true; do
+        echo -e "${GREEN}Please enter your domain name for the installation:${NC}"
+        read -p "Domain (e.g., example.com or sub.example.com): " server_name
+
+        if [ -z "$server_name" ]; then
+            echo -e "${RED}Domain name cannot be empty${NC}"
+            continue
+        fi
+
+        if validate_domain "$server_name"; then
+            break
+        else
+            echo -e "${RED}Invalid domain format. Please enter a valid domain name.${NC}"
+        fi
+    done
+fi
+
+echo -e "${GREEN}Starting installation for domain: $server_name${NC}"
+
+# Update package lists
+echo "Updating package lists..."
+apt-get update
+
+
+
 # Function to check and install packages
 install_package() {
     if ! dpkg -l | grep -q "^ii  $1 "; then
