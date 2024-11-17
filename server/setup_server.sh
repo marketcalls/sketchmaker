@@ -24,6 +24,65 @@ install_package() {
     fi
 }
 
+# Function to setup directories and permissions
+setup_directories_and_permissions() {
+    echo "Setting up directories and permissions..."
+    
+    # Set variables
+    APP_ROOT="/var/python/sketchmaker/sketchmaker"
+    STATIC_ROOT="$APP_ROOT/static"
+    LOG_DIR="/var/log/gunicorn"
+
+    # Create all necessary directories
+    mkdir -p "$STATIC_ROOT/images"
+    mkdir -p "$STATIC_ROOT/uploads"
+    mkdir -p "$STATIC_ROOT/training_files/uploads"
+    mkdir -p "$STATIC_ROOT/training_files/models"
+    mkdir -p "$STATIC_ROOT/training_files/temp"
+    mkdir -p "$APP_ROOT/instance"
+    mkdir -p "$LOG_DIR"
+
+    # Create log files if they don't exist
+    touch "$LOG_DIR/gunicorn.error.log"
+    touch "$LOG_DIR/gunicorn.access.log"
+
+    # Set ownership
+    chown -R www-data:www-data "$APP_ROOT"
+    chown -R www-data:www-data "$LOG_DIR"
+    chown www-data:www-data "$LOG_DIR/gunicorn.error.log"
+    chown www-data:www-data "$LOG_DIR/gunicorn.access.log"
+
+    # Set directory permissions
+    chmod 755 "$APP_ROOT"
+    chmod -R 755 "$STATIC_ROOT"
+    chmod -R 775 "$STATIC_ROOT/images"
+    chmod -R 775 "$STATIC_ROOT/uploads"
+    chmod -R 775 "$STATIC_ROOT/training_files"
+    chmod -R 775 "$APP_ROOT/instance"
+    chmod -R 775 "$LOG_DIR"
+    chmod 664 "$LOG_DIR/gunicorn.error.log"
+    chmod 664 "$LOG_DIR/gunicorn.access.log"
+
+    # Set app root permissions - 755 for directories 644 for files
+    find "$APP_ROOT" -type d -exec chmod 755 {} \;
+    find "$APP_ROOT" -type f -exec chmod 644 {} \;
+
+    echo "Checking permissions..."
+    echo "----------------------"
+
+    # Check log files
+    echo "Log Files:"
+    ls -l "$LOG_DIR/gunicorn.error.log"
+    ls -l "$LOG_DIR/gunicorn.access.log"
+
+    # Check write permissions
+    echo -e "\nTesting write permissions..."
+    su www-data -s /bin/bash -c "echo 'test' >> '$LOG_DIR/gunicorn.error.log'" && echo "✓ error log is writable" || echo "✗ error log is not writable"
+    su www-data -s /bin/bash -c "echo 'test' >> '$LOG_DIR/gunicorn.access.log'" && echo "✓ access log is writable" || echo "✗ access log is not writable"
+
+    echo -e "\nDirectory setup and permission checks completed."
+}
+
 # Check if script is run as root
 if [ "$EUID" -ne 0 ]; then 
     echo "Please run as root (use sudo)"
@@ -60,47 +119,6 @@ if ! command -v nginx &> /dev/null; then
     add-apt-repository -y ppa:nginx/stable
     apt-get update
     install_package "nginx"
-    
-    # Create nginx directories if they don't exist
-    mkdir -p /etc/nginx/sites-available
-    mkdir -p /etc/nginx/sites-enabled
-    mkdir -p /var/www/html
-    
-    # Create basic nginx.conf if it doesn't exist
-    if [ ! -f "/etc/nginx/nginx.conf" ]; then
-        cat > "/etc/nginx/nginx.conf" <<EOF
-user www-data;
-worker_processes auto;
-pid /run/nginx.pid;
-include /etc/nginx/modules-enabled/*.conf;
-
-events {
-    worker_connections 768;
-}
-
-http {
-    sendfile on;
-    tcp_nopush on;
-    tcp_nodelay on;
-    keepalive_timeout 65;
-    types_hash_max_size 2048;
-
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
-
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers on;
-
-    access_log /var/log/nginx/access.log;
-    error_log /var/log/nginx/error.log;
-
-    gzip on;
-
-    include /etc/nginx/conf.d/*.conf;
-    include /etc/nginx/sites-enabled/*;
-}
-EOF
-    fi
 fi
 
 # Install certbot and nginx plugin
@@ -132,37 +150,21 @@ git config --global --add safe.directory /var/python/sketchmaker/sketchmaker
 
 # Set up environment file
 cp .env.sample .env
-# You might want to modify .env file here if needed
-# sed -i 's/OLD_VALUE/NEW_VALUE/g' .env
-
-# Make scripts executable and run them
-chmod +x prestart.sh check_permissions.sh
-./prestart.sh
-./check_permissions.sh
 
 # Install Python dependencies
 pip install -r requirements.txt
 pip install gunicorn eventlet
 
-# Create necessary directories
+# Setup directories and permissions
+setup_directories_and_permissions
+
+# Create necessary nginx directories
 mkdir -p /etc/nginx/sites-available
 mkdir -p /etc/nginx/sites-enabled
-mkdir -p /etc/systemd/system
-mkdir -p /var/log/gunicorn
 
-# First, create a basic nginx config for domain validation
-cat > "/etc/nginx/sites-available/sketchmaker" <<EOF
-server {
-    listen 80;
-    listen [::]:80;
-    server_name $server_name;
-    root /var/www/html;
-    
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-}
-EOF
+# Copy nginx configuration and update domain
+cp server/sketchmaker /etc/nginx/sites-available/sketchmaker
+sed -i "s/server_name .*/server_name $server_name;/g" /etc/nginx/sites-available/sketchmaker
 
 # Create symbolic link if it doesn't exist
 if [ ! -L "/etc/nginx/sites-enabled/sketchmaker" ]; then
@@ -187,51 +189,12 @@ fi
 echo "Obtaining SSL certificate for $server_name..."
 certbot --nginx -d $server_name --non-interactive --agree-tos --email admin@${server_name#*.}
 
-# Now update nginx config with full configuration including SSL
-cp "$(dirname "$0")/sketchmaker" "/etc/nginx/sites-available/sketchmaker"
-sed -i "s/server_name .*/server_name $server_name;/g" "/etc/nginx/sites-available/sketchmaker"
-
 # Update SSL certificate paths in nginx config
-sed -i "s|ssl_certificate .*|ssl_certificate /etc/letsencrypt/live/$server_name/fullchain.pem;|g" "/etc/nginx/sites-available/sketchmaker"
-sed -i "s|ssl_certificate_key .*|ssl_certificate_key /etc/letsencrypt/live/$server_name/privkey.pem;|g" "/etc/nginx/sites-available/sketchmaker"
+sed -i "s|ssl_certificate .*|ssl_certificate /etc/letsencrypt/live/$server_name/fullchain.pem;|g" /etc/nginx/sites-available/sketchmaker
+sed -i "s|ssl_certificate_key .*|ssl_certificate_key /etc/letsencrypt/live/$server_name/privkey.pem;|g" /etc/nginx/sites-available/sketchmaker
 
-# Copy and configure systemd service
-cat > "/etc/systemd/system/sketchmaker.service" <<EOF
-[Unit]
-Description=Sketchmaker Gunicorn Service
-After=network.target
-
-[Service]
-User=www-data
-Group=www-data
-WorkingDirectory=/var/python/sketchmaker/sketchmaker
-Environment="PATH=/var/python/sketchmaker/venv/bin"
-ExecStart=/var/python/sketchmaker/venv/bin/gunicorn \
-    --workers 2 \
-    --threads 2 \
-    --worker-class=gthread \
-    --worker-connections=1000 \
-    --bind unix:/var/python/sketchmaker/sketchmaker/sketchmaker.sock \
-    --timeout 300 \
-    --graceful-timeout 300 \
-    --keep-alive 300 \
-    --log-file=/var/log/gunicorn/gunicorn.error.log \
-    --access-logfile=/var/log/gunicorn/gunicorn.access.log \
-    --capture-output \
-    app:app
-
-Restart=always
-RestartSec=5
-LimitNOFILE=65536
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Set proper permissions
-chown -R www-data:www-data /var/log/gunicorn
-chmod -R 755 /var/log/gunicorn
-chown -R www-data:www-data /var/python/sketchmaker
+# Copy systemd service file
+cp server/sketchmaker.service /etc/systemd/system/
 
 # Configure UFW if it's active
 if command -v ufw >/dev/null 2>&1; then
