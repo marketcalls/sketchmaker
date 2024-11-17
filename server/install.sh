@@ -6,6 +6,16 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Print banner
+echo -e "${BLUE}"
+echo "███████╗██╗  ██╗███████╗████████╗ ██████╗██╗  ██╗███╗   ███╗ █████╗ ██╗  ██╗███████╗██████╗ "
+echo "██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝██╔════╝██║  ██║████╗ ████║██╔══██╗██║ ██╔╝██╔════╝██╔══██╗"
+echo "███████╗█████╔╝ █████╗     ██║   ██║     ███████║██╔████╔██║███████║█████╔╝ █████╗  ██████╔╝"
+echo "╚════██║██╔═██╗ ██╔══╝     ██║   ██║     ██╔══██║██║╚██╔╝██║██╔══██║██╔═██╗ ██╔══╝  ██╔══██╗"
+echo "███████║██║  ██╗███████╗   ██║   ╚██████╗██║  ██║██║ ╚═╝ ██║██║  ██║██║  ██╗███████╗██║  ██║"
+echo "╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝"
+echo -e "${NC}"
+
 # Function to validate domain name format
 validate_domain() {
     if [[ $1 =~ ^([a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
@@ -76,16 +86,6 @@ setup_directories_and_permissions() {
     echo "Directory setup completed."
 }
 
-# Print banner
-echo -e "${BLUE}"
-echo "███████╗██╗  ██╗███████╗████████╗ ██████╗██╗  ██╗███╗   ███╗ █████╗ ██╗  ██╗███████╗██████╗ "
-echo "██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝██╔════╝██║  ██║████╗ ████║██╔══██╗██║ ██╔╝██╔════╝██╔══██╗"
-echo "███████╗█████╔╝ █████╗     ██║   ██║     ███████║██╔████╔██║███████║█████╔╝ █████╗  ██████╔╝"
-echo "╚════██║██╔═██╗ ██╔══╝     ██║   ██║     ██╔══██║██║╚██╔╝██║██╔══██║██╔═██╗ ██╔══╝  ██╔══██╗"
-echo "███████║██║  ██╗███████╗   ██║   ╚██████╗██║  ██║██║ ╚═╝ ██║██║  ██║██║  ██╗███████╗██║  ██║"
-echo "╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝"
-echo -e "${NC}"
-
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then 
     echo -e "${RED}Please run as root (use sudo)${NC}"
@@ -121,6 +121,20 @@ install_package "software-properties-common"
 install_package "python3-pip"
 install_package "python3-venv"
 install_package "git"
+
+# Install Cairo and other required system libraries
+echo "Installing Cairo and other dependencies..."
+install_package "libcairo2-dev"
+install_package "pkg-config"
+install_package "python3-dev"
+install_package "build-essential"
+install_package "libffi-dev"
+install_package "python3-cairo"
+install_package "libcairo2"
+install_package "libpango1.0-dev"
+install_package "libjpeg-dev"
+install_package "libgif-dev"
+install_package "librsvg2-dev"
 
 # Install nginx if not present
 if ! command -v nginx &> /dev/null; then
@@ -160,6 +174,7 @@ git config --global --add safe.directory /var/python/sketchmaker/sketchmaker
 cp .env.sample .env
 
 # Install Python dependencies
+pip install wheel
 pip install -r requirements.txt
 pip install gunicorn eventlet
 
@@ -177,12 +192,25 @@ server {
     listen [::]:80;
     server_name $server_name;
 
+    client_max_body_size 25M;
+    client_body_timeout 300s;
+    client_header_timeout 300s;
+    keepalive_timeout 300s;
+    send_timeout 300s;
+    proxy_read_timeout 300s;
+    proxy_connect_timeout 300s;
+    proxy_send_timeout 300s;
+
     location / {
         proxy_pass http://unix:/var/python/sketchmaker/sketchmaker/sketchmaker.sock;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
     }
 
     location /static {
