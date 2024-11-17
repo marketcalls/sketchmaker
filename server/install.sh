@@ -76,17 +76,6 @@ setup_directories_and_permissions() {
     echo "Directory setup completed."
 }
 
-# Check if script is being piped
-if [ ! -t 0 ]; then
-    # If being piped, download and execute the script properly
-    TMP_SCRIPT=$(mktemp)
-    curl -fsSL https://raw.githubusercontent.com/marketcalls/sketchmaker/master/server/install.sh -o "$TMP_SCRIPT"
-    chmod +x "$TMP_SCRIPT"
-    bash "$TMP_SCRIPT"
-    rm -f "$TMP_SCRIPT"
-    exit 0
-fi
-
 # Print banner
 echo -e "${BLUE}"
 echo "███████╗██╗  ██╗███████╗████████╗ ██████╗██╗  ██╗███╗   ███╗ █████╗ ██╗  ██╗███████╗██████╗ "
@@ -181,9 +170,28 @@ setup_directories_and_permissions
 mkdir -p /etc/nginx/sites-available
 mkdir -p /etc/nginx/sites-enabled
 
-# Copy nginx configuration and update domain
-cp server/sketchmaker /etc/nginx/sites-available/sketchmaker
-sed -i "s/server_name .*/server_name $server_name;/g" /etc/nginx/sites-available/sketchmaker
+# Create initial nginx configuration (HTTP only)
+cat > "/etc/nginx/sites-available/sketchmaker" <<EOF
+server {
+    listen 80;
+    listen [::]:80;
+    server_name $server_name;
+
+    location / {
+        proxy_pass http://unix:/var/python/sketchmaker/sketchmaker/sketchmaker.sock;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+
+    location /static {
+        alias /var/python/sketchmaker/sketchmaker/static;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+}
+EOF
 
 # Create symbolic link if it doesn't exist
 if [ ! -L "/etc/nginx/sites-enabled/sketchmaker" ]; then
@@ -204,14 +212,6 @@ else
     exit 1
 fi
 
-# Obtain SSL certificate
-echo "Obtaining SSL certificate for $server_name..."
-certbot --nginx -d $server_name --non-interactive --agree-tos --email admin@${server_name#*.}
-
-# Update SSL certificate paths in nginx config
-sed -i "s|ssl_certificate .*|ssl_certificate /etc/letsencrypt/live/$server_name/fullchain.pem;|g" /etc/nginx/sites-available/sketchmaker
-sed -i "s|ssl_certificate_key .*|ssl_certificate_key /etc/letsencrypt/live/$server_name/privkey.pem;|g" /etc/nginx/sites-available/sketchmaker
-
 # Copy systemd service file
 cp server/sketchmaker.service /etc/systemd/system/
 
@@ -221,14 +221,20 @@ if command -v ufw >/dev/null 2>&1; then
     ufw allow OpenSSH
 fi
 
-# Setup auto-renewal for SSL certificate
-echo "0 0 * * * root certbot renew --quiet" > /etc/cron.d/certbot-renewal
-
 # Reload and start services
 systemctl daemon-reload
 systemctl enable sketchmaker
 systemctl start sketchmaker
-nginx -t && systemctl restart nginx
+
+# Now that basic setup is done, obtain SSL certificate
+echo "Obtaining SSL certificate for $server_name..."
+certbot --nginx -d $server_name --non-interactive --agree-tos --email admin@${server_name#*.}
+
+# Setup auto-renewal for SSL certificate
+echo "0 0 * * * root certbot renew --quiet" > /etc/cron.d/certbot-renewal
+
+# Final nginx restart
+systemctl restart nginx
 
 echo -e "${GREEN}Setup completed successfully!${NC}"
 echo "Your server is configured with domain: $server_name"
