@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Function to validate domain name format
+# Function to validate domain name format (including subdomains)
 validate_domain() {
-    if [[ $1 =~ ^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$ ]]; then
+    if [[ $1 =~ ^([a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
         return 0
     else
         return 1
@@ -41,11 +41,11 @@ echo "Certbot installed successfully!"
 
 # Ask for server name
 while true; do
-    read -p "Enter your server name (e.g., example.com): " server_name
+    read -p "Enter your domain name (e.g., example.com or sub.example.com): " server_name
     if validate_domain "$server_name"; then
         break
     else
-        echo "Invalid domain format. Please enter a valid domain name."
+        echo "Invalid domain format. Please enter a valid domain name (e.g., example.com or sub.example.com)"
     fi
 done
 
@@ -84,7 +84,7 @@ nginx -t && systemctl reload nginx
 
 # Obtain SSL certificate
 echo "Obtaining SSL certificate for $server_name..."
-certbot --nginx -d $server_name --non-interactive --agree-tos --email admin@$server_name
+certbot --nginx -d $server_name --non-interactive --agree-tos --email admin@${server_name#*.}
 
 # Now update nginx config with full configuration including SSL
 cp "$(dirname "$0")/sketchmaker" "/etc/nginx/sites-available/sketchmaker"
