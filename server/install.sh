@@ -6,6 +6,9 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Ensure script is running with a TTY for input
+exec < /dev/tty
+
 # Print banner
 echo -e "${BLUE}"
 echo "███████╗██╗  ██╗███████╗████████╗ ██████╗██╗  ██╗███╗   ███╗ █████╗ ██╗  ██╗███████╗██████╗ "
@@ -92,14 +95,16 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Ask for domain name
-while true; do
+# Get domain name with proper input handling
+server_name=""
+while [ -z "$server_name" ]; do
     echo -e "${GREEN}Please enter your domain name for the installation:${NC}"
-    read -p "Domain (e.g., example.com or sub.example.com): " server_name
-    if validate_domain "$server_name"; then
-        break
-    else
+    echo -n "Domain (e.g., example.com or sub.example.com): "
+    read server_name < /dev/tty
+    
+    if ! validate_domain "$server_name"; then
         echo -e "${RED}Invalid domain format. Please enter a valid domain name.${NC}"
+        server_name=""
     fi
 done
 
