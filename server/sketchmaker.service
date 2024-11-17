@@ -1,0 +1,33 @@
+[Unit]
+Description=Sketchmaker Gunicorn Service
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/python/sketchmaker/sketchmaker
+Environment="PATH=/var/python/sketchmaker/venv/bin"
+
+ExecStart=/var/python/sketchmaker/venv/bin/gunicorn \
+    --workers 2 \
+    --threads 2 \
+    --worker-class=gthread \
+    --worker-connections=1000 \
+    --bind unix:/var/python/sketchmaker/sketchmaker/sketchmaker.sock \
+    --timeout 300 \
+    --graceful-timeout 300 \
+    --keep-alive 300 \
+    --log-file=/var/log/gunicorn/gunicorn.error.log \
+    --access-logfile=/var/log/gunicorn/gunicorn.access.log \
+    --capture-output \
+    app:app
+
+# Restart on failure
+Restart=always
+RestartSec=5
+
+# Increase system limits
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
