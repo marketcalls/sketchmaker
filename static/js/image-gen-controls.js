@@ -44,6 +44,30 @@ document.getElementById('loraPicker').addEventListener('change', function(e) {
     if (e.target.value) {
         loraPath.value = e.target.value;
     }
+
+    // Update form data with LoRA information
+    const formData = new FormData(document.getElementById('imageGenForm'));
+    if (e.target.value) {
+        formData.set('loras', JSON.stringify([{
+            path: e.target.value,
+            scale: parseFloat(document.getElementById('loraScale').value) || 1.0,
+            trigger_word: triggerWord
+        }]));
+    }
+});
+
+// Handle LoRA scale change
+document.getElementById('loraScale').addEventListener('change', function(e) {
+    const loraPicker = document.getElementById('loraPicker');
+    const selectedOption = loraPicker.options[loraPicker.selectedIndex];
+    if (selectedOption && selectedOption.value) {
+        const formData = new FormData(document.getElementById('imageGenForm'));
+        formData.set('loras', JSON.stringify([{
+            path: selectedOption.value,
+            scale: parseFloat(e.target.value) || 1.0,
+            trigger_word: selectedOption.dataset.triggerWord
+        }]));
+    }
 });
 
 // Toggle between dropdown and manual input
@@ -56,10 +80,32 @@ document.getElementById('toggleLoraInput').addEventListener('click', function() 
         dropdownContainer.classList.remove('hidden');
         manualContainer.classList.add('hidden');
         this.textContent = 'Manual Input';
+
+        // Use dropdown value if available
+        const loraPicker = document.getElementById('loraPicker');
+        const selectedOption = loraPicker.options[loraPicker.selectedIndex];
+        if (selectedOption && selectedOption.value) {
+            const formData = new FormData(document.getElementById('imageGenForm'));
+            formData.set('loras', JSON.stringify([{
+                path: selectedOption.value,
+                scale: parseFloat(document.getElementById('loraScale').value) || 1.0,
+                trigger_word: selectedOption.dataset.triggerWord
+            }]));
+        }
     } else {
         dropdownContainer.classList.add('hidden');
         manualContainer.classList.remove('hidden');
         this.textContent = 'Use Dropdown';
+
+        // Use manual input value if available
+        const loraPath = document.getElementById('loraPath').value;
+        if (loraPath) {
+            const formData = new FormData(document.getElementById('imageGenForm'));
+            formData.set('loras', JSON.stringify([{
+                path: loraPath,
+                scale: parseFloat(document.getElementById('loraScale').value) || 1.0
+            }]));
+        }
     }
 });
 

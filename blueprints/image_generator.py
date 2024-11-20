@@ -2,6 +2,7 @@ import uuid
 import os
 import requests
 from flask import current_app, jsonify, Blueprint
+from flask_login import login_required, current_user
 from .clients import init_fal_client
 import io
 import fal_client
@@ -10,11 +11,13 @@ from models import db, TrainingHistory
 image_generator_bp = Blueprint('image_generator', __name__)
 
 @image_generator_bp.route('/api/lora-data')
+@login_required
 def get_lora_data():
-    """Get LoRA data from training history"""
+    """Get LoRA data from training history for current user"""
     try:
-        # Query training history using Flask-SQLAlchemy
+        # Query training history using Flask-SQLAlchemy, filtered by current user
         trainings = TrainingHistory.query.filter_by(
+            user_id=current_user.id,
             status='completed'
         ).filter(
             TrainingHistory.weights_url.isnot(None)
