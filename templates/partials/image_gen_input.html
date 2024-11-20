@@ -1,0 +1,14 @@
+<div class="mb-8">
+    <h2 class="text-2xl font-semibold mb-4">Image Prompt</h2>
+    <div class="relative">
+        <textarea id="userInput" name="message" rows="4" 
+            class="textarea textarea-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
+            placeholder="Describe your image content in detail."></textarea>
+        <div id="characterCount" class="absolute bottom-2 right-2 text-sm opacity-70 hidden">
+            <span id="currentCount">0</span>/<span id="maxCount">1000</span>
+        </div>
+        <div id="characterWarning" class="mt-2 text-error hidden">
+            Prompt exceeds 1000 characters. Excess text will be trimmed.
+        </div>
+    </div>
+</div>

@@ -1,10 +1,36 @@
 import uuid
 import os
 import requests
-from flask import current_app
+from flask import current_app, jsonify, Blueprint
 from .clients import init_fal_client
 import io
 import fal_client
+from models import db, TrainingHistory
+
+image_generator_bp = Blueprint('image_generator', __name__)
+
+@image_generator_bp.route('/api/lora-data')
+def get_lora_data():
+    """Get LoRA data from training history"""
+    try:
+        # Query training history using Flask-SQLAlchemy
+        trainings = TrainingHistory.query.filter_by(
+            status='completed'
+        ).filter(
+            TrainingHistory.weights_url.isnot(None)
+        ).order_by(
+            TrainingHistory.created_at.desc()
+        ).all()
+
+        lora_data = [{
+            "trigger_word": training.trigger_word,
+            "weights_url": training.weights_url
+        } for training in trainings]
+
+        return jsonify({"lora_data": lora_data})
+    except Exception as e:
+        print(f"Error fetching LoRA data: {str(e)}")
+        return jsonify({"error": "Failed to fetch LoRA data"}), 500
 
 def get_model_arguments(model, data):
     """Get model-specific arguments based on the model type"""

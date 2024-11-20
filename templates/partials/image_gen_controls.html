@@ -1,0 +1,278 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">Model</span>
+        </label>
+        <select id="model" name="model" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="fal-ai/flux-pro/v1.1">Flux Pro</option>
+            <option value="fal-ai/flux-pro/v1.1-ultra">Flux Pro Ultra</option>
+            <option value="fal-ai/flux-lora">Flux Lora</option>
+            <option value="fal-ai/flux/dev">Flux Dev</option>
+            <option value="fal-ai/flux-realism">Flux Realism</option>
+            <option value="fal-ai/recraft-v3">Recraft V3</option>
+        </select>
+    </div>
+
+    <!-- Recraft V3 Style Control -->
+    <div class="form-control hidden" id="recraftStyleControl">
+        <label class="label">
+            <span class="label-text">Recraft Style</span>
+        </label>
+        <select id="recraftStyle" name="recraft_style" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="any">Default</option>
+            <option value="realistic_image">Realistic Image</option>
+            <option value="digital_illustration">Digital Illustration</option>
+            <option value="vector_illustration">Vector Illustration</option>
+            <option value="realistic_image/b_and_w">Realistic B&W</option>
+            <option value="realistic_image/hard_flash">Realistic Hard Flash</option>
+            <option value="realistic_image/hdr">Realistic HDR</option>
+            <option value="realistic_image/natural_light">Realistic Natural Light</option>
+            <option value="realistic_image/studio_portrait">Realistic Studio Portrait</option>
+            <option value="realistic_image/enterprise">Realistic Enterprise</option>
+            <option value="realistic_image/motion_blur">Realistic Motion Blur</option>
+            <option value="digital_illustration/pixel_art">Digital Pixel Art</option>
+            <option value="digital_illustration/hand_drawn">Digital Hand Drawn</option>
+            <option value="digital_illustration/grain">Digital Grain</option>
+            <option value="digital_illustration/infantile_sketch">Digital Infantile Sketch</option>
+            <option value="digital_illustration/2d_art_poster">Digital 2D Art Poster</option>
+            <option value="digital_illustration/handmade_3d">Digital Handmade 3D</option>
+            <option value="digital_illustration/hand_drawn_outline">Digital Hand Drawn Outline</option>
+            <option value="digital_illustration/engraving_color">Digital Engraving Color</option>
+            <option value="digital_illustration/2d_art_poster_2">Digital 2D Art Poster 2</option>
+            <option value="vector_illustration/engraving">Vector Engraving</option>
+            <option value="vector_illustration/line_art">Vector Line Art</option>
+            <option value="vector_illustration/line_circuit">Vector Line Circuit</option>
+            <option value="vector_illustration/linocut">Vector Linocut</option>
+        </select>
+    </div>
+
+    <!-- Recraft V3 Colors Control -->
+    <div class="form-control hidden" id="recraftColorsControl">
+        <label class="label">
+            <span class="label-text">Colors</span>
+            <button type="button" id="addColorBtn" class="btn btn-sm btn-primary">Add Color</button>
+        </label>
+        <div id="colorPickers" class="flex flex-wrap gap-2">
+            <!-- Color pickers will be added here dynamically -->
+        </div>
+    </div>
+
+    <div class="form-control" id="imageSizeControl">
+        <label class="label">
+            <span class="label-text">Image Size</span>
+        </label>
+        <select id="imageSize" name="image_size" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="youtube_thumbnail">YouTube Thumbnail (1280x704)</option>
+            <option value="landscape_4_3">Landscape 4:3 (1280x960)</option>
+            <option value="landscape_16_9">Landscape 16:9 (1280x720)</option>
+            <option value="portrait_4_3">Portrait 4:3 (960x1280)</option>
+            <option value="portrait_16_9">Portrait 16:9 (720x1280)</option>
+            <option value="square">Square 1:1 (1024x1024)</option>
+            <option value="square_hd">Square HD (1280x1280)</option>
+            <option value="instagram_post_square">Instagram Post Square (1080x1080)</option>
+            <option value="instagram_post_portrait">Instagram Post Portrait (1080x1350)</option>
+            <option value="instagram_story">Instagram Story (1080x1920)</option>
+            <option value="logo">Logo (512x512)</option>
+            <option value="blog_banner">Blog Banner (1280x640)</option>
+            <option value="linkedin_post">LinkedIn Post (1200x627)</option>
+            <option value="facebook_post_landscape">Facebook Post (1200x630)</option>
+            <option value="twitter_header">Twitter Header (1500x500)</option>
+        </select>
+    </div>
+
+    <div class="form-control hidden" id="aspectRatioControl">
+        <label class="label">
+            <span class="label-text">Aspect Ratio</span>
+        </label>
+        <select id="aspectRatio" name="aspect_ratio" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="16:9">16:9</option>
+            <option value="16:10">16:10</option>
+            <option value="21:9">21:9</option>
+            <option value="4:3">5:4</option>
+            <option value="4:3">4:3</option>
+            <option value="4:3">3:2</option>
+            <option value="1:1">1:1</option>
+            <option value="3:4">2:3</option>
+            <option value="9:16">3:4</option>
+            <option value="9:21">4:5</option>
+            <option value="16:9">9:21</option>
+            <option value="16:10">10:16</option>
+            <option value="21:9">9:16</option>
+        </select>
+    </div>
+
+    <div class="form-control relative">
+        <label class="label">
+            <span class="label-text">Artistic Style</span>
+        </label>
+        <select id="artStyle" name="art_style" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" onchange="showArtStyleDescription()">
+            <option value="None">None</option>
+            <option value="Impressionism">Impressionism</option>
+            <option value="Cubism">Cubism</option>
+            <option value="Surrealism">Surrealism</option>
+            <option value="Abstract Expressionism">Abstract Expressionism</option>
+            <option value="Fauvism">Fauvism</option>
+            <option value="Art Nouveau">Art Nouveau</option>
+            <option value="Baroque">Baroque</option>
+            <option value="Renaissance">Renaissance</option>
+            <option value="Gothic">Gothic</option>
+            <option value="Pop Art">Pop Art</option>
+            <option value="Minimalism">Minimalism</option>
+            <option value="Post-Impressionism">Post-Impressionism</option>
+            <option value="Romanticism">Romanticism</option>
+            <option value="Realism">Realism</option>
+            <option value="Symbolism">Symbolism</option>
+            <option value="Expressionism">Expressionism</option>
+            <option value="Neo-Classical">Neo-Classical</option>
+            <option value="Constructivism">Constructivism</option>
+            <option value="Futurism">Futurism</option>
+            <option value="Dadaism">Dadaism</option>
+            <option value="Art Deco">Art Deco</option>
+            <option value="Op Art">Op Art</option>
+            <option value="Photorealism">Photorealism</option>
+            <option value="Bauhaus">Bauhaus</option>
+            <option value="Illustrative">Illustrative</option>
+        </select>
+        <div id="artStyleTooltip" class="hidden absolute z-10 w-64 p-3 mt-1 text-sm bg-base-200/90 backdrop-blur-md rounded-lg shadow-xl border border-base-content/10"></div>
+    </div>
+
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">Color Scheme</span>
+        </label>
+        <select id="colorScheme" name="color_scheme" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="None">None</option>
+            <option value="Warm">Warm</option>
+            <option value="Cool">Cool</option>
+            <option value="Pastel">Pastel</option>
+            <option value="Monochrome">Monochrome</option>
+            <option value="Vibrant">Vibrant</option>
+            <option value="Earthy">Earthy</option>
+            <option value="Neon">Neon</option>
+        </select>
+    </div>
+
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">Lighting and Mood</span>
+        </label>
+        <select id="lightingMood" name="lighting_mood" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="None">None</option>
+            <option value="Natural Light">Natural Light</option>
+            <option value="Studio Light">Studio Light</option>
+            <option value="Dramatic">Dramatic</option>
+            <option value="Soft">Soft</option>
+            <option value="High Contrast">High Contrast</option>
+            <option value="Low Key">Low Key</option>
+            <option value="High Key">High Key</option>
+        </select>
+    </div>
+
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">Subject Focus</span>
+        </label>
+        <select id="subjectFocus" name="subject_focus" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="None">None</option>
+            <option value="People">People</option>
+            <option value="Nature">Nature</option>
+            <option value="Animals">Animals</option>
+            <option value="Architecture">Architecture</option>
+            <option value="Objects">Objects</option>
+            <option value="Abstract">Abstract</option>
+        </select>
+    </div>
+
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">Background Style</span>
+        </label>
+        <select id="backgroundStyle" name="background_style" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="None">None</option>
+            <option value="Plain">Plain</option>
+            <option value="Gradient">Gradient</option>
+            <option value="Textured">Textured</option>
+            <option value="Patterned">Patterned</option>
+            <option value="Blurred">Blurred</option>
+            <option value="Environmental">Environmental</option>
+        </select>
+    </div>
+
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">Effects and Filters</span>
+        </label>
+        <select id="effectsFilters" name="effects_filters" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="None">None</option>
+            <option value="Vintage">Vintage</option>
+            <option value="Black and White">Black and White</option>
+            <option value="Sepia">Sepia</option>
+            <option value="HDR">HDR</option>
+            <option value="Vignette">Vignette</option>
+            <option value="Grain">Grain</option>
+            <option value="Blur">Blur</option>
+        </select>
+    </div>
+
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">Number of Inference Steps</span>
+        </label>
+        <input type="number" id="numInferenceSteps" name="num_inference_steps" 
+            class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
+            value="28" min="1" max="50">
+    </div>
+
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">Guidance Scale</span>
+        </label>
+        <input type="number" id="guidanceScale" name="guidance_scale" 
+            class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
+            value="3.5" min="0" max="20" step="0.1">
+    </div>
+
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">Seed (optional)</span>
+        </label>
+        <input type="number" id="seed" name="seed" 
+            class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
+            min="0">
+    </div>
+</div>
+
+<div id="loraInputs" class="hidden space-y-4 mt-4">
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">LoRA Selection</span>
+            <button type="button" id="toggleLoraInput" class="btn btn-sm btn-secondary">
+                Manual Input
+            </button>
+        </label>
+        <div id="loraDropdownContainer">
+            <select id="loraPicker" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+                <option value="">Select a LoRA model</option>
+                <!-- Options will be populated dynamically -->
+            </select>
+            <div class="text-sm mt-2 opacity-70">
+                Selected Trigger Word: <span id="selectedTriggerWord">None</span>
+            </div>
+        </div>
+        <div id="loraManualContainer" class="hidden">
+            <input type="text" id="loraPath" name="lora_path" 
+                class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200"
+                placeholder="Enter LoRA path (safetensors)">
+        </div>
+    </div>
+    <div class="form-control">
+        <label class="label">
+            <span class="label-text">LoRA Scale</span>
+        </label>
+        <input type="number" id="loraScale" name="lora_scale" 
+            class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" 
+            value="1" min="0" max="1" step="0.1">
+    </div>
+</div>
+
+<script src="/static/js/image-gen-controls.js"></script>

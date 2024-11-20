@@ -166,7 +166,7 @@ def upload_training_images():
 def start_training():
     try:
         if not current_user.has_required_api_keys():
-            return jsonify({'error': 'Please add your API keys in settings'}), 400
+            return jsonify({'error': 'Please add your FAL.ai API keys in settings'}), 400
 
         data = request.get_json()
         if not data:
