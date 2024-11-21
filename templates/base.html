@@ -97,6 +97,51 @@
             font-weight: 600;
             letter-spacing: -0.025em;
         }
+
+        /* Code block styling */
+        code {
+            color: var(--fallback-bc,oklch(var(--bc))) !important;
+            background-color: var(--fallback-b1,oklch(var(--b1))) !important;
+            border: 1px solid var(--fallback-b3,oklch(var(--b3))) !important;
+        }
+
+        /* Toast styling */
+        #toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .toast {
+            min-width: 300px;
+            animation: slideIn 0.2s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toast.hide {
+            animation: slideOut 0.2s ease-in forwards;
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
     </style>
     {% endblock %}
     {% block extra_css %}{% endblock %}
@@ -156,14 +201,41 @@
     </div>
     
     {% block content %}{% endblock %}
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
     
     <script>
-        // Set default theme to dark
+        // Toast functionality
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} shadow-lg`;
+            toast.innerHTML = `
+                <div class="flex items-start">
+                    ${type === 'success' ? '<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>' : ''}
+                    ${type === 'error' ? '<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>' : ''}
+                    ${type === 'warning' ? '<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>' : ''}
+                    ${type === 'info' ? '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' : ''}
+                    <span class="ml-2">${message}</span>
+                </div>
+            `;
+            container.appendChild(toast);
+
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 200);
+            }, 3000);
+        }
+
+        // Theme switcher functionality
         if (!localStorage.getItem('theme')) {
             localStorage.setItem('theme', 'dark');
         }
         
-        // Theme switcher functionality
         const themeController = document.querySelector('.theme-controller');
         if (themeController) {
             themeController.checked = localStorage.getItem('theme') === 'light';

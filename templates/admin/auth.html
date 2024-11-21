@@ -76,10 +76,14 @@
                                                 <li>Click "Create Credentials" → "OAuth client ID"</li>
                                                 <li>Select "Web application"</li>
                                                 <li>Add authorized JavaScript origins:
-                                                    <code class="block bg-base-300 p-2 mt-1 rounded">{{ request.host_url.rstrip('/') }}</code>
+                                                    <div class="bg-base-100 p-2 mt-1 rounded border border-base-300">
+                                                        <code class="text-base-content">{{ request.host_url.rstrip('/') }}</code>
+                                                    </div>
                                                 </li>
                                                 <li>Add authorized redirect URI:
-                                                    <code class="block bg-base-300 p-2 mt-1 rounded">{{ request.host_url.rstrip('/') }}/auth/google/callback</code>
+                                                    <div class="bg-base-100 p-2 mt-1 rounded border border-base-300">
+                                                        <code class="text-base-content">{{ request.host_url.rstrip('/') }}/auth/google/callback</code>
+                                                    </div>
                                                 </li>
                                             </ul>
                                         </li>
@@ -117,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Ensure at least one auth method is enabled
         if (!regularAuthToggle.checked && !googleAuthToggle.checked) {
-            alert('At least one authentication method must be enabled.');
+            showToast('At least one authentication method must be enabled.', 'error');
             return;
         }
 
@@ -127,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const clientSecret = document.getElementById('googleClientSecret').value.trim();
             
             if (!clientId || !clientSecret) {
-                alert('Google Client ID and Client Secret are required when Google Auth is enabled.');
+                showToast('Google Client ID and Client Secret are required when Google Auth is enabled.', 'error');
                 return;
             }
         }
@@ -149,13 +153,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (data.success) {
-                alert('Auth settings updated successfully');
+                showToast('Auth settings updated successfully', 'success');
             } else {
-                alert(data.message || 'Failed to update auth settings');
+                showToast(data.message || 'Failed to update auth settings', 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while updating auth settings');
+            showToast('An error occurred while updating auth settings', 'error');
         }
     });
 });
