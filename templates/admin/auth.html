@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Auth Settings - Admin{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Authentication Settings</h1>
+        
+        <!-- Auth Settings Form -->
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <form id="authSettingsForm" class="space-y-6">
+                    <!-- Regular Auth Toggle -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-4">
+                            <input type="checkbox" class="toggle toggle-primary" id="regularAuthEnabled" 
+                                   {% if settings.regular_auth_enabled %}checked{% endif %}>
+                            <span class="label-text">Enable Regular Authentication</span>
+                        </label>
+                        <label class="label">
+                            <span class="label-text-alt">Allow users to register and login with username/password</span>
+                        </label>
+                    </div>
+
+                    <!-- Google Auth Toggle -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-4">
+                            <input type="checkbox" class="toggle toggle-primary" id="googleAuthEnabled"
+                                   {% if settings.google_auth_enabled %}checked{% endif %}>
+                            <span class="label-text">Enable Google Authentication</span>
+                        </label>
+                        <label class="label">
+                            <span class="label-text-alt">Allow users to login with their Google account</span>
+                        </label>
+                    </div>
+
+                    <!-- Google OAuth Settings -->
+                    <div id="googleSettings" class="space-y-4 {% if not settings.google_auth_enabled %}hidden{% endif %}">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Google Client ID</span>
+                            </label>
+                            <input type="text" class="input input-bordered w-full" id="googleClientId"
+                                   value="{{ settings.google_client_id or '' }}"
+                                   placeholder="Enter your Google Client ID">
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Google Client Secret</span>
+                            </label>
+                            <input type="password" class="input input-bordered w-full" id="googleClientSecret"
+                                   value="{{ settings.google_client_secret or '' }}"
+                                   placeholder="Enter your Google Client Secret">
+                        </div>
+
+                        <!-- Setup Instructions -->
+                        <div class="alert alert-info shadow-lg mt-4">
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div>
+                                    <h3 class="font-bold">How to Set Up Google Authentication</h3>
+                                    <ol class="list-decimal list-inside mt-2 space-y-2">
+                                        <li>Go to <a href="https://console.cloud.google.com" target="_blank" class="link">Google Cloud Console</a></li>
+                                        <li>Create a new project or select an existing one</li>
+                                        <li>Go to "APIs & Services" → "OAuth consent screen"
+                                            <ul class="list-disc list-inside ml-4 mt-1">
+                                                <li>Select "External" for User Type</li>
+                                                <li>Fill in required app information</li>
+                                                <li>Add scopes: email and profile</li>
+                                            </ul>
+                                        </li>
+                                        <li>Go to "APIs & Services" → "Credentials"
+                                            <ul class="list-disc list-inside ml-4 mt-1">
+                                                <li>Click "Create Credentials" → "OAuth client ID"</li>
+                                                <li>Select "Web application"</li>
+                                                <li>Add authorized JavaScript origins:
+                                                    <code class="block bg-base-300 p-2 mt-1 rounded">{{ request.host_url.rstrip('/') }}</code>
+                                                </li>
+                                                <li>Add authorized redirect URI:
+                                                    <code class="block bg-base-300 p-2 mt-1 rounded">{{ request.host_url.rstrip('/') }}/auth/google/callback</code>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>Copy the generated Client ID and Client Secret and paste them above</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-actions justify-end">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('authSettingsForm');
+    const googleAuthToggle = document.getElementById('googleAuthEnabled');
+    const googleSettings = document.getElementById('googleSettings');
+    const regularAuthToggle = document.getElementById('regularAuthEnabled');
+
+    // Toggle Google settings visibility
+    googleAuthToggle.addEventListener('change', function() {
+        googleSettings.classList.toggle('hidden', !this.checked);
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Ensure at least one auth method is enabled
+        if (!regularAuthToggle.checked && !googleAuthToggle.checked) {
+            alert('At least one authentication method must be enabled.');
+            return;
+        }
+
+        // Validate Google settings if enabled
+        if (googleAuthToggle.checked) {
+            const clientId = document.getElementById('googleClientId').value.trim();
+            const clientSecret = document.getElementById('googleClientSecret').value.trim();
+            
+            if (!clientId || !clientSecret) {
+                alert('Google Client ID and Client Secret are required when Google Auth is enabled.');
+                return;
+            }
+        }
+
+        try {
+            const response = await fetch('{{ url_for("admin.update_auth_settings") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'regular_auth_enabled': regularAuthToggle.checked.toString(),
+                    'google_auth_enabled': googleAuthToggle.checked.toString(),
+                    'google_client_id': document.getElementById('googleClientId').value.trim(),
+                    'google_client_secret': document.getElementById('googleClientSecret').value.trim()
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Auth settings updated successfully');
+            } else {
+                alert(data.message || 'Failed to update auth settings');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while updating auth settings');
+        }
+    });
+});
+</script>
+{% endblock %}

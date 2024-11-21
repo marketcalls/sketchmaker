@@ -3,7 +3,7 @@ from extensions import db
 
 # Import all models to make them available when importing from models package
 from .api import APIProvider, AIModel
-from .auth import User, PasswordResetOTP
+from .auth import User, PasswordResetOTP, AuthSettings
 from .content import Image, TrainingHistory
 from .email import EmailSettings
 from .system import SystemSettings
@@ -14,6 +14,7 @@ __all__ = [
     'AIModel',
     'User',
     'PasswordResetOTP',
+    'AuthSettings',
     'Image',
     'TrainingHistory',
     'EmailSettings',

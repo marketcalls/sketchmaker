@@ -1,12 +1,13 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, SystemSettings, EmailSettings, PasswordResetOTP
+from models import db, User, SystemSettings, EmailSettings, PasswordResetOTP, AuthSettings
 from extensions import limiter, get_rate_limit_string
 from jinja2 import Template
 import os
 from datetime import datetime
 import re
+import requests
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -133,7 +134,20 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('core.dashboard'))
 
+    # Get auth settings
+    auth_settings = AuthSettings.get_settings()
+
+    # If both auth methods are disabled, show error
+    if not auth_settings.regular_auth_enabled and not auth_settings.google_auth_enabled:
+        flash('Authentication is currently disabled. Please contact an administrator.')
+        return render_template('auth/login.html', auth_settings=auth_settings)
+
     if request.method == 'POST':
+        # Only process form if regular auth is enabled
+        if not auth_settings.regular_auth_enabled:
+            flash('Regular authentication is disabled.')
+            return redirect(url_for('auth.login'))
+
         email = request.form.get('email')
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
@@ -160,7 +174,110 @@ def login():
             return redirect(next_page)
         return redirect(next_page or url_for('core.dashboard'))
 
-    return render_template('auth/login.html')
+    return render_template('auth/login.html', auth_settings=auth_settings)
+
+@auth_bp.route('/auth/google/login')
+@limiter.limit(get_rate_limit_string())
+def google_login():
+    # Get auth settings
+    auth_settings = AuthSettings.get_settings()
+    if not auth_settings.google_auth_enabled:
+        flash('Google authentication is disabled.')
+        return redirect(url_for('auth.login'))
+
+    # Construct the callback URL
+    callback_url = url_for('auth.google_callback', _external=True)
+
+    # Google OAuth configuration
+    params = {
+        'client_id': auth_settings.google_client_id,
+        'redirect_uri': callback_url,
+        'response_type': 'code',
+        'scope': 'openid email profile',
+        'access_type': 'offline',
+        'prompt': 'consent',
+    }
+    
+    # Redirect to Google's OAuth page
+    auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' + '&'.join([f'{k}={v}' for k, v in params.items()])
+    return redirect(auth_url)
+
+@auth_bp.route('/auth/google/callback')
+@limiter.limit(get_rate_limit_string())
+def google_callback():
+    # Get auth settings
+    auth_settings = AuthSettings.get_settings()
+    if not auth_settings.google_auth_enabled:
+        flash('Google authentication is disabled.')
+        return redirect(url_for('auth.login'))
+
+    error = request.args.get('error')
+    if error:
+        flash('Google authentication failed: ' + error)
+        return redirect(url_for('auth.login'))
+
+    code = request.args.get('code')
+    if not code:
+        flash('Authentication failed: No authorization code received')
+        return redirect(url_for('auth.login'))
+
+    try:
+        # Exchange code for tokens
+        callback_url = url_for('auth.google_callback', _external=True)
+        token_url = 'https://oauth2.googleapis.com/token'
+        token_data = {
+            'code': code,
+            'client_id': auth_settings.google_client_id,
+            'client_secret': auth_settings.google_client_secret,
+            'redirect_uri': callback_url,
+            'grant_type': 'authorization_code'
+        }
+
+        # Get user info from Google
+        token_response = requests.post(token_url, data=token_data)
+        token_response.raise_for_status()
+        tokens = token_response.json()
+
+        userinfo_url = 'https://www.googleapis.com/oauth2/v3/userinfo'
+        headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
+        userinfo_response = requests.get(userinfo_url, headers=headers)
+        userinfo_response.raise_for_status()
+        userinfo = userinfo_response.json()
+
+        # Get or create user
+        user = User.query.filter_by(email=userinfo['email']).first()
+        if not user:
+            # Create new user
+            username = userinfo['email'].split('@')[0]
+            base_username = username
+            counter = 1
+            while User.query.filter_by(username=username).first():
+                username = f"{base_username}{counter}"
+                counter += 1
+
+            user = User(
+                email=userinfo['email'],
+                username=username,
+                password_hash='',  # No password for Google auth users
+                google_id=userinfo['sub'],
+                is_active=True,
+                is_approved=True,  # Auto-approve Google auth users
+                role='user'
+            )
+            db.session.add(user)
+            db.session.commit()
+        elif not user.google_id:
+            # Link existing user to Google
+            user.google_id = userinfo['sub']
+            db.session.commit()
+
+        # Log in the user
+        login_user(user)
+        return redirect(url_for('core.dashboard'))
+
+    except Exception as e:
+        flash('Failed to authenticate with Google: ' + str(e))
+        return redirect(url_for('auth.login'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 @limiter.limit(get_rate_limit_string())
@@ -169,7 +286,20 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('core.dashboard'))
 
+    # Get auth settings
+    auth_settings = AuthSettings.get_settings()
+
+    # If both auth methods are disabled, show error
+    if not auth_settings.regular_auth_enabled and not auth_settings.google_auth_enabled:
+        flash('Registration is currently disabled. Please contact an administrator.')
+        return render_template('auth/register.html', auth_settings=auth_settings)
+
     if request.method == 'POST':
+        # Only process form if regular auth is enabled
+        if not auth_settings.regular_auth_enabled:
+            flash('Regular registration is disabled.')
+            return redirect(url_for('auth.register'))
+
         email = request.form.get('email')
         username = request.form.get('username')
         password = request.form.get('password')
@@ -226,7 +356,7 @@ def register():
             flash('Registration successful. Please login.')
             return redirect(url_for('auth.login'))
 
-    return render_template('auth/register.html')
+    return render_template('auth/register.html', auth_settings=auth_settings)
 
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 @limiter.limit(get_rate_limit_string())

@@ -122,6 +122,9 @@
                         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52">
                             <li><a href="{{ url_for('admin.manage') }}">Manage Users</a></li>
                             <li><a href="{{ url_for('admin.email_settings') }}">Email Settings</a></li>
+                            {% if current_user.is_superadmin() %}
+                            <li><a href="{{ url_for('admin.auth_settings') }}">Auth Settings</a></li>
+                            {% endif %}
                         </ul>
                     </div>
                 {% endif %}

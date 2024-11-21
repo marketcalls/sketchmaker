@@ -4,6 +4,30 @@ from datetime import datetime, timedelta
 import random
 from .api import APIProvider  # Add this import
 
+class AuthSettings(db.Model):
+    __tablename__ = 'auth_settings'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    regular_auth_enabled = db.Column(db.Boolean, default=True, nullable=False)
+    google_auth_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    google_client_id = db.Column(db.String(255))
+    google_client_secret = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @staticmethod
+    def get_settings():
+        """Get or create auth settings"""
+        settings = AuthSettings.query.first()
+        if not settings:
+            settings = AuthSettings(
+                regular_auth_enabled=True,
+                google_auth_enabled=False
+            )
+            db.session.add(settings)
+            db.session.commit()
+        return settings
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -29,6 +53,9 @@ class User(UserMixin, db.Model):
     gemini_api_key = db.Column(db.String(255))
     groq_api_key = db.Column(db.String(255))
     fal_key = db.Column(db.String(255))
+
+    # Google OAuth info
+    google_id = db.Column(db.String(255), unique=True)  # For Google OAuth users
 
     def get_api_keys(self):
         """Get user's API keys"""

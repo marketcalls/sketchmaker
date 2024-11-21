@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, request
 from extensions import db, login_manager, limiter, get_rate_limit_string
+from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
 
@@ -32,10 +33,11 @@ def create_app():
     db.init_app(app)
     limiter.init_app(app)
     login_manager.init_app(app)
+    migrate = Migrate(app, db)
 
     with app.app_context():
         # Import models here to avoid circular imports
-        from models import User, APIProvider, AIModel
+        from models import User, APIProvider, AIModel, AuthSettings
         
         # Import blueprints
         from blueprints.auth import auth_bp
