@@ -2,6 +2,8 @@
 
 A sophisticated web application that leverages multiple AI providers and models to generate artwork, banners, and custom visual content from text descriptions. Features include custom model training, multiple format support, and a comprehensive gallery system.
 
+![SketchMaker AI Dashboard](https://marketcalls.in/wp-content/uploads/2024/11/SketchMaker-AI.webp)
+
 ## Core Features
 
 ### Multi-Provider AI Support
@@ -10,12 +12,16 @@ A sophisticated web application that leverages multiple AI providers and models 
 - Google Gemini: Next-generation AI with multimodal understanding
 - Groq: High-performance inference with ultra-low latency
 
+![AI Generated Social Media Expert](https://marketcalls.in/wp-content/uploads/2024/08/The-Social-Media-Expert.png)
+
 ### Banner Generation
 - SVG banner creation with precise control
 - Multiple style presets (modern, minimalist, artistic, corporate, playful, tech, elegant)
 - Dynamic text alignment and positioning
 - Automatic viewBox and preserveAspectRatio handling
 - Support for gradients, patterns, and effects
+
+![AI Generated Banner](https://marketcalls.in/wp-content/uploads/2024/08/Converge-2024.jpg)
 
 ### Image Generation (FAL Integration)
 - Flux Pro: High-quality standard image generation
@@ -24,6 +30,8 @@ A sophisticated web application that leverages multiple AI providers and models 
 - Flux Dev: Development and testing environment
 - Flux Realism: Enhanced photorealistic generation
 - Recraft V3: Advanced style control with color customization
+
+![AI Generated LinkedIn Headshot](https://marketcalls.in/wp-content/uploads/2024/08/0f811820-55c0-4f5d-823a-967ed102ba64.webp)
 
 ### Custom Model Training
 - Support for 5-20 training images
@@ -34,6 +42,8 @@ A sophisticated web application that leverages multiple AI providers and models 
 - Easy access to trained model files
 - Trigger word management
 
+![AI Generated Thumbnail](https://marketcalls.in/wp-content/uploads/2024/08/thumbnail-1.png)
+
 ### Gallery & Asset Management
 - Personal image galleries
 - Multiple format support (WebP, PNG, JPEG)
@@ -42,6 +52,8 @@ A sophisticated web application that leverages multiple AI providers and models 
 - Image metadata tracking
 - Creation history
 
+![AI Generated Art](https://marketcalls.in/wp-content/uploads/2024/08/bannana.jpeg)
+
 ### Advanced Security
 - Role-based access control (User/Admin/Superadmin)
 - Secure API key management
@@ -49,6 +61,29 @@ A sophisticated web application that leverages multiple AI providers and models 
 - First-user superadmin privileges
 - User account management
 - Activity monitoring
+
+### Authentication System
+- Multiple authentication methods:
+  * Regular username/password authentication
+  * Google OAuth integration
+  * Configurable authentication controls
+- Admin authentication controls:
+  * Enable/disable regular authentication
+  * Enable/disable Google authentication
+  * Configure Google OAuth credentials
+  * Manage authentication settings through admin interface
+- Google OAuth features:
+  * Secure OAuth 2.0 implementation
+  * Automatic account creation for new Google users
+  * Account linking for existing users
+  * Profile information synchronization
+  * Secure callback handling
+- Authentication security:
+  * Password strength requirements
+  * Secure password hashing
+  * Rate limiting on login attempts
+  * Session management
+  * Account recovery options
 
 ### Email System
 - Support for both SMTP and Amazon SES
@@ -85,6 +120,8 @@ A sophisticated web application that leverages multiple AI providers and models 
 - GSAP animations
 - Responsive design
 
+![AI Generated Portrait](https://marketcalls.in/wp-content/uploads/2024/08/Man-with-a-Cat.jpg)
+
 ### Database
 - SQLite (development)
 - PostgreSQL (production ready)
@@ -105,7 +142,6 @@ A sophisticated web application that leverages multiple AI providers and models 
 - Python virtual environment
 - Git version control
 - VSCode integration
-
 
 ## Installation
 
@@ -141,9 +177,43 @@ python app.py
 
 ## Configuration
 
+### Authentication Configuration
+Configure authentication settings in the admin interface (/admin/manage/auth):
+
+#### Regular Authentication
+- Enable/disable username/password authentication
+- Configure password requirements
+- Manage user registration settings
+
+#### Google OAuth Setup
+1. Go to [Google Cloud Console](https://console.cloud.google.com)
+2. Create a new project or select existing one
+3. Configure OAuth consent screen:
+   - Select "External" user type
+   - Add required app information
+   - Add scopes: email and profile
+4. Create OAuth credentials:
+   - Create OAuth client ID
+   - Select "Web application"
+   - Add authorized JavaScript origins:
+     ```
+     http://localhost:5000 (development)
+     https://your-domain.com (production)
+     ```
+   - Add authorized redirect URIs:
+     ```
+     http://localhost:5000/auth/google/callback (development)
+     https://your-domain.com/auth/google/callback (production)
+     ```
+5. Copy Client ID and Client Secret
+6. Configure in admin interface:
+   - Enable Google authentication
+   - Add Google Client ID
+   - Add Google Client Secret
+
 ### Required API Keys
 Configure these in the admin settings after first login:
-- OpenAI , Anthropic , Google Gemini , Groq API key (configure any one)
+- OpenAI, Anthropic, Google Gemini, Groq API key (configure any one)
 - FAL API key
 
 ### Email Configuration
@@ -167,6 +237,8 @@ Configure either SMTP or Amazon SES:
    - Register first user (becomes superadmin)
    - Configure API keys in settings
    - Set up email service
+   - Configure authentication methods
+   - Set up Google OAuth (if needed)
    - Select preferred AI provider
 
 2. Content Generation:
@@ -178,6 +250,7 @@ Configure either SMTP or Amazon SES:
 3. Admin Functions:
    - Manage users and roles
    - Configure email settings
+   - Configure authentication settings
    - Monitor system settings
    - Track user activity
 
