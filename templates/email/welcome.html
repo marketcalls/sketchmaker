@@ -32,15 +32,6 @@
         .content {
             padding: 20px 0;
         }
-        .button {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #2563eb;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
         .footer {
             text-align: center;
             padding-top: 20px;
@@ -70,7 +61,24 @@
 
             {% if not requires_approval %}
             <p style="text-align: center;">
-                <a href="{{ login_url }}" class="button">Start Creating Now</a>
+                <!-- Gmail-compatible button styling -->
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="center">
+                            <table border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="border-radius: 4px;" bgcolor="#2563eb">
+                                        <a href="{{ login_url }}" 
+                                           target="_blank"
+                                           style="font-size: 16px; font-family: Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 4px; padding: 12px 24px; border: 1px solid #2563eb; display: inline-block; font-weight: bold;">
+                                            Start Creating Now
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
             </p>
             {% else %}
             <p>You will receive another email once your account has been approved by an administrator.</p>
