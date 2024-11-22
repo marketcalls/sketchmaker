@@ -255,21 +255,41 @@ def google_callback():
                 username = f"{base_username}{counter}"
                 counter += 1
 
+            # Get system settings for manual approval
+            settings = SystemSettings.get_settings()
+            requires_approval = settings.require_manual_approval and User.query.first() is not None
+
             user = User(
                 email=userinfo['email'],
                 username=username,
                 password_hash='',  # No password for Google auth users
                 google_id=userinfo['sub'],
                 is_active=True,
-                is_approved=True,  # Auto-approve Google auth users
+                is_approved=not requires_approval,  # Set based on system settings
                 role='user'
             )
             db.session.add(user)
             db.session.commit()
+
+            # Send welcome email
+            email_success, email_message = send_welcome_email(user, requires_approval)
+            if not email_success:
+                print(f"Failed to send welcome email: {email_message}")
+                # Don't show email failure to user, just log it
+
         elif not user.google_id:
             # Link existing user to Google
             user.google_id = userinfo['sub']
             db.session.commit()
+
+        # Check if user is approved and active
+        if not user.is_approved:
+            flash('Your account is pending approval. Please wait for administrator approval.')
+            return redirect(url_for('auth.login'))
+
+        if not user.is_active:
+            flash('Your account has been deactivated. Please contact an administrator.')
+            return redirect(url_for('auth.login'))
 
         # Log in the user
         login_user(user)
