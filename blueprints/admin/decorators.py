@@ -6,7 +6,8 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin():
-            if request.is_xhr:
+            # Check if request is AJAX using proper header check
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({
                     'success': False,
                     'message': 'You do not have permission to access this page.'

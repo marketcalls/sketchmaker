@@ -287,10 +287,13 @@ document.getElementById('searchInput').addEventListener('keypress', function(e) 
 async function updateApprovalSetting(checked) {
     try {
         const formData = new FormData();
-        formData.append('require_manual_approval', checked);
+        formData.append('require_manual_approval', checked ? 'true' : 'false');
 
         const response = await fetch("{{ url_for('admin.update_settings') }}", {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formData
         });
         
@@ -411,8 +414,11 @@ async function updateUser(userId, action, additionalData = {}) {
             formData.append(key, value);
         }
 
-        const response = await fetch(`/manage/user/${userId}`, {
+        const response = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', userId), {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formData
         });
 
@@ -451,6 +457,9 @@ async function addUser() {
 
         const response = await fetch("{{ url_for('admin.add_user') }}", {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formData
         });
 

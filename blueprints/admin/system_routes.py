@@ -10,8 +10,9 @@ from .decorators import admin_required
 def update_settings():
     try:
         settings = SystemSettings.get_settings()
-        # Convert checkbox value to boolean
-        settings.require_manual_approval = request.form.get('require_manual_approval', 'false') == 'true'
+        # Get the value and convert to boolean
+        require_manual_approval = request.form.get('require_manual_approval')
+        settings.require_manual_approval = require_manual_approval in ['true', 'True', '1', 'on', True]
         db.session.commit()
         
         return jsonify({
