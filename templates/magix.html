@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<!-- Add Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+.canvas-container {
+    margin: 0 auto;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-4">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-4">Image Magix Generator</h1>
+
+        <div class="grid grid-cols-1 gap-2">
+            <!-- Image Upload Section -->
+            <div class="card bg-base-200 shadow-xl">
+                <div class="card-body p-3">
+                    <div class="form-control">
+                        <input type="file" id="imageUpload" accept="image/jpeg,image/png,image/webp" class="file-input file-input-bordered w-full" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Editor Section -->
+            <div class="card bg-base-200 shadow-xl">
+                <div class="card-body p-3">
+                    <div class="relative">
+                        <!-- Visible canvas for drawing on image -->
+                        <canvas id="editor" class="w-full border border-base-300 rounded-lg"></canvas>
+                        <!-- Hidden canvas for mask -->
+                        <canvas id="maskCanvas" class="hidden"></canvas>
+                        <div class="absolute top-2 right-2 flex gap-2">
+                            <button id="drawTool" class="btn btn-circle btn-sm btn-primary">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button id="clearCanvas" class="btn btn-circle btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prompt Input Section -->
+            <div class="card bg-base-200 shadow-xl">
+                <div class="card-body p-3">
+                    <div class="flex flex-col gap-2">
+                        <textarea id="prompt" class="textarea textarea-bordered h-16" placeholder="Describe what you want to generate in the marked area..."></textarea>
+                        <button id="generateBtn" class="btn btn-primary w-full">
+                            Generate Magix
+                            <span class="loading loading-spinner loading-sm hidden"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div id="resultSection" class="card bg-base-200 shadow-xl hidden">
+                <div class="card-body p-3">
+                    <div class="flex flex-col gap-2">
+                        <img id="resultImage" class="w-full rounded-lg shadow-lg" />
+                        <button id="downloadBtn" class="btn btn-secondary w-full">
+                            Download Result
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load Fabric.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script>
+let canvas;
+let maskCanvas;
+let originalImage = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize main canvas
+    canvas = new fabric.Canvas('editor', {
+        isDrawingMode: true
+    });
+
+    // Initialize mask canvas
+    maskCanvas = new fabric.Canvas('maskCanvas', {
+        backgroundColor: 'black'
+    });
+
+    // Set up brush
+    canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+    canvas.freeDrawingBrush.width = 5;
+    canvas.freeDrawingBrush.color = 'rgba(255, 0, 0, 0.5)';
+
+    // Handle image upload
+    document.getElementById('imageUpload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                // Create a temporary image to get dimensions
+                const img = new Image();
+                img.onload = function() {
+                    // Store original image
+                    originalImage = img;
+
+                    // Set canvas dimensions to match image
+                    canvas.setWidth(img.width);
+                    canvas.setHeight(img.height);
+                    maskCanvas.setWidth(img.width);
+                    maskCanvas.setHeight(img.height);
+
+                    // Set image as background
+                    fabric.Image.fromURL(event.target.result, function(fabricImg) {
+                        canvas.setBackgroundImage(fabricImg, canvas.renderAll.bind(canvas));
+                    });
+
+                    // Reset mask canvas
+                    maskCanvas.clear();
+                    maskCanvas.backgroundColor = 'black';
+                    maskCanvas.renderAll();
+
+                    // Scale canvas display while maintaining internal dimensions
+                    const container = canvas.wrapperEl.parentNode;
+                    const maxHeight = Math.min(400, window.innerHeight * 0.4); // Limit height
+                    const scale = Math.min(
+                        container.clientWidth / img.width,
+                        maxHeight / img.height
+                    );
+                    canvas.setZoom(scale);
+                    canvas.setDimensions({
+                        width: img.width * scale,
+                        height: img.height * scale
+                    });
+
+                    // Center canvas
+                    canvas.wrapperEl.style.margin = '0 auto';
+
+                    // Activate draw tool
+                    document.getElementById('drawTool').click();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Draw tool
+    document.getElementById('drawTool').addEventListener('click', function() {
+        // Highlight active tool
+        this.classList.add('btn-primary');
+
+        // Enable drawing mode
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush.color = 'rgba(255, 0, 0, 0.5)';
+        canvas.freeDrawingBrush.width = 5;
+
+        // Update mask when path is created
+        canvas.on('path:created', function(e) {
+            const path = e.path;
+            const maskPath = fabric.util.object.clone(path);
+            maskPath.set({
+                stroke: 'white',
+                fill: 'white',
+                strokeWidth: 5
+            });
+            maskCanvas.add(maskPath);
+            maskCanvas.renderAll();
+        });
+    });
+
+    // Clear canvas
+    document.getElementById('clearCanvas').addEventListener('click', function() {
+        canvas.clear();
+        canvas.setBackgroundImage(canvas.backgroundImage, canvas.renderAll.bind(canvas));
+        maskCanvas.clear();
+        maskCanvas.backgroundColor = 'black';
+        maskCanvas.renderAll();
+    });
+
+    // Generate button
+    document.getElementById('generateBtn').addEventListener('click', async function() {
+        const prompt = document.getElementById('prompt').value;
+        if (!prompt) {
+            alert('Please enter a prompt');
+            return;
+        }
+
+        if (!originalImage) {
+            alert('Please upload an image');
+            return;
+        }
+
+        // Show loading state
+        this.disabled = true;
+        this.querySelector('.loading').classList.remove('hidden');
+
+        try {
+            // Send to backend
+            const response = await fetch('/api/magix/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    prompt: prompt,
+                    image_data: originalImage.src,
+                    mask_data: maskCanvas.toDataURL({
+                        format: 'png',
+                        backgroundColor: 'black'
+                    })
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Generation failed');
+            }
+
+            const result = await response.json();
+
+            // Display result
+            document.getElementById('resultImage').src = result.image_url;
+            document.getElementById('resultSection').classList.remove('hidden');
+
+            // Enable download button
+            document.getElementById('downloadBtn').onclick = () => {
+                window.location.href = result.image_url;
+            };
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to generate image. Please try again.');
+        } finally {
+            // Reset button state
+            this.disabled = false;
+            this.querySelector('.loading').classList.remove('hidden');
+        }
+    });
+
+    // Activate draw tool by default
+    document.getElementById('drawTool').click();
+});
+</script>
+{% endblock %}

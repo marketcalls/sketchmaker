@@ -4,6 +4,7 @@ from .generate import generate_bp
 from .gallery import gallery_bp
 from .download import download_bp
 from .admin import admin
+from .magix import magix_bp
 from .training import training_bp
 from .banner import banner
 from .image_generator import image_generator_bp
@@ -15,6 +16,7 @@ __all__ = [
     'gallery_bp',
     'download_bp',
     'admin',
+    'magix_bp',
     'training_bp',
     'banner',
     'image_generator_bp'

@@ -49,6 +49,7 @@ def create_app():
         from blueprints.training import training_bp
         from blueprints.banner import banner
         from blueprints.image_generator import image_generator_bp
+        from blueprints.magix import magix_bp
         
         # Register blueprints
         app.register_blueprint(auth_bp)
@@ -60,6 +61,7 @@ def create_app():
         app.register_blueprint(training_bp)
         app.register_blueprint(banner)
         app.register_blueprint(image_generator_bp)
+        app.register_blueprint(magix_bp)
         
         # Error handlers
         @app.errorhandler(404)
