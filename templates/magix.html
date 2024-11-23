@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
 .canvas-container {
-    margin: 0 auto;
+    margin: 0 auto !important;
 }
 .canvas-wrapper {
     display: flex;
@@ -15,6 +15,17 @@
     min-height: 200px;
     max-height: 400px;
     overflow: hidden;
+    position: relative;
+}
+.canvas-container,
+.canvas-container.drawing,
+.canvas-container canvas,
+.upper-canvas {
+    cursor: crosshair !important;
+}
+#editor {
+    border: 1px solid rgba(var(--b3, var(--b2)) / var(--tw-border-opacity));
+    border-radius: 0.5rem;
 }
 </style>
 {% endblock %}
@@ -37,9 +48,9 @@
             <!-- Canvas Editor Section -->
             <div class="card bg-base-200 shadow-xl">
                 <div class="card-body p-2">
-                    <div class="relative canvas-wrapper">
+                    <div class="canvas-wrapper">
                         <!-- Visible canvas for drawing on image -->
-                        <canvas id="editor" class="border border-base-300 rounded-lg"></canvas>
+                        <canvas id="editor"></canvas>
                         <!-- Hidden canvas for mask -->
                         <canvas id="maskCanvas" class="hidden"></canvas>
                         <div class="absolute top-2 right-2 flex gap-2">
@@ -159,9 +170,35 @@ function resetDrawing() {
     setupDrawingMode();
 }
 
+function setupCanvas(img) {
+    // Set canvas dimensions to match image
+    canvas.setWidth(img.width);
+    canvas.setHeight(img.height);
+    maskCanvas.setWidth(img.width);
+    maskCanvas.setHeight(img.height);
+
+    // Get container dimensions
+    const container = document.querySelector('.canvas-wrapper');
+    const maxWidth = container.clientWidth - 20;
+    const maxHeight = container.clientHeight - 20;
+
+    // Calculate scale to fit within container
+    const scaleX = maxWidth / img.width;
+    const scaleY = maxHeight / img.height;
+    const scale = Math.min(scaleX, scaleY);
+
+    // Scale the canvas container using CSS transform
+    canvas.wrapperEl.style.transform = `scale(${scale})`;
+    canvas.wrapperEl.style.transformOrigin = 'center center';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize main canvas
-    canvas = new fabric.Canvas('editor');
+    canvas = new fabric.Canvas('editor', {
+        selection: false,
+        defaultCursor: 'crosshair',
+        hoverCursor: 'crosshair'
+    });
 
     // Initialize mask canvas
     maskCanvas = new fabric.Canvas('maskCanvas', {
@@ -189,40 +226,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     maskCanvas.backgroundColor = 'black';
                     maskCanvas.renderAll();
 
-                    // Set canvas dimensions to match image
-                    canvas.setWidth(img.width);
-                    canvas.setHeight(img.height);
-                    maskCanvas.setWidth(img.width);
-                    maskCanvas.setHeight(img.height);
-
                     // Set image as background
                     fabric.Image.fromURL(event.target.result, function(fabricImg) {
                         canvas.setBackgroundImage(fabricImg, function() {
+                            setupCanvas(img);
                             canvas.renderAll();
-                            // Save initial state after background is set
                             saveState();
                         });
                     });
-
-                    // Get container dimensions
-                    const container = document.querySelector('.canvas-wrapper');
-                    const maxWidth = container.clientWidth - 20;
-                    const maxHeight = container.clientHeight - 20;
-
-                    // Calculate scale to fit within container while maintaining aspect ratio
-                    const scaleX = maxWidth / img.width;
-                    const scaleY = maxHeight / img.height;
-                    const scale = Math.min(scaleX, scaleY);
-
-                    // Apply the scale
-                    canvas.setZoom(scale);
-                    canvas.setDimensions({
-                        width: img.width * scale,
-                        height: img.height * scale
-                    });
-
-                    // Center canvas
-                    canvas.wrapperEl.style.margin = '0 auto';
 
                     // Reset states
                     canvasStates = [];
@@ -356,6 +367,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset button state
             this.disabled = false;
             loadingSpinner.classList.add('hidden');
+        }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (originalImage) {
+            setupCanvas(originalImage);
+            canvas.renderAll();
         }
     });
 });
