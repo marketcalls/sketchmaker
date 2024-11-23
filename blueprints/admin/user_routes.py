@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
-from models import db, User, PasswordResetOTP, Image
+from models import db, User, PasswordResetOTP, Image, TrainingHistory
 from extensions import limiter, get_rate_limit_string
 from .decorators import admin_required
 from .utils import is_valid_password, send_approval_email
@@ -108,8 +108,25 @@ def update_user(user_id):
                 # Delete the image record
                 db.session.delete(image)
             
+            # Delete all user's training history
+            TrainingHistory.query.filter_by(user_id=user.id).delete()
+            
             # Delete associated password reset OTPs
             PasswordResetOTP.query.filter_by(user_id=user.id).delete()
+            
+            # Clear provider and model selections
+            user.selected_provider_id = None
+            user.selected_model_id = None
+            
+            # Clear API keys
+            user.openai_api_key = None
+            user.anthropic_api_key = None
+            user.gemini_api_key = None
+            user.groq_api_key = None
+            user.fal_key = None
+            
+            # Clear OAuth info
+            user.google_id = None
             
             # Finally delete the user
             db.session.delete(user)
