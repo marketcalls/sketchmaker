@@ -1,10 +1,11 @@
 from flask import render_template, request, jsonify
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
-from models import db, User, PasswordResetOTP
+from models import db, User, PasswordResetOTP, Image
 from extensions import limiter, get_rate_limit_string
 from .decorators import admin_required
 from .utils import is_valid_password, send_approval_email
+import os
 
 @limiter.limit(get_rate_limit_string())
 @login_required
@@ -90,9 +91,27 @@ def update_user(user_id):
                     'message': 'Only superadmins can delete superadmin accounts.'
                 }), 403
                 
-            # Delete associated password reset OTPs first
+            # Delete all user's images first
+            images = Image.query.filter_by(user_id=user.id).all()
+            for image in images:
+                # Delete the actual image files (both PNG and WebP versions)
+                base_filename = os.path.splitext(image.filename)[0]
+                png_path = os.path.join('static', 'images', f'{base_filename}.png')
+                webp_path = os.path.join('static', 'images', f'{base_filename}.webp')
+                
+                # Try to delete both file versions if they exist
+                if os.path.exists(png_path):
+                    os.remove(png_path)
+                if os.path.exists(webp_path):
+                    os.remove(webp_path)
+                
+                # Delete the image record
+                db.session.delete(image)
+            
+            # Delete associated password reset OTPs
             PasswordResetOTP.query.filter_by(user_id=user.id).delete()
-            # Delete the user
+            
+            # Finally delete the user
             db.session.delete(user)
         
         db.session.commit()
