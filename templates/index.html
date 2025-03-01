@@ -2,42 +2,185 @@
 
 {% block title %}Sketch Maker AI - Transform Text Into Art{% endblock %}
 
+{% block extra_css %}
+<style>
+  /* Custom animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(var(--color-primary-rgb), 0.4)); }
+    50% { filter: drop-shadow(0 0 16px rgba(var(--color-primary-rgb), 0.7)); }
+  }
+  
+  @keyframes pulse-star {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.5); }
+  }
+  
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+  
+  .glow-effect {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-secondary;
+  }
+  
+  /* Particle background */
+  #particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  /* Glass morphism effect */
+  .glassmorphism {
+    @apply backdrop-blur-md bg-opacity-20 border border-opacity-20 shadow-xl;
+  }
+  
+  .marquee-container {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+  }
+  
+  .marquee-content {
+    display: flex;
+    animation: marquee 30s linear infinite;
+    width: max-content;
+  }
+  
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  .feature-icon {
+    @apply relative;
+  }
+  
+  .feature-icon::after {
+    content: "";
+    @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full bg-primary opacity-10 scale-0 transition-all duration-300;
+  }
+  
+  .card:hover .feature-icon::after {
+    @apply scale-150;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300">
+<div class="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300 relative overflow-hidden">
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
+    <!-- Diagonal Design Element -->
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary opacity-10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/3 -left-24 w-80 h-80 bg-secondary opacity-10 rounded-full blur-3xl pointer-events-none"></div>
+    
     <!-- Hero Section -->
-    <section class="py-12 md:py-24">
+    <section class="py-16 md:py-28 relative z-10">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row items-center gap-8 md:gap-16">
-                <div class="flex-1 text-center md:text-left">
-                    <h1 class="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-                        Transform Text Into Art
+                <div class="flex-1 text-center md:text-left relative">
+                    <div class="absolute -top-10 -left-10 w-24 h-24 bg-primary opacity-5 rounded-full blur-xl"></div>
+                    
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 gradient-text leading-tight">
+                        Transform Text Into <span class="relative inline-block">Art<span class="absolute -bottom-1 left-0 w-full h-1 bg-secondary rounded-full"></span></span>
                     </h1>
+                    
                     <p class="text-lg md:text-xl text-base-content/80 mb-8 max-w-2xl">
-                        Create stunning visuals with multiple AI models including OpenAI, Anthropic, Google Gemini, and Groq. Generate custom banners, train your own models, and bring your ideas to life with advanced image generation powered by FAL.
+                        Create stunning visuals with multiple AI models including 
+                        <span class="text-primary font-medium">OpenAI</span>, 
+                        <span class="text-secondary font-medium">Anthropic</span>, 
+                        <span class="text-accent font-medium">Google Gemini</span>, and 
+                        <span class="text-info font-medium">Groq</span>. 
+                        Generate custom banners, train your own models, and bring your ideas to life with Flux Pro, Flux Lora, Ideogram, and Recraft.
                     </p>
+                    
                     <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                         {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-lg">
-                                Go to Dashboard
+                            <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-lg relative overflow-hidden group">
+                                <span class="relative z-10">Go to Dashboard</span>
+                                <span class="absolute inset-0 bg-white opacity-20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
                             </a>
                         {% else %}
-                            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
-                                Start Creating
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg relative overflow-hidden group">
+                                <span class="relative z-10">Start Creating</span>
+                                <span class="absolute inset-0 bg-white opacity-20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
                             </a>
                         {% endif %}
-                        <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-ghost btn-lg">
-                            View Gallery
+                        <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-outline btn-lg group relative overflow-hidden">
+                            <span class="relative z-10 group-hover:text-primary-content">View Gallery</span>
+                            <span class="absolute inset-0 bg-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                         </a>
                     </div>
+                    
+                    <!-- Tech badges -->
+                    <div class="mt-10 flex flex-wrap gap-2 justify-center md:justify-start">
+                        <span class="badge badge-primary badge-outline font-medium py-3">OpenAI</span>
+                        <span class="badge badge-secondary badge-outline font-medium py-3">Anthropic</span>
+                        <span class="badge badge-accent badge-outline font-medium py-3">Google Gemini</span>
+                        <span class="badge badge-info badge-outline font-medium py-3">Groq</span>
+                        <span class="badge badge-success badge-outline font-medium py-3">Flux Pro</span>
+                        <span class="badge badge-warning badge-outline font-medium py-3">Flux Lora</span>
+                        <span class="badge badge-error badge-outline font-medium py-3">Ideogram</span>
+                        <span class="badge badge-info badge-outline font-medium py-3">Recraft</span>
+                    </div>
                 </div>
-                <div class="flex-1 max-w-lg">
-                    <div class="mockup-browser border border-base-300 bg-base-200">
+                
+                <div class="flex-1 max-w-lg perspective-1000">
+                    <div class="mockup-browser border border-base-300 bg-base-200 shadow-xl animate-float glow-effect relative">
                         <div class="mockup-browser-toolbar">
                             <div class="input bg-base-300">sketchmaker.ai</div>
                         </div>
                         <div class="flex flex-col gap-4 p-4 bg-base-300 relative overflow-hidden">
-                            <div class="animate-pulse bg-base-content/5 h-32 rounded-lg"></div>
-                            <div class="animate-pulse bg-base-content/5 h-4 w-3/4 rounded"></div>
+                            <!-- Abstract AI visualization -->
+                            <div class="h-60 rounded-lg overflow-hidden relative">
+                                <div class="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-primary/20 to-secondary/20"></div>
+                                <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                                    <path fill="rgba(100,100,255,0.1)" d="M0,50 Q25,0 50,50 T100,50 T150,50 T200,50 V100 H0 Z">
+                                        <animate attributeName="d" 
+                                                 dur="10s" 
+                                                 repeatCount="indefinite" 
+                                                 values="M0,50 Q25,0 50,50 T100,50 T150,50 T200,50 V100 H0 Z;
+                                                        M0,50 Q25,100 50,50 T100,50 T150,50 T200,50 V100 H0 Z;
+                                                        M0,50 Q25,0 50,50 T100,50 T150,50 T200,50 V100 H0 Z" />
+                                    </path>
+                                    <path fill="rgba(200,100,255,0.1)" d="M0,60 Q50,30 100,60 T200,60 V100 H0 Z">
+                                        <animate attributeName="d" 
+                                                 dur="12s" 
+                                                 repeatCount="indefinite" 
+                                                 values="M0,60 Q50,30 100,60 T200,60 V100 H0 Z;
+                                                        M0,60 Q50,80 100,60 T200,60 V100 H0 Z;
+                                                        M0,60 Q50,30 100,60 T200,60 V100 H0 Z" />
+                                    </path>
+                                </svg>
+                                
+                                <!-- Placeholder for "AI generating" dots -->
+                                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                                    <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                                    <div class="w-2 h-2 bg-primary rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                                    <div class="w-2 h-2 bg-primary rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-2 items-center">
+                                <span class="w-3 h-3 bg-green-500 rounded-full pulse"></span>
+                                <div class="animate-pulse bg-base-content/5 h-4 w-3/4 rounded"></div>
+                            </div>
                             <div class="animate-pulse bg-base-content/5 h-4 w-1/2 rounded"></div>
                         </div>
                     </div>
@@ -46,74 +189,275 @@
         </div>
     </section>
 
+    <!-- Logo Marquee -->
+    <div class="py-6 bg-base-300/50 overflow-hidden">
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <!-- These would be your tech partners/models - add logos here -->
+                {% for i in range(10) %}
+                <div class="flex items-center gap-8 px-12">
+                    <div class="text-4xl font-bold opacity-10 text-primary">OpenAI</div>
+                    <div class="text-4xl font-bold opacity-10 text-secondary">Anthropic</div>
+                    <div class="text-4xl font-bold opacity-10 text-accent">Google</div>
+                    <div class="text-4xl font-bold opacity-10 text-info">Groq</div>
+                    <div class="text-4xl font-bold opacity-10 text-success">Flux Pro</div>
+                    <div class="text-4xl font-bold opacity-10 text-warning">Flux Lora</div>
+                    <div class="text-4xl font-bold opacity-10 text-error">Ideogram</div>
+                    <div class="text-4xl font-bold opacity-10 text-info">Recraft</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
     <!-- Features Section -->
-    <section class="py-12 md:py-24 bg-base-200/50">
+    <section class="py-16 md:py-24 bg-base-200/50 relative z-10">
+        <div class="absolute top-0 right-0 w-full h-64 bg-gradient-to-b from-base-300/50 to-transparent pointer-events-none"></div>
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Key Features</h2>
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4 inline-block gradient-text">Key Features</h2>
+                <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
+                <p class="mt-4 text-lg text-base-content/70 max-w-2xl mx-auto">Powerful tools to transform your creative vision into reality</p>
+            </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Multiple AI Providers -->
-                <div class="card bg-base-100 shadow-xl">
+                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
-                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        <h3 class="card-title text-xl mb-2">Multiple AI Providers</h3>
+                        <div class="feature-icon">
+                            <svg class="w-14 h-14 text-primary mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="card-title text-xl mb-3 text-primary">Multiple AI Providers</h3>
                         <p class="text-base-content/70">Choose from OpenAI, Anthropic, Google Gemini, or Groq for advanced prompt enhancement and generation.</p>
+                        <div class="mt-4 flex gap-2">
+                            <div class="badge badge-sm badge-primary">OpenAI</div>
+                            <div class="badge badge-sm badge-secondary">Anthropic</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Advanced Generation -->
-                <div class="card bg-base-100 shadow-xl">
+                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
-                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <h3 class="card-title text-xl mb-2">Advanced Generation</h3>
-                        <p class="text-base-content/70">Create images, banners, and SVGs with FAL models including Flux Pro, Recraft V3, and custom LoRA training.</p>
+                        <div class="feature-icon">
+                            <svg class="w-14 h-14 text-secondary mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="card-title text-xl mb-3 text-secondary">Advanced Generation</h3>
+                        <p class="text-base-content/70">Create images, banners, and SVGs with multiple models including Flux Pro, Flux Lora, Ideogram, Recraft, and custom LoRA training.</p>
+                        <div class="mt-4 flex gap-2">
+                            <div class="badge badge-sm badge-secondary">Flux Pro</div>
+                            <div class="badge badge-sm badge-warning">Flux Lora</div>
+                            <div class="badge badge-sm badge-error">Ideogram</div>
+                            <div class="badge badge-sm badge-accent">Recraft</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Custom Training -->
-                <div class="card bg-base-100 shadow-xl">
+                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
-                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        <h3 class="card-title text-xl mb-2">Custom Training</h3>
+                        <div class="feature-icon">
+                            <svg class="w-14 h-14 text-accent mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h3 class="card-title text-xl mb-3 text-accent">Custom Training</h3>
                         <p class="text-base-content/70">Train your own models with 5-20 images, monitor progress in real-time, and use your custom styles.</p>
+                        <div class="mt-4 flex gap-2">
+                            <div class="badge badge-sm badge-accent">LoRA</div>
+                            <div class="badge badge-sm badge-info">Custom Styles</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Multiple Formats -->
-                <div class="card bg-base-100 shadow-xl">
+                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
-                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        <h3 class="card-title text-xl mb-2">Multiple Formats</h3>
+                        <div class="feature-icon">
+                            <svg class="w-14 h-14 text-info mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="card-title text-xl mb-3 text-info">Multiple Formats</h3>
                         <p class="text-base-content/70">Download your creations in WebP, PNG, JPEG formats with optimized quality and compression.</p>
+                        <div class="mt-4 flex gap-2">
+                            <div class="badge badge-sm badge-info">WebP</div>
+                            <div class="badge badge-sm badge-success">PNG</div>
+                            <div class="badge badge-sm badge-info">JPEG</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Personal Gallery -->
-                <div class="card bg-base-100 shadow-xl">
+                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
-                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <h3 class="card-title text-xl mb-2">Personal Gallery</h3>
+                        <div class="feature-icon">
+                            <svg class="w-14 h-14 text-success mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="card-title text-xl mb-3 text-success">Personal Gallery</h3>
                         <p class="text-base-content/70">Store and manage your generated artwork in a personal gallery with easy access and sharing options.</p>
+                        <div class="mt-4 flex gap-2">
+                            <div class="badge badge-sm badge-success">Cloud Storage</div>
+                            <div class="badge badge-sm badge-primary">Sharing</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Smart Prompts -->
-                <div class="card bg-base-100 shadow-xl">
+                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
-                        <svg class="w-12 h-12 text-primary mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <h3 class="card-title text-xl mb-2">Smart Prompts</h3>
+                        <div class="feature-icon">
+                            <svg class="w-14 h-14 text-warning mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="card-title text-xl mb-3 text-warning">Smart Prompts</h3>
                         <p class="text-base-content/70">Enhance your prompts with AI-powered suggestions and optimizations for better results.</p>
+                        <div class="mt-4 flex gap-2">
+                            <div class="badge badge-sm badge-warning">AI-optimized</div>
+                            <div class="badge badge-sm badge-secondary">Suggestions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section (New) -->
+    <section class="py-16 bg-base-200/50 relative z-10">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4 inline-block gradient-text">User Testimonials</h2>
+                <div class="w-24 h-1 bg-accent mx-auto rounded-full"></div>
+                <p class="mt-4 text-lg text-base-content/70 max-w-2xl mx-auto">See what our users are saying about Sketch Maker AI</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Replace with actual testimonials -->
+                <div class="card bg-base-100/70 glassmorphism">
+                    <div class="card-body">
+                        <div class="flex mb-4">
+                            <div class="rating">
+                                <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-1" class="mask mask-star-2 bg-orange-400" checked />
+                            </div>
+                        </div>
+                        <p class="italic text-base-content/80">"The multiple AI model options give me so much creative flexibility. I love how I can generate completely different styles based on my needs."</p>
+                        <div class="mt-4 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                                <span class="text-primary">JS</span>
+                            </div>
+                            <div>
+                                <p class="font-medium">Jamie S.</p>
+                                <p class="text-sm text-base-content/60">Graphic Designer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card bg-base-100/70 glassmorphism">
+                    <div class="card-body">
+                        <div class="flex mb-4">
+                            <div class="rating">
+                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked />
+                            </div>
+                        </div>
+                        <p class="italic text-base-content/80">"Training my own Flux Lora model changed everything. Now my AI-generated art perfectly matches my brand's unique style."</p>
+                        <div class="mt-4 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                                <span class="text-secondary">AR</span>
+                            </div>
+                            <div>
+                                <p class="font-medium">Alex R.</p>
+                                <p class="text-sm text-base-content/60">Marketing Lead</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card bg-base-100/70 glassmorphism">
+                    <div class="card-body">
+                        <div class="flex mb-4">
+                            <div class="rating">
+                                <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" checked />
+                                <input type="radio" name="rating-3" class="mask mask-star-2 bg-orange-400" />
+                            </div>
+                        </div>
+                        <p class="italic text-base-content/80">"The banner generation feature saved our team countless hours. We create professional social media graphics in seconds now."</p>
+                        <div class="mt-4 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                                <span class="text-accent">TM</span>
+                            </div>
+                            <div>
+                                <p class="font-medium">Taylor M.</p>
+                                <p class="text-sm text-base-content/60">Social Media Manager</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works (New) -->
+    <section class="py-16 relative z-10">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4 inline-block gradient-text">How It Works</h2>
+                <div class="w-24 h-1 bg-info mx-auto rounded-full"></div>
+                <p class="mt-4 text-lg text-base-content/70 max-w-2xl mx-auto">Create stunning artwork in three simple steps</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <!-- Progress line connecting the steps -->
+                <div class="hidden md:block absolute top-24 left-0 w-full h-0.5 bg-primary/30"></div>
+                
+                <!-- Step 1 -->
+                <div class="relative z-10">
+                    <div class="bg-base-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-primary text-primary font-bold">1</div>
+                    <div class="card bg-base-100/70 glassmorphism">
+                        <div class="card-body text-center">
+                            <h3 class="font-bold text-xl mb-3">Enter Your Prompt</h3>
+                            <p class="text-base-content/70">Describe what you want to create or use our AI-powered prompt suggestions.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="relative z-10">
+                    <div class="bg-base-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-secondary text-secondary font-bold">2</div>
+                    <div class="card bg-base-100/70 glassmorphism">
+                        <div class="card-body text-center">
+                            <h3 class="font-bold text-xl mb-3">Choose Your Model</h3>
+                            <p class="text-base-content/70">Select from multiple AI providers or use your own custom-trained model.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="relative z-10">
+                    <div class="bg-base-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-accent text-accent font-bold">3</div>
+                    <div class="card bg-base-100/70 glassmorphism">
+                        <div class="card-body text-center">
+                            <h3 class="font-bold text-xl mb-3">Generate & Download</h3>
+                            <p class="text-base-content/70">Get your finished artwork in seconds and save it in your preferred format.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -121,32 +465,198 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-12 md:py-24">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Create?</h2>
-            <p class="text-lg md:text-xl text-base-content/80 mb-8 max-w-2xl mx-auto">
-                Join now and start transforming your ideas into beautiful artwork with advanced AI technology.
+    <section class="py-16 md:py-32 relative bg-gradient-to-br from-base-300/80 via-primary/10 to-secondary/10">
+        <!-- Decorative elements -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-primary opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-80 h-80 bg-secondary opacity-5 rounded-full blur-3xl translate-y-1/4 -translate-x-1/4"></div>
+        
+        <!-- Stars/particles effect -->
+        <div class="absolute inset-0 overflow-hidden">
+            <!-- Static positioned stars -->
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 15%; left: 25%; animation: pulse-star 3s infinite 0.1s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 45%; left: 10%; animation: pulse-star 3s infinite 0.7s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 78%; left: 35%; animation: pulse-star 3s infinite 1.2s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 32%; left: 85%; animation: pulse-star 3s infinite 0.4s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 65%; left: 72%; animation: pulse-star 3s infinite 0.9s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 22%; left: 60%; animation: pulse-star 3s infinite 1.5s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 85%; left: 15%; animation: pulse-star 3s infinite 0.3s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 10%; left: 45%; animation: pulse-star 3s infinite 1.8s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 50%; left: 55%; animation: pulse-star 3s infinite 0.5s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 75%; left: 80%; animation: pulse-star 3s infinite 1.1s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 35%; left: 30%; animation: pulse-star 3s infinite 0.8s"></div>
+            <div class="absolute w-1 h-1 bg-white rounded-full opacity-30" style="top: 60%; left: 40%; animation: pulse-star 3s infinite 1.4s"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <!-- Glow effect behind the heading -->
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-48 bg-primary opacity-5 blur-3xl rounded-full"></div>
+            
+            <h2 class="text-3xl md:text-5xl font-bold mb-6 gradient-text leading-tight">Ready to Transform Your Ideas?</h2>
+            <p class="text-lg md:text-xl text-base-content/80 mb-12 max-w-2xl mx-auto">
+                Join thousands of creators and bring your vision to life with advanced AI technology.
             </p>
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-lg">
-                    Go to Dashboard
+            
+            <div class="flex justify-center gap-4 flex-wrap">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-lg shadow-xl relative overflow-hidden group px-8">
+                        <span class="relative z-10">Go to Dashboard</span>
+                        <span class="absolute inset-0 bg-white opacity-20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg shadow-xl relative overflow-hidden group px-8">
+                        <span class="relative z-10">Get Started Now</span>
+                        <span class="absolute inset-0 bg-white opacity-20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+                    </a>
+                {% endif %}
+                
+                <!-- Second button for more contrast -->
+                <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-outline border-primary text-primary hover:bg-primary hover:text-white btn-lg">
+                    Explore Gallery
                 </a>
-            {% else %}
-                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
-                    Get Started Now
-                </a>
-            {% endif %}
+            </div>
+        </div>
+        
+        <!-- Better wave divider implementation with proper coloring -->
+        <div class="absolute -bottom-1 left-0 w-full overflow-hidden leading-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" class="w-full h-16 md:h-24">
+                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="var(--fallback-b2,oklch(var(--b2)))" opacity=".8"></path>
+                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="var(--fallback-b2,oklch(var(--b2)))" opacity=".5"></path>
+                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="var(--fallback-b2,oklch(var(--b2)))" opacity=".3"></path>
+            </svg>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer footer-center p-10 bg-base-200 text-base-content">
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content relative z-10">
         <div>
-            <p class="font-bold">
-                Sketch Maker AI © {{ current_year }}
+            <svg class="w-12 h-12 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="18" height="18" rx="4" class="fill-primary"/>
+                <path d="M12 8L16 12L12 16M8 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="stroke-primary-content"/>
+            </svg>
+            <p class="font-bold text-xl gradient-text">
+                Sketch Maker AI
             </p>
-            <p class="text-base-content/70">Transform your ideas into art</p>
+            <p class="text-base-content/70">Transform your ideas into art • © {{ current_year }}</p>
+            <div class="flex gap-4 mt-4">
+                <a class="btn btn-ghost btn-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="fill-current"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg>
+                </a> 
+                <a class="btn btn-ghost btn-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="fill-current"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path></svg>
+                </a> 
+                <a class="btn btn-ghost btn-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="fill-current"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path></svg>
+                </a>
+            </div>
         </div>
     </footer>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Particles.js -->
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize particles
+    if (typeof particlesJS !== 'undefined') {
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 30,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#ffffff"
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    }
+                },
+                "opacity": {
+                    "value": 0.1,
+                    "random": true
+                },
+                "size": {
+                    "value": 3,
+                    "random": true
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.1,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 1,
+                    "direction": "none",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "grab"
+                    },
+                    "onclick": {
+                        "enable": false
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 140,
+                        "line_linked": {
+                            "opacity": 0.3
+                        }
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+    }
+    
+    // Simple animation for feature cards without ScrollTrigger
+    if (typeof gsap !== 'undefined') {
+        // Animate feature cards on scroll with IntersectionObserver instead
+        const cards = document.querySelectorAll('.card');
+        
+        const animateElement = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const card = entry.target;
+                    gsap.fromTo(card, 
+                        { y: 50, opacity: 0 },
+                        { y: 0, opacity: 1, duration: 0.6, delay: Array.from(cards).indexOf(card) * 0.1 }
+                    );
+                    observer.unobserve(card);
+                }
+            });
+        };
+        
+        const observer = new IntersectionObserver(animateElement, {
+            root: null,
+            threshold: 0.1,
+            rootMargin: '-50px'
+        });
+        
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+    }
+});
+</script>
 {% endblock %}
