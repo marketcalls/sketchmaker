@@ -140,8 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (e.target.value === 'fal-ai/flux-lora') {
             if (loraInputs) loraInputs.classList.remove('hidden');
             if (imageSizeControl) imageSizeControl.classList.remove('hidden');
-        } else if (e.target.value === 'fal-ai/ideogram/v2') {
-            console.log('Showing Ideogram V2 controls');
+        } else if (e.target.value === 'fal-ai/ideogram/v2' || e.target.value === 'fal-ai/ideogram/v2a') {
+            console.log('Showing Ideogram controls for model:', e.target.value);
             if (ideogramAspectRatioControl) ideogramAspectRatioControl.classList.remove('hidden');
             if (ideogramExpandPromptControl) ideogramExpandPromptControl.classList.remove('hidden');
             if (ideogramStyleControl) ideogramStyleControl.classList.remove('hidden');
@@ -266,8 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.image_size = dimensions;
             } else if (selectedModel === 'fal-ai/flux-pro/v1.1-ultra') {
                 formData.aspect_ratio = document.getElementById('aspectRatio').value;
-            } else if (selectedModel === 'fal-ai/ideogram/v2') {
-                // Add Ideogram V2 specific parameters
+            } else if (selectedModel === 'fal-ai/ideogram/v2' || selectedModel === 'fal-ai/ideogram/v2a') {
+                // Add Ideogram V2/V2a specific parameters
                 const aspectRatioElement = document.getElementById('ideogramAspectRatio');
                 const expandPromptElement = document.getElementById('ideogramExpandPrompt');
                 const styleElement = document.getElementById('ideogramStyle');
@@ -280,7 +280,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (negativePromptElement && negativePromptElement.value.trim()) {
                     formData.negative_prompt = negativePromptElement.value;
+                } else {
+                    formData.negative_prompt = '';
                 }
+                
+                console.log(`Ideogram ${selectedModel} parameters:`, {
+                    aspect_ratio: formData.aspect_ratio,
+                    expand_prompt: formData.expand_prompt,
+                    style: formData.style,
+                    negative_prompt: formData.negative_prompt
+                });
             } else {
                 formData.image_size = dimensions;
             }

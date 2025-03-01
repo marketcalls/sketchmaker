@@ -63,10 +63,17 @@ def get_model_arguments(model, data):
         }
     elif model == "fal-ai/ideogram/v2":
         model_args = {
-            "aspect_ratio": data.get("aspect_ratio", "1:1"),
-            "expand_prompt": data.get("expand_prompt", True),
-            "style": data.get("style", "auto"),
-            "negative_prompt": data.get("negative_prompt", "")
+            "aspect_ratio": data.get("aspect_ratio") or "1:1",
+            "expand_prompt": data.get("expand_prompt") if data.get("expand_prompt") is not None else True,
+            "style": data.get("style") or "auto",
+            "negative_prompt": data.get("negative_prompt") or ""
+        }
+    elif model == "fal-ai/ideogram/v2a":
+        model_args = {
+            "aspect_ratio": data.get("aspect_ratio") or "1:1",
+            "expand_prompt": data.get("expand_prompt") if data.get("expand_prompt") is not None else True,
+            "style": data.get("style") or "auto",
+            "negative_prompt": data.get("negative_prompt") or ""
         }
     else:
         # All other models require image_size
