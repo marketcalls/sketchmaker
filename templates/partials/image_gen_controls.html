@@ -10,6 +10,7 @@
             <option value="fal-ai/flux/dev">Flux Dev</option>
             <option value="fal-ai/flux-realism">Flux Realism</option>
             <option value="fal-ai/recraft-v3">Recraft V3</option>
+            <option value="fal-ai/ideogram/v2">Ideogram V2</option>
         </select>
     </div>
 
@@ -55,6 +56,58 @@
         <div id="colorPickers" class="flex flex-wrap gap-2">
             <!-- Color pickers will be added here dynamically -->
         </div>
+    </div>
+
+    <!-- Ideogram V2 Controls -->
+    <div class="form-control hidden" id="ideogramAspectRatioControl">
+        <label class="label">
+            <span class="label-text">Aspect Ratio</span>
+        </label>
+        <select id="ideogramAspectRatio" name="aspect_ratio" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="1:1">1:1</option>
+            <option value="10:16">10:16</option>
+            <option value="16:10">16:10</option>
+            <option value="9:16">9:16</option>
+            <option value="16:9">16:9</option>
+            <option value="4:3">4:3</option>
+            <option value="3:4">3:4</option>
+            <option value="1:3">1:3</option>
+            <option value="3:1">3:1</option>
+            <option value="3:2">3:2</option>
+        </select>
+    </div>
+
+    <div class="form-control hidden" id="ideogramExpandPromptControl">
+        <label class="label cursor-pointer justify-start gap-4">
+            <span class="label-text">Expand Prompt</span>
+            <input type="checkbox" id="ideogramExpandPrompt" name="expand_prompt" class="toggle toggle-primary" checked />
+        </label>
+        <div class="text-xs opacity-70 mt-1">
+            Enhances your prompt with additional details for better results
+        </div>
+    </div>
+
+    <div class="form-control hidden" id="ideogramNegativePromptControl">
+        <label class="label">
+            <span class="label-text">Negative Prompt</span>
+        </label>
+        <textarea id="ideogramNegativePrompt" name="negative_prompt" class="textarea textarea-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" placeholder="Enter things to avoid in the image"></textarea>
+    </div>
+
+    <div class="form-control hidden" id="ideogramStyleControl">
+        <label class="label">
+            <span class="label-text">Style</span>
+        </label>
+        <select id="ideogramStyle" name="style" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="auto">Auto</option>
+            <option value="photograph">Photograph</option>
+            <option value="anime">Anime</option>
+            <option value="3d_render">3D Render</option>
+            <option value="pixel_art">Pixel Art</option>
+            <option value="cinematic">Cinematic</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="illustration">Illustration</option>
+        </select>
     </div>
 
     <div class="form-control" id="imageSizeControl">

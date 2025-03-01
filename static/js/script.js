@@ -107,19 +107,50 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Model changed to:', e.target.value);
         const recraftControls = document.getElementById('recraftStyleControl');
         const recraftColorsControl = document.getElementById('recraftColorsControl');
+        const imageSizeControl = document.getElementById('imageSizeControl');
         
+        // Ideogram V2 Controls
+        const ideogramAspectRatioControl = document.getElementById('ideogramAspectRatioControl');
+        const ideogramExpandPromptControl = document.getElementById('ideogramExpandPromptControl');
+        const ideogramStyleControl = document.getElementById('ideogramStyleControl');
+        const ideogramNegativePromptControl = document.getElementById('ideogramNegativePromptControl');
+        
+        // Debug logging for Ideogram controls
+        console.log('Ideogram controls present:', {
+            aspectRatioControl: !!ideogramAspectRatioControl,
+            expandPromptControl: !!ideogramExpandPromptControl,
+            styleControl: !!ideogramStyleControl,
+            negativePromptControl: !!ideogramNegativePromptControl
+        });
+        
+        // Hide all model-specific controls first
+        if (recraftControls) recraftControls.classList.add('hidden');
+        if (recraftColorsControl) recraftColorsControl.classList.add('hidden');
+        if (loraInputs) loraInputs.classList.add('hidden');
+        if (ideogramAspectRatioControl) ideogramAspectRatioControl.classList.add('hidden');
+        if (ideogramExpandPromptControl) ideogramExpandPromptControl.classList.add('hidden');
+        if (ideogramStyleControl) ideogramStyleControl.classList.add('hidden');
+        if (ideogramNegativePromptControl) ideogramNegativePromptControl.classList.add('hidden');
+        
+        // Show controls based on model
         if (e.target.value === 'fal-ai/recraft-v3') {
-            recraftControls.classList.remove('hidden');
-            recraftColorsControl.classList.remove('hidden');
-            loraInputs.classList.add('hidden');
+            if (recraftControls) recraftControls.classList.remove('hidden');
+            if (recraftColorsControl) recraftColorsControl.classList.remove('hidden');
+            if (imageSizeControl) imageSizeControl.classList.remove('hidden');
         } else if (e.target.value === 'fal-ai/flux-lora') {
-            recraftControls.classList.add('hidden');
-            recraftColorsControl.classList.add('hidden');
-            loraInputs.classList.remove('hidden');
+            if (loraInputs) loraInputs.classList.remove('hidden');
+            if (imageSizeControl) imageSizeControl.classList.remove('hidden');
+        } else if (e.target.value === 'fal-ai/ideogram/v2') {
+            console.log('Showing Ideogram V2 controls');
+            if (ideogramAspectRatioControl) ideogramAspectRatioControl.classList.remove('hidden');
+            if (ideogramExpandPromptControl) ideogramExpandPromptControl.classList.remove('hidden');
+            if (ideogramStyleControl) ideogramStyleControl.classList.remove('hidden');
+            if (ideogramNegativePromptControl) ideogramNegativePromptControl.classList.remove('hidden');
+            if (imageSizeControl) imageSizeControl.classList.add('hidden'); // Hide image size as Ideogram uses aspect ratio
+        } else if (e.target.value === 'fal-ai/flux-pro/v1.1-ultra') {
+            if (imageSizeControl) imageSizeControl.classList.add('hidden'); // Ultra uses aspect ratio instead of dimensions
         } else {
-            recraftControls.classList.add('hidden');
-            recraftColorsControl.classList.add('hidden');
-            loraInputs.classList.add('hidden');
+            if (imageSizeControl) imageSizeControl.classList.remove('hidden');
         }
     });
 
@@ -235,6 +266,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.image_size = dimensions;
             } else if (selectedModel === 'fal-ai/flux-pro/v1.1-ultra') {
                 formData.aspect_ratio = document.getElementById('aspectRatio').value;
+            } else if (selectedModel === 'fal-ai/ideogram/v2') {
+                // Add Ideogram V2 specific parameters
+                const aspectRatioElement = document.getElementById('ideogramAspectRatio');
+                const expandPromptElement = document.getElementById('ideogramExpandPrompt');
+                const styleElement = document.getElementById('ideogramStyle');
+                const negativePromptElement = document.getElementById('ideogramNegativePrompt');
+                
+                // Set default values if elements don't exist
+                formData.aspect_ratio = aspectRatioElement ? aspectRatioElement.value : '1:1';
+                formData.expand_prompt = expandPromptElement ? expandPromptElement.checked : true;
+                formData.style = styleElement ? styleElement.value : 'auto';
+                
+                if (negativePromptElement && negativePromptElement.value.trim()) {
+                    formData.negative_prompt = negativePromptElement.value;
+                }
             } else {
                 formData.image_size = dimensions;
             }

@@ -139,6 +139,13 @@ def generate_image_route():
             })
         elif model == 'fal-ai/flux-pro/v1.1-ultra':
             generation_params['aspect_ratio'] = data.get('aspect_ratio', '16:9')
+        elif model == 'fal-ai/ideogram/v2':
+            generation_params.update({
+                'aspect_ratio': data.get('aspect_ratio', '1:1'),
+                'expand_prompt': data.get('expand_prompt', True),
+                'style': data.get('style', 'auto'),
+                'negative_prompt': data.get('negative_prompt', '')
+            })
         else:
             generation_params['image_size'] = data.get('image_size', {
                 'width': 1024,

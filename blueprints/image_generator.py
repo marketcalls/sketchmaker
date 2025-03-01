@@ -61,6 +61,13 @@ def get_model_arguments(model, data):
             "output_format": "jpeg",
             "safety_tolerance": "2"
         }
+    elif model == "fal-ai/ideogram/v2":
+        model_args = {
+            "aspect_ratio": data.get("aspect_ratio", "1:1"),
+            "expand_prompt": data.get("expand_prompt", True),
+            "style": data.get("style", "auto"),
+            "negative_prompt": data.get("negative_prompt", "")
+        }
     else:
         # All other models require image_size
         if not isinstance(data.get("image_size"), dict) or 'width' not in data["image_size"] or 'height' not in data["image_size"]:
