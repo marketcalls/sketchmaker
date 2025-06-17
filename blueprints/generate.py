@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from .image_generator import generate_image
 from .prompt_generator import generate_prompt
 from .clients import APIKeyError
-from models import db, Image
+from models import db, Image, APISettings
 from extensions import limiter, get_rate_limit_string
 import os
 from PIL import Image as PILImage
@@ -33,12 +33,14 @@ def generate_prompt_route():
         }), 400
 
     try:
-        if not current_user.has_required_api_keys():
+        # Check if system has required API keys
+        api_settings = APISettings.get_settings()
+        if not api_settings.has_required_keys():
             return jsonify({
-                'error': 'API keys are required',
-                'details': 'Please add your API keys in settings',
-                'type': 'missing_keys'
-            }), 400
+                'error': 'System configuration incomplete',
+                'details': 'API keys not configured by administrators',
+                'type': 'missing_system_keys'
+            }), 503
 
         try:
             # Pass the model to generate_prompt for model-specific prompt generation
@@ -53,7 +55,7 @@ def generate_prompt_route():
                 raise  # Re-raise if it's not an API key error
             return jsonify({
                 'error': 'Invalid API key',
-                'details': 'Please check your API key in settings',
+                'details': 'Contact administrator - system API key is invalid',
                 'type': 'invalid_key'
             }), 401
         except OpenAIError as e:
@@ -74,7 +76,7 @@ def generate_prompt_route():
     except APIKeyError as e:
         return jsonify({
             'error': str(e),
-            'details': 'Please check your API keys in settings',
+            'details': 'Contact administrator - system API configuration issue',
             'type': 'api_key_error'
         }), 400
     except Exception as e:
@@ -91,12 +93,26 @@ def generate_prompt_route():
 @login_required
 def generate_image_route():
     try:
-        if not current_user.has_required_api_keys():
+        # Check if user has credits
+        if not current_user.can_generate_image():
+            subscription = current_user.get_subscription()
+            plan_name = subscription.plan.display_name if subscription else 'No Plan'
             return jsonify({
-                'error': 'API keys are required',
-                'details': 'Please add your API keys in settings',
-                'type': 'missing_keys'
-            }), 400
+                'error': 'Insufficient credits',
+                'details': f'You have no credits remaining. Your current plan is: {plan_name}',
+                'type': 'insufficient_credits',
+                'credits_remaining': 0,
+                'plan': plan_name
+            }), 403
+        
+        # Check if system has required API keys
+        api_settings = APISettings.get_settings()
+        if not api_settings.has_required_keys():
+            return jsonify({
+                'error': 'System configuration incomplete',
+                'details': 'API keys not configured by administrators',
+                'type': 'missing_system_keys'
+            }), 503
 
         data = request.get_json()
         if not data or 'prompt' not in data:
@@ -180,7 +196,7 @@ def generate_image_route():
             if "No user found for Key ID and Secret" in str(e):
                 return jsonify({
                     'error': 'Invalid FAL API key',
-                    'details': 'Please check your FAL API key in settings',
+                    'details': 'Contact administrator - FAL API key issue',
                     'type': 'invalid_fal_key'
                 }), 401
             elif "rate limit" in str(e).lower():
@@ -285,12 +301,27 @@ def generate_image_route():
             }), 500
         
         db.session.commit()
+        
+        # Use credits after successful generation
+        credits_used = len(saved_images)  # Use 1 credit per image generated
+        if credits_used > 0:
+            current_user.use_credits(
+                amount=credits_used,
+                action='image_generation',
+                extra_data={
+                    'model': model,
+                    'prompt': prompt,
+                    'art_style': art_style,
+                    'images_generated': credits_used
+                }
+            )
 
         response_data = {
             'images': saved_images,
             'prompt': prompt,
             'art_style': art_style,
-            'model': model
+            'model': model,
+            'credits_remaining': current_user.get_credits_remaining()
         }
 
         # Add dimension info if available
@@ -304,7 +335,7 @@ def generate_image_route():
     except APIKeyError as e:
         return jsonify({
             'error': str(e),
-            'details': 'Please check your API keys in settings',
+            'details': 'Contact administrator - system API configuration issue',
             'type': 'api_key_error'
         }), 400
     except Exception as e:

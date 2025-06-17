@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Subscription Reports - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Subscription Reports</h1>
+        <a href="{{ url_for('admin_subscription.manage_subscriptions') }}" class="btn btn-ghost">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Subscriptions
+        </a>
+    </div>
+
+    <!-- Overview Statistics -->
+    <div class="stats shadow mb-6 w-full">
+        <div class="stat">
+            <div class="stat-title">Total Users</div>
+            <div class="stat-value text-primary">{{ total_users }}</div>
+            <div class="stat-desc">All registered users</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Monthly Credits Used</div>
+            <div class="stat-value">{{ monthly_usage }}</div>
+            <div class="stat-desc">Current month</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Active Subscriptions</div>
+            <div class="stat-value">{{ plan_stats|length }}</div>
+            <div class="stat-desc">Different plan types</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Plan Distribution -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Plan Distribution</h2>
+                
+                <div class="space-y-4">
+                    {% for plan_name, count in plan_stats %}
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-semibold">{{ plan_name }}</div>
+                            <div class="text-sm text-base-content/70">{{ count }} users</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-32 bg-base-300 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" 
+                                     style="width: {{ (count / total_users * 100) if total_users > 0 else 0 }}%"></div>
+                            </div>
+                            <span class="text-sm font-bold">
+                                {{ "%.1f"|format((count / total_users * 100) if total_users > 0 else 0) }}%
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Users -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Top Users This Month</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Credits Used</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for username, credits in top_users %}
+                            <tr>
+                                <td>{{ username }}</td>
+                                <td>
+                                    <span class="font-bold text-primary">{{ credits }}</span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="2" class="text-center text-base-content/70">
+                                    No usage data for this month
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Usage Trend -->
+    <div class="card bg-base-100 shadow-xl mt-6">
+        <div class="card-body">
+            <h2 class="card-title">Usage Summary</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div class="stat bg-base-200 rounded-lg">
+                    <div class="stat-title">Average Credits per User</div>
+                    <div class="stat-value text-sm">
+                        {{ "%.1f"|format((monthly_usage / total_users) if total_users > 0 else 0) }}
+                    </div>
+                </div>
+                
+                <div class="stat bg-base-200 rounded-lg">
+                    <div class="stat-title">Most Popular Plan</div>
+                    <div class="stat-value text-sm">
+                        {% if plan_stats %}
+                            {{ plan_stats|sort(attribute=1, reverse=true)|first|first }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="stat bg-base-200 rounded-lg">
+                    <div class="stat-title">Active Users</div>
+                    <div class="stat-value text-sm">
+                        {{ top_users|length }}
+                    </div>
+                    <div class="stat-desc">Used credits this month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-6 flex gap-4">
+        <button class="btn btn-primary" onclick="exportReport()">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Export Report
+        </button>
+        
+        <a href="{{ url_for('admin_subscription.manage_plans') }}" class="btn btn-secondary">
+            Manage Plans
+        </a>
+    </div>
+</div>
+
+<script>
+function exportReport() {
+    // Simple CSV export
+    const data = [
+        ['Plan Distribution'],
+        ['Plan Name', 'User Count', 'Percentage'],
+        {% for plan_name, count in plan_stats %}
+        ['{{ plan_name }}', '{{ count }}', '{{ "%.1f"|format((count / total_users * 100) if total_users > 0 else 0) }}%'],
+        {% endfor %}
+        [],
+        ['Top Users This Month'],
+        ['Username', 'Credits Used'],
+        {% for username, credits in top_users %}
+        ['{{ username }}', '{{ credits }}'],
+        {% endfor %}
+    ];
+    
+    const csv = data.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `subscription_report_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    showToast('Report exported successfully!', 'success');
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-top toast-end`;
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `<span>${message}</span>`;
+    
+    toast.appendChild(alert);
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -1,10 +1,6 @@
 from flask import Blueprint, jsonify, request, render_template, send_file, current_app
 from flask_login import login_required, current_user
-from models import AIModel, Image, db
-import anthropic
-from openai import OpenAI
-import google.generativeai as genai
-from groq import Groq
+from models import Image, db
 import traceback
 from io import BytesIO
 import cairosvg
@@ -174,63 +170,24 @@ Technical Optimization:
 The final SVG should be visually striking, professionally designed, and optimized for web use."""
 
 def generate_svg(prompt, system_prompt):
-    # Get the current provider and model
-    if not current_user.selected_provider_id or not current_user.selected_model_id:
-        raise ValueError("No provider or model selected")
-
-    model = AIModel.query.get(current_user.selected_model_id)
-    if not model:
-        raise ValueError("Selected model not found")
-
-    provider_name = model.provider.name
-    model_name = model.name
-
-    # Generate SVG based on provider
-    if provider_name == 'Anthropic':
-        client = anthropic.Anthropic(api_key=current_user.anthropic_api_key)
-        message = client.messages.create(
-            model=model_name,  # Use model name from database
-            max_tokens=1500,
+    # Use centralized AI client system
+    from blueprints.clients import get_ai_client, get_selected_model
+    
+    try:
+        # Get the AI client and model from centralized system
+        client = get_ai_client()
+        model = get_selected_model()
+        
+        # Generate the SVG content
+        return client.generate_completion(
+            system_content=system_prompt,
+            user_content=prompt,
+            model=model,
             temperature=0.7,
-            system=system_prompt,
-            messages=[{"role": "user", "content": prompt}]
+            max_tokens=1500
         )
-        return message.content[0].text
-
-    elif provider_name == 'OpenAI':
-        client = OpenAI(api_key=current_user.openai_api_key)
-        response = client.chat.completions.create(
-            model=model_name,  # Use model name from database
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7
-        )
-        return response.choices[0].message.content
-
-    elif provider_name == 'Google Gemini':
-        genai.configure(api_key=current_user.gemini_api_key)
-        model = genai.GenerativeModel(model_name)  # Use model name from database
-        response = model.generate_content(
-            f"{system_prompt}\n\nUser request: {prompt}"
-        )
-        return response.text
-
-    elif provider_name == 'Groq':
-        client = Groq(api_key=current_user.groq_api_key)
-        chat_completion = client.chat.completions.create(
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
-            ],
-            model=model_name,  # Use model name from database
-            temperature=0.7
-        )
-        return chat_completion.choices[0].message.content
-
-    else:
-        raise ValueError(f"Unsupported provider: {provider_name}")
+    except Exception as e:
+        raise ValueError(f"Failed to generate SVG: {str(e)}")
 
 def save_banner_image(svg_content, prompt, width, height, style):
     """Save banner as PNG and create database record"""
@@ -298,11 +255,14 @@ def banner_page():
 @login_required
 def generate_banner():
     try:
-        if not current_user.get_selected_provider_key():
+        # Check if system has required API keys
+        from models import APISettings
+        api_settings = APISettings.get_settings()
+        if not api_settings.has_required_keys():
             return jsonify({
-                'error': 'API key required',
-                'details': 'Please configure your API key in settings'
-            }), 400
+                'error': 'System API keys not configured',
+                'details': 'Contact administrator to configure API keys'
+            }), 503
 
         # Get parameters
         data = request.get_json() or {}

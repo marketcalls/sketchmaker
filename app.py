@@ -1,7 +1,9 @@
 from flask import Flask, render_template, jsonify, request
 from extensions import db, login_manager, limiter, get_rate_limit_string
 from flask_migrate import Migrate
+from services.scheduler import subscription_scheduler
 import os
+import atexit
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -34,10 +36,16 @@ def create_app():
     limiter.init_app(app)
     login_manager.init_app(app)
     migrate = Migrate(app, db)
+    
+    # Initialize scheduler
+    subscription_scheduler.init_app(app)
+    
+    # Ensure scheduler stops when app shuts down
+    atexit.register(lambda: subscription_scheduler.stop())
 
     with app.app_context():
         # Import models here to avoid circular imports
-        from models import User, APIProvider, AIModel, AuthSettings
+        from models import User, APIProvider, AIModel, AuthSettings, SubscriptionPlanModel, UserSubscription, APISettings
         
         # Import blueprints
         from blueprints.auth import auth_bp
@@ -50,6 +58,8 @@ def create_app():
         from blueprints.banner import banner
         from blueprints.image_generator import image_generator_bp
         from blueprints.magix import magix_bp
+        from blueprints.admin.subscription_routes import admin_subscription_bp
+        from blueprints.admin.api_routes import admin_api_bp
         
         # Register blueprints
         app.register_blueprint(auth_bp)
@@ -58,6 +68,8 @@ def create_app():
         app.register_blueprint(gallery_bp)
         app.register_blueprint(download_bp)
         app.register_blueprint(admin)
+        app.register_blueprint(admin_subscription_bp)
+        app.register_blueprint(admin_api_bp)
         app.register_blueprint(training_bp)
         app.register_blueprint(banner)
         app.register_blueprint(image_generator_bp)
@@ -165,9 +177,39 @@ def create_app():
 
                 db.session.commit()
         
+        def init_subscription_plans():
+            """Initialize default subscription plans"""
+            SubscriptionPlanModel.initialize_default_plans()
+            
+            # Assign free plan to all existing users without subscription
+            users_without_sub = User.query.filter(
+                ~User.id.in_(
+                    db.session.query(UserSubscription.user_id).filter_by(is_active=True)
+                )
+            ).all()
+            
+            free_plan = SubscriptionPlanModel.query.filter_by(name='free').first()
+            if free_plan:
+                for user in users_without_sub:
+                    sub = UserSubscription(
+                        user_id=user.id,
+                        plan_id=free_plan.id,
+                        credits_remaining=free_plan.monthly_credits,
+                        credits_used_this_month=0
+                    )
+                    db.session.add(sub)
+                db.session.commit()
+        
+        def init_api_settings():
+            """Initialize API settings"""
+            # This just ensures the API settings record exists
+            APISettings.get_settings()
+        
         # Create database tables and initialize providers
         db.create_all()
         init_api_providers()
+        init_subscription_plans()
+        init_api_settings()
     
     return app
 

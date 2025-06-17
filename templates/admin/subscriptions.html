@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Subscriptions - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Manage User Subscriptions</h1>
+        <a href="{{ url_for('admin.manage') }}" class="btn btn-ghost">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Admin
+        </a>
+    </div>
+
+    <!-- Subscription Statistics -->
+    <div class="stats shadow mb-6 w-full">
+        <div class="stat">
+            <div class="stat-title">Total Users</div>
+            <div class="stat-value">{{ user_subscriptions|length }}</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Active Subscriptions</div>
+            <div class="stat-value">{{ user_subscriptions|selectattr('subscription')|list|length }}</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Available Plans</div>
+            <div class="stat-value">{{ plans|length }}</div>
+        </div>
+    </div>
+
+    <!-- User Subscriptions Table -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title mb-4">User Subscriptions</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Current Plan</th>
+                            <th>Credits Remaining</th>
+                            <th>Credits Used</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in user_subscriptions %}
+                        <tr>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    {{ item.user.username }}
+                                    {% if item.user.role == 'superadmin' %}
+                                        <span class="badge badge-error badge-sm">Superadmin</span>
+                                    {% elif item.user.role == 'admin' %}
+                                        <span class="badge badge-warning badge-sm">Admin</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>{{ item.user.email }}</td>
+                            <td>
+                                <span class="badge badge-primary">{{ item.plan_name }}</span>
+                            </td>
+                            <td>
+                                <span class="font-bold text-primary">{{ item.credits_remaining }}</span>
+                            </td>
+                            <td>{{ item.credits_used }}</td>
+                            <td>
+                                <div class="flex gap-2">
+                                    <button class="btn btn-sm btn-primary" 
+                                            onclick="showAssignPlanModal({{ item.user.id }}, '{{ item.user.username }}')">
+                                        Change Plan
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary" 
+                                            onclick="showModifyCreditsModal({{ item.user.id }}, '{{ item.user.username }}', {{ item.credits_remaining }})">
+                                        Modify Credits
+                                    </button>
+                                    <a href="{{ url_for('admin_subscription.view_usage', user_id=item.user.id) }}" 
+                                       class="btn btn-sm btn-ghost">
+                                        View Usage
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-6 flex gap-4">
+        <a href="{{ url_for('admin_subscription.manage_plans') }}" class="btn btn-primary">
+            Manage Plans
+        </a>
+        <a href="{{ url_for('admin_subscription.subscription_reports') }}" class="btn btn-secondary">
+            View Reports
+        </a>
+        <a href="{{ url_for('admin_subscription.view_scheduled_jobs') }}" class="btn btn-accent">
+            Scheduled Jobs
+        </a>
+    </div>
+</div>
+
+<!-- Assign Plan Modal -->
+<dialog id="assignPlanModal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Assign Subscription Plan</h3>
+        <form id="assignPlanForm">
+            <input type="hidden" id="assignUserId" name="user_id">
+            
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text">User</span>
+                </label>
+                <input type="text" id="assignUsername" class="input input-bordered" readonly>
+            </div>
+            
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text">Select Plan</span>
+                </label>
+                <select id="planId" name="plan_id" class="select select-bordered" required>
+                    <option value="">Choose a plan</option>
+                    {% for plan in plans %}
+                    <option value="{{ plan.id }}">
+                        {{ plan.display_name }} ({{ plan.monthly_credits }} credits/month)
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text">Notes (optional)</span>
+                </label>
+                <textarea id="planNotes" name="notes" class="textarea textarea-bordered" 
+                          placeholder="Admin notes about this subscription change"></textarea>
+            </div>
+            
+            <div class="modal-action">
+                <button type="submit" class="btn btn-primary">Assign Plan</button>
+                <button type="button" class="btn" onclick="assignPlanModal.close()">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<!-- Modify Credits Modal -->
+<dialog id="modifyCreditsModal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Modify User Credits</h3>
+        <form id="modifyCreditsForm">
+            <input type="hidden" id="modifyUserId" name="user_id">
+            
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text">User</span>
+                </label>
+                <input type="text" id="modifyUsername" class="input input-bordered" readonly>
+            </div>
+            
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text">Current Credits</span>
+                </label>
+                <input type="text" id="currentCredits" class="input input-bordered" readonly>
+            </div>
+            
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text">Action</span>
+                </label>
+                <select id="creditAction" name="action" class="select select-bordered" required>
+                    <option value="add">Add Credits</option>
+                    <option value="set">Set Credits To</option>
+                </select>
+            </div>
+            
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text">Credits</span>
+                </label>
+                <input type="number" id="creditAmount" name="credits" 
+                       class="input input-bordered" min="0" required>
+            </div>
+            
+            <div class="modal-action">
+                <button type="submit" class="btn btn-primary">Update Credits</button>
+                <button type="button" class="btn" onclick="modifyCreditsModal.close()">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<script>
+// Modal elements
+const assignPlanModal = document.getElementById('assignPlanModal');
+const modifyCreditsModal = document.getElementById('modifyCreditsModal');
+
+// Show assign plan modal
+function showAssignPlanModal(userId, username) {
+    document.getElementById('assignUserId').value = userId;
+    document.getElementById('assignUsername').value = username;
+    document.getElementById('planId').value = '';
+    document.getElementById('planNotes').value = '';
+    assignPlanModal.showModal();
+}
+
+// Show modify credits modal
+function showModifyCreditsModal(userId, username, currentCredits) {
+    document.getElementById('modifyUserId').value = userId;
+    document.getElementById('modifyUsername').value = username;
+    document.getElementById('currentCredits').value = currentCredits;
+    document.getElementById('creditAction').value = 'add';
+    document.getElementById('creditAmount').value = '';
+    modifyCreditsModal.showModal();
+}
+
+// Handle assign plan form submission
+document.getElementById('assignPlanForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    
+    try {
+        const response = await fetch('/admin/subscriptions/assign', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            assignPlanModal.close();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast(result.message || 'Failed to assign plan', 'error');
+        }
+    } catch (error) {
+        showToast('An error occurred', 'error');
+        console.error(error);
+    }
+});
+
+// Handle modify credits form submission
+document.getElementById('modifyCreditsForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    data.credits = parseInt(data.credits);
+    
+    try {
+        const response = await fetch('/admin/subscriptions/modify-credits', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            modifyCreditsModal.close();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast(result.message || 'Failed to modify credits', 'error');
+        }
+    } catch (error) {
+        showToast('An error occurred', 'error');
+        console.error(error);
+    }
+});
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-top toast-end`;
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `<span>${message}</span>`;
+    
+    toast.appendChild(alert);
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -1,6 +1,7 @@
 alembic==1.16.2
 annotated-types==0.7.0
 anthropic==0.39.0
+APScheduler==3.10.4
 anyio==4.4.0
 blinker==1.8.2
 boto3==1.35.63
@@ -12,6 +13,7 @@ certifi==2024.7.4
 cffi==1.17.1
 charset-normalizer==3.3.2
 click==8.1.7
+cryptography==42.0.5
 cssselect2==0.7.0
 defusedxml==0.7.1
 Deprecated==1.2.14

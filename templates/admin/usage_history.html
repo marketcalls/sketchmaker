@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Usage History - {{ user.username }} - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold">Usage History</h1>
+            <p class="text-base-content/70">User: {{ user.username }} ({{ user.email }})</p>
+        </div>
+        <a href="{{ url_for('admin_subscription.manage_subscriptions') }}" class="btn btn-ghost">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Subscriptions
+        </a>
+    </div>
+
+    <!-- Usage Statistics -->
+    <div class="stats shadow mb-6 w-full">
+        <div class="stat">
+            <div class="stat-title">Total Credits Used</div>
+            <div class="stat-value text-primary">{{ total_credits_used }}</div>
+            <div class="stat-desc">Last 30 days</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Total Actions</div>
+            <div class="stat-value">{{ usage_history|length }}</div>
+            <div class="stat-desc">Last 100 actions shown</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Current Plan</div>
+            <div class="stat-value text-sm">
+                {% if user.subscription %}
+                    {{ user.subscription.plan.display_name }}
+                {% else %}
+                    No Plan
+                {% endif %}
+            </div>
+            <div class="stat-desc">
+                {% if user.subscription %}
+                    {{ user.subscription.credits_remaining }} credits remaining
+                {% else %}
+                    No active subscription
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage History Table -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Recent Activity</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Action</th>
+                            <th>Credits Used</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usage in usage_history %}
+                        <tr>
+                            <td>
+                                <div class="text-sm">
+                                    {{ usage.created_at.strftime('%Y-%m-%d') }}
+                                    <br>
+                                    <span class="text-xs text-base-content/70">
+                                        {{ usage.created_at.strftime('%H:%M:%S') }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-primary">
+                                    {{ usage.action.replace('_', ' ').title() }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="font-bold">{{ usage.credits_used }}</span>
+                            </td>
+                            <td>
+                                {% if usage.metadata %}
+                                <div class="dropdown dropdown-end">
+                                    <label tabindex="0" class="btn btn-xs btn-ghost">
+                                        View Details
+                                    </label>
+                                    <div tabindex="0" class="dropdown-content z-[1] card card-compact w-96 p-2 shadow bg-base-200">
+                                        <div class="card-body">
+                                            <h3 class="font-bold">Action Details</h3>
+                                            <div class="text-sm space-y-1">
+                                                {% for key, value in usage.metadata.items() %}
+                                                <div>
+                                                    <span class="font-semibold">{{ key.replace('_', ' ').title() }}:</span>
+                                                    {% if key == 'prompt' and value|length > 50 %}
+                                                        <span class="block mt-1 text-xs">{{ value[:50] }}...</span>
+                                                    {% else %}
+                                                        <span>{{ value }}</span>
+                                                    {% endif %}
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <span class="text-base-content/50">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-base-content/70">
+                                No usage history found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

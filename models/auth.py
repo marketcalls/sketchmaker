@@ -42,6 +42,9 @@ class User(UserMixin, db.Model):
     images = db.relationship('Image', backref='user', lazy=True)
     training_history = db.relationship('TrainingHistory', backref='user', lazy=True)
     password_resets = db.relationship('PasswordResetOTP', backref='user', lazy=True)
+    subscription = db.relationship('UserSubscription', backref='user', uselist=False, 
+                                 foreign_keys='UserSubscription.user_id',
+                                 primaryjoin='User.id==UserSubscription.user_id')
     
     # API Provider settings
     selected_provider_id = db.Column(db.Integer, db.ForeignKey('api_provider.id'))
@@ -95,6 +98,62 @@ class User(UserMixin, db.Model):
     def is_superadmin(self):
         """Check if user is a superadmin"""
         return self.role == 'superadmin'
+    
+    def get_subscription(self):
+        """Get active subscription for user"""
+        from .subscription import UserSubscription
+        return UserSubscription.query.filter_by(
+            user_id=self.id, 
+            is_active=True
+        ).first()
+    
+    def get_subscription_plan(self):
+        """Get user's subscription plan name"""
+        sub = self.get_subscription()
+        return sub.plan.name if sub else 'free'
+    
+    def get_credits_remaining(self):
+        """Get remaining credits for the month"""
+        sub = self.get_subscription()
+        return sub.credits_remaining if sub else 0
+    
+    def can_generate_image(self, credits_needed=1):
+        """Check if user has enough credits to generate image"""
+        sub = self.get_subscription()
+        if not sub:
+            return False
+        
+        # Check if credits need to be reset
+        if sub.should_reset_credits():
+            sub.reset_monthly_credits()
+        
+        return sub.has_credits(credits_needed)
+    
+    def use_credits(self, amount=1, action='image_generation', extra_data=None):
+        """Use credits and log the usage"""
+        from .subscription import UsageHistory
+        
+        sub = self.get_subscription()
+        if not sub:
+            return False
+        
+        # Check if credits need to be reset
+        if sub.should_reset_credits():
+            sub.reset_monthly_credits()
+        
+        if sub.use_credit(amount):
+            # Log usage
+            usage = UsageHistory(
+                user_id=self.id,
+                subscription_id=sub.id,
+                action=action,
+                credits_used=amount,
+                extra_data=extra_data
+            )
+            db.session.add(usage)
+            db.session.commit()
+            return True
+        return False
 
     @staticmethod
     def get_first_user():

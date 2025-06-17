@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Subscription - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="min-h-screen">
+    <div class="navbar bg-base-200/50 backdrop-blur-sm border-b border-base-300">
+        <div class="container mx-auto px-4">
+            <h1 class="text-xl font-semibold">My Subscription</h1>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            {% include "partials/subscription_info.html" %}
+            
+            <!-- Upgrade Options -->
+            {% if subscription and subscription.plan.name != 'pro' %}
+            <div class="card bg-base-100 shadow-xl mt-6">
+                <div class="card-body">
+                    <h3 class="card-title">Upgrade Your Plan</h3>
+                    <p class="text-base-content/70">Get more credits and features by upgrading your subscription.</p>
+                    <div class="card-actions justify-end mt-4">
+                        <button class="btn btn-primary" onclick="showToast('Please contact an administrator to upgrade your plan.', 'info')">
+                            Contact Admin to Upgrade
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Usage History Summary -->
+            <div class="card bg-base-100 shadow-xl mt-6">
+                <div class="card-body">
+                    <h3 class="card-title">Usage Summary</h3>
+                    {% if subscription %}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div class="stat">
+                            <div class="stat-title">Credits Used This Month</div>
+                            <div class="stat-value text-primary">{{ subscription.credits_used_this_month }}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-title">Credits Remaining</div>
+                            <div class="stat-value text-success">{{ subscription.credits_remaining }}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-title">Monthly Allowance</div>
+                            <div class="stat-value">{{ subscription.plan.monthly_credits }}</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-base-content/70">No subscription data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}

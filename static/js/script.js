@@ -78,12 +78,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // API error handler
     function handleAPIError(error) {
         const errorMessage = error.message || error;
-        if (errorMessage.toLowerCase().includes('api key')) {
-            showToast('Invalid or missing API key. Please check your API keys in settings.', 'error');
+        if (errorMessage.toLowerCase().includes('insufficient credits')) {
+            showToast('You have no credits remaining. Please contact an administrator to upgrade your plan.', 'error');
+            // Update credits display if it exists
+            updateCreditsDisplay(0);
+        } else if (errorMessage.toLowerCase().includes('api key')) {
+            showToast('Invalid or missing API key. Please contact administrator.', 'error');
         } else if (errorMessage.toLowerCase().includes('authentication failed')) {
-            showToast('API authentication failed. Please verify your API keys in settings.', 'error');
+            showToast('API authentication failed. Please contact administrator.', 'error');
         } else {
             showToast(errorMessage, 'error');
+        }
+    }
+    
+    // Update credits display
+    function updateCreditsDisplay(credits) {
+        const creditsElement = document.querySelector('.text-primary');
+        if (creditsElement && creditsElement.textContent.match(/^\d+$/)) {
+            creditsElement.textContent = credits;
         }
     }
 
@@ -329,6 +341,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.images && data.images.length > 0) {
                 displayGeneratedImage(data);
                 showToast('Image generated successfully!', 'success');
+                // Update credits display if provided
+                if (data.credits_remaining !== undefined) {
+                    updateCreditsDisplay(data.credits_remaining);
+                }
             } else {
                 throw new Error(data.error || 'Invalid response from server');
             }

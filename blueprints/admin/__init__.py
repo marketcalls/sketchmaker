@@ -8,6 +8,7 @@ from .user_routes import manage, update_user, add_user, search_users
 from .email_routes import email_settings, update_email_settings, test_email_settings
 from .system_routes import update_settings
 from .auth_routes import auth_settings, update_auth_settings
+from .subscription_routes import admin_subscription_bp
 
 # Register routes directly on the admin blueprint
 admin.add_url_rule('/manage', 'manage', manage)

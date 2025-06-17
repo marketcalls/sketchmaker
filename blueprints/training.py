@@ -165,8 +165,11 @@ def upload_training_images():
 @login_required
 def start_training():
     try:
-        if not current_user.has_required_api_keys():
-            return jsonify({'error': 'Please add your FAL.ai API keys in settings'}), 400
+        # Check if system has required API keys
+        from models import APISettings
+        api_settings = APISettings.get_settings()
+        if not api_settings.has_required_keys():
+            return jsonify({'error': 'System API keys not configured. Contact administrator.'}), 503
 
         data = request.get_json()
         if not data:

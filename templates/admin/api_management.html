@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}API Key Management - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">API Key Management</h1>
+        <a href="{{ url_for('admin.manage') }}" class="btn btn-ghost">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Admin
+        </a>
+    </div>
+
+    <!-- System Status -->
+    <div class="alert alert-info mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+            <h3 class="font-bold">Centralized API Management</h3>
+            <div class="text-sm">All API keys are managed centrally by administrators. Users consume these services through their subscription credits.</div>
+        </div>
+    </div>
+
+    <!-- API Status Overview -->
+    <div class="stats shadow mb-6 w-full">
+        <div class="stat">
+            <div class="stat-title">Configured Providers</div>
+            <div class="stat-value text-primary">{{ available_providers|length }}</div>
+            <div class="stat-desc">{{ providers|length }} total providers</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">System Status</div>
+            <div class="stat-value {% if api_settings.has_required_keys() %}text-success{% else %}text-error{% endif %} text-sm">
+                {% if api_settings.has_required_keys() %}Ready{% else %}Incomplete{% endif %}
+            </div>
+            <div class="stat-desc">
+                {% if api_settings.has_required_keys() %}
+                    All required keys configured
+                {% else %}
+                    Missing required API keys
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Last Updated</div>
+            <div class="stat-value text-sm">
+                {% if api_settings.updated_at %}
+                    {{ api_settings.updated_at.strftime('%m-%d %H:%M') }}
+                {% else %}
+                    Never
+                {% endif %}
+            </div>
+            <div class="stat-desc">
+                {% if api_settings.updated_by_id %}
+                    By admin
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- AI Provider Keys -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">AI Provider API Keys</h2>
+                <p class="text-sm text-base-content/70 mb-4">Configure API keys for prompt enhancement and AI processing</p>
+                
+                <form id="providerKeysForm">
+                    <div class="space-y-4">
+                        <!-- OpenAI -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center gap-2">
+                                    OpenAI API Key
+                                    {% if api_settings.get_openai_key() %}
+                                        <span class="badge badge-success badge-sm">Configured</span>
+                                    {% else %}
+                                        <span class="badge badge-error badge-sm">Missing</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <input type="password" name="openai_api_key" 
+                                       placeholder="sk-..." 
+                                       class="input input-bordered flex-1"
+                                       value="{% if api_settings.get_openai_key() %}••••••••••••••••{% endif %}">
+                                <button type="button" class="btn btn-outline" onclick="testProvider('OpenAI')">Test</button>
+                            </div>
+                        </div>
+
+                        <!-- Anthropic -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center gap-2">
+                                    Anthropic API Key
+                                    {% if api_settings.get_anthropic_key() %}
+                                        <span class="badge badge-success badge-sm">Configured</span>
+                                    {% else %}
+                                        <span class="badge badge-error badge-sm">Missing</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <input type="password" name="anthropic_api_key" 
+                                       placeholder="sk-ant-..." 
+                                       class="input input-bordered flex-1"
+                                       value="{% if api_settings.get_anthropic_key() %}••••••••••••••••{% endif %}">
+                                <button type="button" class="btn btn-outline" onclick="testProvider('Anthropic')">Test</button>
+                            </div>
+                        </div>
+
+                        <!-- Google Gemini -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center gap-2">
+                                    Google Gemini API Key
+                                    {% if api_settings.get_gemini_key() %}
+                                        <span class="badge badge-success badge-sm">Configured</span>
+                                    {% else %}
+                                        <span class="badge badge-error badge-sm">Missing</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <input type="password" name="gemini_api_key" 
+                                       placeholder="AI..." 
+                                       class="input input-bordered flex-1"
+                                       value="{% if api_settings.get_gemini_key() %}••••••••••••••••{% endif %}">
+                                <button type="button" class="btn btn-outline" onclick="testProvider('Google Gemini')">Test</button>
+                            </div>
+                        </div>
+
+                        <!-- Groq -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center gap-2">
+                                    Groq API Key
+                                    {% if api_settings.get_groq_key() %}
+                                        <span class="badge badge-success badge-sm">Configured</span>
+                                    {% else %}
+                                        <span class="badge badge-error badge-sm">Missing</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <input type="password" name="groq_api_key" 
+                                       placeholder="gsk_..." 
+                                       class="input input-bordered flex-1"
+                                       value="{% if api_settings.get_groq_key() %}••••••••••••••••{% endif %}">
+                                <button type="button" class="btn btn-outline" onclick="testProvider('Groq')">Test</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Image Generation Keys -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Image Generation API</h2>
+                <p class="text-sm text-base-content/70 mb-4">Configure API keys for image generation services</p>
+                
+                <form id="imageKeysForm">
+                    <div class="space-y-4">
+                        <!-- FAL -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center gap-2">
+                                    FAL API Key (Required)
+                                    {% if api_settings.get_fal_key() %}
+                                        <span class="badge badge-success badge-sm">Configured</span>
+                                    {% else %}
+                                        <span class="badge badge-error badge-sm">Missing</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <input type="password" name="fal_key" 
+                                       placeholder="fal_..." 
+                                       class="input input-bordered flex-1"
+                                       value="{% if api_settings.get_fal_key() %}••••••••••••••••{% endif %}">
+                                <button type="button" class="btn btn-outline" onclick="testProvider('FAL')">Test</button>
+                            </div>
+                            <label class="label">
+                                <span class="label-text-alt">Required for all image generation features</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Default Settings -->
+                <div class="divider">Default Settings</div>
+                
+                <form id="defaultsForm">
+                    <div class="space-y-4">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Default AI Provider</span>
+                            </label>
+                            <select name="default_provider_id" class="select select-bordered">
+                                <option value="">Select provider...</option>
+                                {% for provider in available_providers %}
+                                <option value="{{ provider.id }}" 
+                                        {% if api_settings.default_provider_id == provider.id %}selected{% endif %}>
+                                    {{ provider.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Default Model</span>
+                            </label>
+                            <select name="default_model_id" class="select select-bordered">
+                                <option value="">Select model...</option>
+                                {% for model in models %}
+                                <option value="{{ model.id }}" 
+                                        {% if api_settings.default_model_id == model.id %}selected{% endif %}>
+                                    {{ model.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-6 flex gap-4">
+        <button class="btn btn-primary" onclick="saveAllSettings()">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Save All Settings
+        </button>
+        
+        <button class="btn btn-secondary" onclick="location.reload()">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Refresh
+        </button>
+
+        {% if current_user.is_superadmin() %}
+        <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-error">Danger Zone</label>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52">
+                <li><a onclick="clearAllKeys()">Clear All Keys</a></li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+async function testProvider(provider) {
+    const button = event.target;
+    const originalText = button.textContent;
+    
+    button.disabled = true;
+    button.textContent = 'Testing...';
+    
+    try {
+        const response = await fetch('/admin/api/test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ provider })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Test failed: ' + error.message, 'error');
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}
+
+async function saveAllSettings() {
+    const forms = ['providerKeysForm', 'imageKeysForm', 'defaultsForm'];
+    const formData = new FormData();
+    
+    // Collect data from all forms
+    forms.forEach(formId => {
+        const form = document.getElementById(formId);
+        const data = new FormData(form);
+        for (let [key, value] of data.entries()) {
+            if (value && !value.includes('••••')) { // Don't send masked values
+                formData.append(key, value);
+            }
+        }
+    });
+    
+    try {
+        const response = await fetch('/admin/api/update', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Save failed: ' + error.message, 'error');
+    }
+}
+
+async function clearAllKeys() {
+    if (!confirm('Are you sure you want to clear ALL API keys? This will disable all AI features.')) {
+        return;
+    }
+    
+    const providers = ['openai', 'anthropic', 'gemini', 'groq', 'fal'];
+    
+    for (const provider of providers) {
+        try {
+            await fetch(`/admin/api/clear/${provider}`, { method: 'POST' });
+        } catch (error) {
+            console.error(`Failed to clear ${provider}:`, error);
+        }
+    }
+    
+    showToast('All API keys cleared', 'warning');
+    setTimeout(() => location.reload(), 1500);
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-top toast-end`;
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `<span>${message}</span>`;
+    
+    toast.appendChild(alert);
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

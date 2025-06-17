@@ -2,415 +2,213 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Settings</h1>
+    <h1 class="text-3xl font-bold mb-8">User Settings</h1>
 
-    <!-- AI Provider Settings Group -->
-    <div class="mb-8 p-6 bg-base-200 rounded-lg">
-        <h2 class="text-2xl font-semibold mb-6">AI Provider Settings</h2>
-        
-        <div id="settingsForm" class="space-y-6">
-            <!-- Provider Selection -->
-            <div class="form-control w-full max-w-md">
-                <label class="label">
-                    <span class="label-text text-lg">API Provider</span>
-                    <span class="label-text-alt text-error hidden" id="providerError">Please select a provider</span>
-                </label>
-                <select id="apiProvider" class="select select-bordered w-full" name="provider">
-                    <option value="">Select Provider</option>
-                    {% for provider in providers %}
-                    <option value="{{ provider.id }}" {% if provider.id == current_user.selected_provider_id %}selected{% endif %}>
-                        {{ provider.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Model Selection -->
-            <div class="form-control w-full max-w-md">
-                <label class="label">
-                    <span class="label-text text-lg">AI Model</span>
-                    <span class="label-text-alt text-error hidden" id="modelError">Please select a model</span>
-                </label>
-                <select id="aiModel" class="select select-bordered w-full" name="model">
-                    <option value="">Select Model</option>
-                    {% for model in models %}
-                    <option value="{{ model.id }}" data-provider="{{ model.provider_id }}" {% if model.id == current_user.selected_model_id %}selected{% endif %}>
-                        {{ model.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Prompt API Key -->
-            <div id="promptKeyContainer" class="form-control w-full max-w-md">
-                <label class="label">
-                    <span id="promptKeyLabel" class="label-text text-lg">
-                        {% if api_keys.current_provider_name %}
-                            {{ api_keys.current_provider_name }} API Key
-                        {% else %}
-                            Prompt API Key
-                        {% endif %}
-                    </span>
-                    <span class="flex items-center gap-2">
-                        <span class="label-text-alt text-error hidden" id="promptKeyError">API key is required</span>
-                        <a href="" id="getKeysLink" target="_blank" class="label-text-alt link link-primary">Get Keys</a>
-                    </span>
-                </label>
-                <div class="relative">
-                    <input type="password" id="promptApiKey" name="prompt_api_key" 
-                           class="input input-bordered w-full pr-20" 
-                           placeholder="Enter API Key"
-                           value="{{ api_keys.current_provider_key }}">
-                    <button type="button" class="btn btn-ghost btn-sm absolute right-2 top-1/2 transform -translate-y-1/2"
-                            onclick="togglePassword('promptApiKey')">
-                        Show
-                    </button>
-                </div>
-            </div>
-
-            <!-- Image Generation API Key -->
-            <div class="form-control w-full max-w-md">
-                <label class="label">
-                    <span class="label-text text-lg">Image Generation API Key (FAL)</span>
-                    <span class="flex items-center gap-2">
-                        <span class="label-text-alt text-error hidden" id="falKeyError">FAL API key is required</span>
-                        <a href="https://fal.ai/dashboard/keys" target="_blank" class="label-text-alt link link-primary">Get Keys</a>
-                    </span>
-                </label>
-                <div class="relative">
-                    <input type="password" id="falKey" name="fal_key" 
-                           class="input input-bordered w-full pr-20" 
-                           value="{{ api_keys.fal_key }}"
-                           placeholder="Enter FAL API Key">
-                    <button type="button" class="btn btn-ghost btn-sm absolute right-2 top-1/2 transform -translate-y-1/2"
-                            onclick="togglePassword('falKey')">
-                        Show
-                    </button>
-                </div>
-            </div>
-
-            <button type="button" onclick="handleSubmit()" class="btn btn-primary">Save Settings</button>
+    <!-- System Configuration Notice -->
+    <div class="alert alert-info mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+            <h3 class="font-bold">System Managed Configuration</h3>
+            <div class="text-sm">AI providers and API keys are managed centrally by administrators. You consume these services through your subscription credits.</div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
-</div>
-
-<script>
-let currentProvider = '{{ current_user.selected_provider_id }}';
-let currentModel = '{{ current_user.selected_model_id }}';
-let apiKeys = {
-    openai_api_key: '{{ api_keys.openai_api_key }}',
-    anthropic_api_key: '{{ api_keys.anthropic_api_key }}',
-    gemini_api_key: '{{ api_keys.gemini_api_key }}',
-    groq_api_key: '{{ api_keys.groq_api_key }}',
-    fal_key: '{{ api_keys.fal_key }}',
-    current_provider_key: '{{ api_keys.current_provider_key }}',
-    current_provider_name: '{{ api_keys.current_provider_name }}'
-};
-
-const providerKeyLinks = {
-    'OpenAI': 'https://platform.openai.com/settings/organization/api-keys',
-    'Anthropic': 'https://console.anthropic.com/settings/keys',
-    'Google Gemini': 'https://aistudio.google.com/apikey',
-    'Groq': 'https://console.groq.com/keys'
-};
-
-console.log('Initial API Keys:', apiKeys);
-
-function togglePassword(inputId) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    
-    const button = input.nextElementSibling;
-    if (!button) return;
-    
-    if (input.type === "password") {
-        input.type = "text";
-        button.textContent = "Hide";
-    } else {
-        input.type = "password";
-        button.textContent = "Show";
-    }
-}
-
-function showError(elementId, show = true) {
-    const errorElement = document.getElementById(elementId);
-    if (!errorElement) return;
-    
-    const inputId = elementId.replace('Error', '');
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    
-    if (show) {
-        errorElement.classList.remove('hidden');
-        input.classList.add('input-error');
-    } else {
-        errorElement.classList.add('hidden');
-        input.classList.remove('input-error');
-    }
-}
-
-function validateForm() {
-    let isValid = true;
-    let errors = [];
-    
-    const elements = {
-        apiProvider: 'API Provider is required',
-        aiModel: 'AI Model is required',
-        promptApiKey: 'Prompt API Key is required',
-        falKey: 'FAL API Key is required'
-    };
-    
-    for (const [elementId, errorMessage] of Object.entries(elements)) {
-        const element = document.getElementById(elementId);
-        if (!element || !element.value) {
-            showError(elementId + 'Error', true);
-            errors.push(errorMessage);
-            isValid = false;
-        } else {
-            showError(elementId + 'Error', false);
-        }
-    }
-    
-    if (!isValid) {
-        showToast('Please fix the following errors:\n' + errors.join('\n'), 'error');
-    }
-    
-    return isValid;
-}
-
-async function handleSubmit() {
-    if (!validateForm()) {
-        return;
-    }
-    
-    const providerSelect = document.getElementById('apiProvider');
-    const modelSelect = document.getElementById('aiModel');
-    const promptKeyInput = document.getElementById('promptApiKey');
-    
-    if (!providerSelect || !modelSelect || !promptKeyInput) {
-        showToast('Form elements not found', 'error');
-        return;
-    }
-    
-    const selectedProvider = providerSelect.options[providerSelect.selectedIndex].text;
-    const formData = {
-        provider_id: providerSelect.value,
-        model_id: modelSelect.value,
-        fal_key: document.getElementById('falKey')?.value || ''
-    };
-    
-    // Add the appropriate API key based on selected provider
-    switch(selectedProvider) {
-        case 'OpenAI':
-            formData.openai_api_key = promptKeyInput.value;
-            break;
-        case 'Anthropic':
-            formData.anthropic_api_key = promptKeyInput.value;
-            break;
-        case 'Google Gemini':
-            formData.gemini_api_key = promptKeyInput.value;
-            break;
-        case 'Groq':
-            formData.groq_api_key = promptKeyInput.value;
-            break;
-    }
-    
-    try {
-        const response = await fetch('/settings/update', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        });
+    <!-- User Preferences -->
+    <div class="mb-8 p-6 bg-base-200 rounded-lg">
+        <h2 class="text-2xl font-semibold mb-6">AI Preferences</h2>
         
-        if (response.ok) {
-            const data = await response.json();
-            showToast('Settings saved successfully', 'success');
-            
-            // Update current values and API keys
-            currentProvider = formData.provider_id;
-            currentModel = formData.model_id;
-            apiKeys = { ...apiKeys, ...data.api_keys };
-            
-            console.log('Updated API Keys:', apiKeys);
-            
-            // Update the prompt API key input and label
-            const promptKeyInput = document.getElementById('promptApiKey');
-            const promptKeyLabel = document.getElementById('promptKeyLabel');
-            
-            if (promptKeyInput && apiKeys.current_provider_key) {
-                promptKeyInput.value = apiKeys.current_provider_key;
-            }
-            
-            if (promptKeyLabel && apiKeys.current_provider_name) {
-                promptKeyLabel.textContent = `${apiKeys.current_provider_name} API Key`;
-            }
-        } else {
-            const data = await response.json();
-            showToast(data.error || 'Failed to save settings', 'error');
-        }
-    } catch (error) {
-        showToast('An error occurred while saving settings', 'error');
-    }
-}
+        <div id="settingsForm" class="space-y-6">
+            <!-- Available Providers (Read-only) -->
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text text-lg">Available AI Providers</span>
+                    <span class="label-text-alt">Configured by administrators</span>
+                </label>
+                <div class="space-y-2">
+                    {% for provider in available_providers %}
+                    <div class="flex items-center gap-2">
+                        <span class="badge badge-success">✓</span>
+                        <span>{{ provider.name }}</span>
+                        {% if api_settings.default_provider_id == provider.id %}
+                        <span class="badge badge-primary badge-sm">Default</span>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <span>No AI providers configured. Contact your administrator.</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
 
-function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
-    
-    const toast = document.createElement('div');
-    
-    const icons = {
-        success: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                 </svg>`,
-        error: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-               </svg>`,
-        info: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>`
-    };
+            <!-- Default Model Information -->
+            {% if api_settings.default_model_id %}
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text text-lg">Default AI Model</span>
+                    <span class="label-text-alt">System default</span>
+                </label>
+                <div class="input input-bordered bg-base-300 flex items-center">
+                    {% for model in models %}
+                        {% if model.id == api_settings.default_model_id %}
+                            {{ model.name }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
 
-    const typeClasses = {
-        success: 'bg-success text-success-content',
-        error: 'bg-error text-error-content',
-        info: 'bg-info text-info-content'
-    };
-
-    toast.className = `alert ${typeClasses[type]} shadow-lg max-w-sm`;
-    toast.innerHTML = `
-        <div class="flex items-center gap-2">
-            ${icons[type]}
-            <span class="flex-1">${message}</span>
-            <button onclick="this.parentElement.parentElement.remove()" class="btn btn-ghost btn-xs">×</button>
+            <!-- System Status -->
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text text-lg">System Status</span>
+                </label>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2">
+                        {% if api_settings.has_required_keys() %}
+                        <span class="badge badge-success">✓</span>
+                        <span>AI Services Available</span>
+                        {% else %}
+                        <span class="badge badge-error">✗</span>
+                        <span>AI Services Unavailable</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        {% if api_settings.get_fal_key() %}
+                        <span class="badge badge-success">✓</span>
+                        <span>Image Generation Available</span>
+                        {% else %}
+                        <span class="badge badge-error">✗</span>
+                        <span>Image Generation Unavailable</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-    `;
-    
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 5000);
-}
+    </div>
 
-document.addEventListener('DOMContentLoaded', function() {
-    const providerSelect = document.getElementById('apiProvider');
-    const modelSelect = document.getElementById('aiModel');
-    const promptKeyInput = document.getElementById('promptApiKey');
-    const promptKeyLabel = document.getElementById('promptKeyLabel');
-    const getKeysLink = document.getElementById('getKeysLink');
-    
-    if (!providerSelect || !modelSelect || !promptKeyInput || !promptKeyLabel || !getKeysLink) {
-        console.error('Required form elements not found');
-        return;
-    }
-    
-    function updatePromptKeyField() {
-        const selectedProvider = providerSelect.options[providerSelect.selectedIndex];
-        if (selectedProvider && selectedProvider.value) {
-            const providerName = selectedProvider.text;
-            promptKeyLabel.textContent = `${providerName} API Key`;
-            promptKeyInput.placeholder = `Enter ${providerName} API Key`;
-            
-            // Update "Get Keys" link
-            if (providerKeyLinks[providerName]) {
-                getKeysLink.href = providerKeyLinks[providerName];
-                getKeysLink.classList.remove('hidden');
-            } else {
-                getKeysLink.classList.add('hidden');
-            }
-            
-            // Set the API key value based on the selected provider
-            let keyValue = '';
-            switch(providerName) {
-                case 'OpenAI':
-                    keyValue = apiKeys.openai_api_key;
-                    break;
-                case 'Anthropic':
-                    keyValue = apiKeys.anthropic_api_key;
-                    break;
-                case 'Google Gemini':
-                    keyValue = apiKeys.gemini_api_key;
-                    break;
-                case 'Groq':
-                    keyValue = apiKeys.groq_api_key;
-                    break;
-            }
-            
-            console.log('Setting key for provider:', providerName, 'Key:', keyValue);
-            promptKeyInput.value = keyValue;
-            
-            if (promptKeyInput.value) {
-                showError('promptKeyError', false);
-            }
-        } else {
-            promptKeyLabel.textContent = 'Prompt API Key';
-            promptKeyInput.placeholder = 'Select a provider first';
-            promptKeyInput.value = '';
-            getKeysLink.classList.add('hidden');
-        }
-    }
-    
-    function updateModelOptions() {
-        const selectedProviderId = providerSelect.value;
-        const options = modelSelect.options;
+    <!-- Account Information -->
+    <div class="mb-8 p-6 bg-base-200 rounded-lg">
+        <h2 class="text-2xl font-semibold mb-6">Account Information</h2>
         
-        for (let i = 0; i < options.length; i++) {
-            const option = options[i];
-            if (!option.value || option.dataset.provider === selectedProviderId) {
-                option.style.display = '';
-            } else {
-                option.style.display = 'none';
-            }
-        }
+        <div class="space-y-4">
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text">Username</span>
+                </label>
+                <div class="input input-bordered bg-base-300 flex items-center">
+                    {{ current_user.username }}
+                </div>
+            </div>
+
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text">Email</span>
+                </label>
+                <div class="input input-bordered bg-base-300 flex items-center">
+                    {{ current_user.email }}
+                </div>
+            </div>
+
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text">Account Role</span>
+                </label>
+                <div class="input input-bordered bg-base-300 flex items-center">
+                    <span class="badge {% if current_user.is_superadmin() %}badge-secondary{% elif current_user.is_admin() %}badge-primary{% else %}badge-ghost{% endif %}">
+                        {{ current_user.role.title() }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text">Member Since</span>
+                </label>
+                <div class="input input-bordered bg-base-300 flex items-center">
+                    {{ current_user.created_at.strftime('%B %d, %Y') }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Information -->
+    {% if subscription %}
+    <div class="mb-8 p-6 bg-base-200 rounded-lg">
+        <h2 class="text-2xl font-semibold mb-6">Current Subscription</h2>
         
-        if (currentProvider !== selectedProviderId) {
-            if (modelSelect.selectedOptions[0].style.display === 'none') {
-                modelSelect.value = '';
-            }
-            currentProvider = selectedProviderId;
-        }
+        <div class="space-y-4">
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text">Plan</span>
+                </label>
+                <div class="input input-bordered bg-base-300 flex items-center">
+                    <span class="badge badge-primary">{{ subscription.plan.display_name }}</span>
+                </div>
+            </div>
+
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text">Credits Remaining</span>
+                </label>
+                <div class="input input-bordered bg-base-300 flex items-center">
+                    <span class="text-primary font-bold">{{ subscription.credits_remaining }}</span>
+                    <span class="text-sm opacity-70 ml-2">/ {{ subscription.plan.monthly_credits }}</span>
+                </div>
+            </div>
+
+            <div class="form-control w-full max-w-md">
+                <label class="label">
+                    <span class="label-text">Next Reset</span>
+                </label>
+                <div class="input input-bordered bg-base-300 flex items-center">
+                    {{ subscription.get_next_reset_date().strftime('%B %d, %Y') }}
+                    <span class="text-sm opacity-70 ml-2">({{ subscription.days_until_reset() }} days)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Help Information -->
+    <div class="mb-8 p-6 bg-base-200 rounded-lg">
+        <h2 class="text-2xl font-semibold mb-6">Need Help?</h2>
         
-        updatePromptKeyField();
-        
-        if (selectedProviderId) {
-            showError('providerError', false);
-        }
-    }
-    
-    providerSelect.addEventListener('change', function() {
-        updateModelOptions();
-        if (this.value) showError('providerError', false);
-    });
-    
-    modelSelect.addEventListener('change', function() {
-        if (this.value) {
-            showError('modelError', false);
-            currentModel = this.value;
-        }
-    });
-    
-    promptKeyInput.addEventListener('input', function() {
-        if (this.value) showError('promptKeyError', false);
-    });
-    
-    const falKeyInput = document.getElementById('falKey');
-    if (falKeyInput) {
-        falKeyInput.addEventListener('input', function() {
-            if (this.value) showError('falKeyError', false);
-        });
-    }
-    
-    // Initialize the form with saved values
-    updateModelOptions();
-    
-    // Set initial API key if available
-    if (apiKeys.current_provider_key) {
-        console.log('Setting initial API key:', apiKeys.current_provider_key);
-        promptKeyInput.value = apiKeys.current_provider_key;
-    }
-});
-</script>
+        <div class="space-y-3">
+            <p class="text-sm">
+                <strong>API Access:</strong> All AI services are managed by administrators. You don't need to configure any API keys.
+            </p>
+            <p class="text-sm">
+                <strong>Credits:</strong> Your subscription determines how many images you can generate per month.
+            </p>
+            <p class="text-sm">
+                <strong>Upgrades:</strong> Contact an administrator to upgrade your subscription plan.
+            </p>
+            {% if current_user.is_admin() %}
+            <div class="divider">Administrator</div>
+            <div class="flex gap-2">
+                <a href="{{ url_for('admin_api.manage_api_keys') }}" class="btn btn-primary btn-sm">
+                    Manage API Keys
+                </a>
+                <a href="{{ url_for('admin_subscription.manage_subscriptions') }}" class="btn btn-secondary btn-sm">
+                    Manage Subscriptions
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="flex justify-center">
+        <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Dashboard
+        </a>
+    </div>
+</div>
 {% endblock %}

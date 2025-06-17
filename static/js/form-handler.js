@@ -193,7 +193,7 @@ export function initializeForm() {
             // Handle specific error types
             if (error.message.includes('API key')) {
                 errorMessage = 'API Key Error';
-                errorDetails = 'Please check your API keys in settings';
+                errorDetails = 'Please contact administrator';
             } else if (error.message.includes('rate limit')) {
                 errorMessage = 'Rate Limit Exceeded';
                 errorDetails = 'Please try again later';

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Scheduled Jobs - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Scheduled Credit Resets</h1>
+        <a href="{{ url_for('admin_subscription.manage_subscriptions') }}" class="btn btn-ghost">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Subscriptions
+        </a>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats shadow mb-6 w-full">
+        <div class="stat">
+            <div class="stat-title">Total Scheduled Jobs</div>
+            <div class="stat-value text-primary">{{ jobs|length }}</div>
+            <div class="stat-desc">Active credit reset schedules</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Next Reset</div>
+            <div class="stat-value text-sm">
+                {% if jobs %}
+                    {% set next_job = jobs|sort(attribute='next_run_time')|first %}
+                    {{ next_job.next_run_time.strftime('%m-%d %H:%M') if next_job.next_run_time else 'N/A' }}
+                {% else %}
+                    No jobs scheduled
+                {% endif %}
+            </div>
+            <div class="stat-desc">
+                {% if jobs %}
+                    {{ next_job.username if next_job.next_run_time else 'N/A' }}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Scheduler Status</div>
+            <div class="stat-value text-success text-sm">Running</div>
+            <div class="stat-desc">APScheduler active</div>
+        </div>
+    </div>
+
+    <!-- Scheduled Jobs Table -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Upcoming Credit Resets</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Plan</th>
+                            <th>Current Credits</th>
+                            <th>Next Reset</th>
+                            <th>Time Until Reset</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in jobs|sort(attribute='next_run_time') %}
+                        <tr>
+                            <td>
+                                <div class="font-semibold">{{ job.username }}</div>
+                                <div class="text-xs text-base-content/70">ID: {{ job.subscription_id }}</div>
+                            </td>
+                            <td>
+                                <span class="badge badge-primary">{{ job.plan_name }}</span>
+                            </td>
+                            <td>
+                                <span class="font-bold text-primary">{{ job.credits_remaining }}</span>
+                            </td>
+                            <td>
+                                {% if job.next_run_time %}
+                                <div class="text-sm">
+                                    {{ job.next_run_time.strftime('%Y-%m-%d') }}
+                                    <br>
+                                    <span class="text-xs text-base-content/70">
+                                        {{ job.next_run_time.strftime('%H:%M:%S') }} UTC
+                                    </span>
+                                </div>
+                                {% else %}
+                                <span class="text-error">Not scheduled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if job.next_run_time %}
+                                    {% set delta = job.next_run_time - current_time %}
+                                    {% if job.next_run_time > current_time %}
+                                        {% set days = (job.next_run_time - current_time).days %}
+                                        {% set hours = ((job.next_run_time - current_time).seconds // 3600) %}
+                                        {% if days > 0 %}
+                                            <span class="text-sm">{{ days }} days</span>
+                                        {% elif hours > 0 %}
+                                            <span class="text-sm">{{ hours }} hours</span>
+                                        {% else %}
+                                            <span class="text-sm">< 1 hour</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-warning">Overdue</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-base-content/50">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary" 
+                                        onclick="forceReset({{ job.subscription_id }}, '{{ job.username }}')">
+                                    Force Reset
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-base-content/70">
+                                No scheduled jobs found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 flex gap-4">
+        <button class="btn btn-primary" onclick="location.reload()">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Refresh Jobs
+        </button>
+        
+        <a href="{{ url_for('admin_subscription.subscription_reports') }}" class="btn btn-secondary">
+            View Reports
+        </a>
+    </div>
+</div>
+
+<script>
+async function forceReset(subscriptionId, username) {
+    if (!confirm(`Are you sure you want to force credit reset for ${username}?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/admin/subscriptions/force-reset/${subscriptionId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast(result.message || 'Failed to reset credits', 'error');
+        }
+    } catch (error) {
+        showToast('An error occurred', 'error');
+        console.error(error);
+    }
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-top toast-end`;
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `<span>${message}</span>`;
+    
+    toast.appendChild(alert);
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Add moment-like functionality for template calculations
+window.moment = {
+    utcnow: () => new Date()
+};
+</script>
+{% endblock %}

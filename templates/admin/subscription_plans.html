@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Subscription Plans - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Manage Subscription Plans</h1>
+        <a href="{{ url_for('admin_subscription.manage_subscriptions') }}" class="btn btn-ghost">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Subscriptions
+        </a>
+    </div>
+
+    <!-- Plans Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for plan in plans %}
+        <div class="card bg-base-100 shadow-xl {% if not plan.is_active %}opacity-50{% endif %}">
+            <div class="card-body">
+                <h2 class="card-title">
+                    {{ plan.display_name }}
+                    {% if not plan.is_active %}
+                    <span class="badge badge-error">Inactive</span>
+                    {% endif %}
+                </h2>
+                
+                <p class="text-sm text-base-content/70">{{ plan.description }}</p>
+                
+                <div class="stat my-4">
+                    <div class="stat-title">Monthly Credits</div>
+                    <div class="stat-value text-primary">{{ plan.monthly_credits }}</div>
+                </div>
+                
+                {% if plan.features %}
+                <div class="space-y-2">
+                    <p class="font-semibold">Features:</p>
+                    <ul class="text-sm space-y-1">
+                        {% for feature in plan.features %}
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            {{ feature }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <div class="card-actions justify-end mt-4">
+                    <button class="btn btn-sm btn-primary" 
+                            onclick="editPlan({{ plan.id }}, '{{ plan.display_name }}', {{ plan.monthly_credits }}, '{{ plan.description }}', {{ plan.features|tojson }})">
+                        Edit
+                    </button>
+                    <button class="btn btn-sm {% if plan.is_active %}btn-error{% else %}btn-success{% endif %}"
+                            onclick="togglePlan({{ plan.id }})">
+                        {% if plan.is_active %}Deactivate{% else %}Activate{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Add Plan Button -->
+    <div class="mt-8">
+        <button class="btn btn-primary" onclick="showAddPlanModal()">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add New Plan
+        </button>
+    </div>
+</div>
+
+<!-- Add/Edit Plan Modal -->
+<dialog id="planModal" class="modal">
+    <div class="modal-box max-w-2xl">
+        <h3 class="font-bold text-lg mb-4" id="modalTitle">Add New Plan</h3>
+        <form id="planForm">
+            <input type="hidden" id="planId" name="plan_id">
+            <input type="hidden" id="planAction" name="action" value="create">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Internal Name</span>
+                    </label>
+                    <input type="text" id="planName" name="name" class="input input-bordered" 
+                           pattern="[a-z_]+" title="Lowercase letters and underscores only" required>
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Display Name</span>
+                    </label>
+                    <input type="text" id="planDisplayName" name="display_name" 
+                           class="input input-bordered" required>
+                </div>
+            </div>
+            
+            <div class="form-control mt-4">
+                <label class="label">
+                    <span class="label-text">Monthly Credits</span>
+                </label>
+                <input type="number" id="planCredits" name="monthly_credits" 
+                       class="input input-bordered" min="0" required>
+            </div>
+            
+            <div class="form-control mt-4">
+                <label class="label">
+                    <span class="label-text">Description</span>
+                </label>
+                <textarea id="planDescription" name="description" 
+                          class="textarea textarea-bordered" rows="2"></textarea>
+            </div>
+            
+            <div class="form-control mt-4">
+                <label class="label">
+                    <span class="label-text">Features (one per line)</span>
+                </label>
+                <textarea id="planFeatures" class="textarea textarea-bordered" 
+                          rows="5" placeholder="Access to all models
+High resolution output
+Priority support"></textarea>
+            </div>
+            
+            <div class="modal-action">
+                <button type="submit" class="btn btn-primary">Save Plan</button>
+                <button type="button" class="btn" onclick="planModal.close()">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<script>
+const planModal = document.getElementById('planModal');
+
+function showAddPlanModal() {
+    document.getElementById('modalTitle').textContent = 'Add New Plan';
+    document.getElementById('planForm').reset();
+    document.getElementById('planAction').value = 'create';
+    document.getElementById('planName').removeAttribute('readonly');
+    planModal.showModal();
+}
+
+function editPlan(id, displayName, credits, description, features) {
+    document.getElementById('modalTitle').textContent = 'Edit Plan';
+    document.getElementById('planId').value = id;
+    document.getElementById('planAction').value = 'update';
+    document.getElementById('planDisplayName').value = displayName;
+    document.getElementById('planCredits').value = credits;
+    document.getElementById('planDescription').value = description;
+    document.getElementById('planFeatures').value = features.join('\n');
+    document.getElementById('planName').setAttribute('readonly', true);
+    planModal.showModal();
+}
+
+async function togglePlan(planId) {
+    try {
+        const response = await fetch('{{ url_for("admin_subscription.manage_plans") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'toggle',
+                plan_id: planId
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(result.message || 'Failed to update plan', 'error');
+        }
+    } catch (error) {
+        showToast('An error occurred', 'error');
+        console.error(error);
+    }
+}
+
+document.getElementById('planForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const features = document.getElementById('planFeatures').value
+        .split('\n')
+        .filter(f => f.trim())
+        .map(f => f.trim());
+    
+    const data = {
+        action: formData.get('action'),
+        plan_id: formData.get('plan_id'),
+        name: formData.get('name'),
+        display_name: formData.get('display_name'),
+        monthly_credits: parseInt(formData.get('monthly_credits')),
+        description: formData.get('description'),
+        features: features
+    };
+    
+    try {
+        const response = await fetch('{{ url_for("admin_subscription.manage_plans") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            planModal.close();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast(result.message || 'Failed to save plan', 'error');
+        }
+    } catch (error) {
+        showToast('An error occurred', 'error');
+        console.error(error);
+    }
+});
+
+// Toast function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-top toast-end`;
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `<span>${message}</span>`;
+    
+    toast.appendChild(alert);
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

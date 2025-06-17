@@ -70,7 +70,7 @@ class AnthropicClient(BaseAIClient):
                         return content.get('text', '').strip()
             return str(message.content[0].text) if message.content else ''
         except anthropic.AuthenticationError as e:
-            raise APIKeyError("Invalid Anthropic API key. Please check your API key in settings.")
+            raise APIKeyError("Invalid Anthropic API key. Contact administrator.")
         except Exception as e:
             raise APIKeyError(f"Error generating completion with Anthropic: {str(e)}")
 
@@ -99,7 +99,7 @@ class GeminiClient(BaseAIClient):
             return response.text
         except google_exceptions.InvalidArgument as e:
             if "API key not valid" in str(e):
-                raise APIKeyError("Invalid Google Gemini API key. Please check your API key in settings.")
+                raise APIKeyError("Invalid Google Gemini API key. Contact administrator.")
             raise APIKeyError(f"Error with Google Gemini API: {str(e)}")
         except Exception as e:
             raise APIKeyError(f"Error generating completion with Google Gemini: {str(e)}")
@@ -127,24 +127,33 @@ class GroqClient(BaseAIClient):
         except Exception as e:
             error_message = str(e).lower()
             if "authentication" in error_message or "api key" in error_message:
-                raise APIKeyError("Invalid Groq API key. Please check your API key in settings.")
+                raise APIKeyError("Invalid Groq API key. Contact administrator.")
             raise APIKeyError(f"Error generating completion with Groq: {str(e)}")
 
 def get_ai_client():
-    """Get the appropriate AI client based on user's selected provider"""
-    from models import APIProvider, AIModel
+    """Get the appropriate AI client based on system configuration"""
+    from models import APISettings, APIProvider
     
-    user = current_user
-    if not user:
-        raise APIKeyError("User not authenticated")
-
-    provider = APIProvider.query.get(user.selected_provider_id)
+    # Get system API settings
+    api_settings = APISettings.get_settings()
+    if not api_settings.has_required_keys():
+        raise APIKeyError("System API keys not configured by administrators")
+    
+    # Use default provider or first available
+    if api_settings.default_provider_id:
+        provider = APIProvider.query.get(api_settings.default_provider_id)
+    else:
+        available_providers = api_settings.get_available_providers()
+        if not available_providers:
+            raise APIKeyError("No AI providers configured")
+        provider = available_providers[0]
+    
     if not provider:
-        raise APIKeyError("No AI provider selected")
+        raise APIKeyError("No valid AI provider found")
 
-    api_key = user.get_selected_provider_key()
+    api_key = api_settings.get_provider_key(provider.name)
     if not api_key:
-        raise APIKeyError(f"{provider.name} API key is required")
+        raise APIKeyError(f"{provider.name} API key not configured")
 
     if provider.name == "OpenAI":
         return OpenAIClient(api_key)
@@ -158,26 +167,47 @@ def get_ai_client():
         raise ValueError(f"Unsupported AI provider: {provider.name}")
 
 def get_selected_model():
-    """Get the user's selected AI model"""
-    from models import AIModel
+    """Get the system's default AI model"""
+    from models import APISettings, AIModel
     
-    user = current_user
-    if not user or not user.selected_model_id:
-        raise APIKeyError("No AI model selected")
-
-    model = AIModel.query.get(user.selected_model_id)
-    if not model:
-        raise APIKeyError("Invalid model selection")
-
-    return model.name
+    api_settings = APISettings.get_settings()
+    
+    # Use default model if configured
+    if api_settings.default_model_id:
+        model = AIModel.query.get(api_settings.default_model_id)
+        if model:
+            return model.name
+    
+    # Otherwise use first available model from default provider
+    if api_settings.default_provider_id:
+        models = AIModel.query.filter_by(
+            provider_id=api_settings.default_provider_id,
+            is_active=True
+        ).first()
+        if models:
+            return models.name
+    
+    # Fallback to any available model
+    available_providers = api_settings.get_available_providers()
+    if available_providers:
+        model = AIModel.query.filter_by(
+            provider_id=available_providers[0].id,
+            is_active=True
+        ).first()
+        if model:
+            return model.name
+    
+    raise APIKeyError("No AI model available")
 
 def init_fal_client():
-    """Initialize FAL client with user's API key"""
-    api_keys = current_user.get_api_keys()
-    fal_key = api_keys['fal_key']
+    """Initialize FAL client with system API key"""
+    from models import APISettings
+    
+    api_settings = APISettings.get_settings()
+    fal_key = api_settings.get_fal_key()
     
     if not fal_key:
-        raise APIKeyError("FAL API key is required. Please add it in your settings.")
+        raise APIKeyError("FAL API key not configured by administrators")
     
     try:
         client = fal_client.SyncClient(key=fal_key)
@@ -185,7 +215,7 @@ def init_fal_client():
     except Exception as e:
         print(f"Error initializing FAL client: {str(e)}")
         if "authentication failed" in str(e).lower():
-            raise APIKeyError("FAL API key authentication failed. Please check your key in settings.")
+            raise APIKeyError("FAL API key authentication failed. Contact administrator.")
         raise APIKeyError(f"Error initializing FAL client: {str(e)}")
 
 def test_fal_client(client):
