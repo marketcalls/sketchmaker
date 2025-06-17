@@ -216,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
             Array.from(files).forEach(file => {
                 formData.append('files[]', file);
             });
+            formData.append('csrf_token', window.csrf_token);
             
             const uploadResponse = await fetch('/api/training/upload', {
                 method: 'POST',
@@ -241,7 +242,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-CSRFToken': window.csrf_token
                 },
                 body: JSON.stringify({
                     images_data_url: uploadResult.images_data_url,

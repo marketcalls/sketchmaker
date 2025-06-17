@@ -97,6 +97,76 @@
             font-weight: 600;
             letter-spacing: -0.025em;
         }
+        
+        /* Dropdown fix - ensure proper hiding and positioning */
+        .dropdown:not(.dropdown-open) .dropdown-content {
+            display: none !important;
+        }
+        
+        .dropdown .dropdown-content {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            min-width: max-content;
+            max-width: 280px;
+            white-space: nowrap;
+        }
+        
+        /* Click-based dropdowns (Both Admin and Profile menus) */
+        .dropdown:focus-within .dropdown-content,
+        .dropdown.dropdown-open .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            display: block !important;
+        }
+        
+        /* Keep dropdown open when hovering over content */
+        .dropdown .dropdown-content:hover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            display: block !important;
+        }
+        
+        /* Ensure dropdown end alignment */
+        .dropdown.dropdown-end .dropdown-content {
+            right: 0;
+            left: auto;
+        }
+        
+        /* Fix dropdown menu items */
+        .dropdown .dropdown-content .menu li a {
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: clip;
+            padding: 0.75rem 1rem;
+            display: block;
+            width: 100%;
+            min-height: 2.5rem;
+            line-height: 1.4;
+        }
+        
+        /* Ensure full text visibility in admin dropdown */
+        .dropdown .dropdown-content {
+            width: auto;
+            min-width: 200px;
+        }
+        
+        /* Responsive dropdown positioning */
+        @media (max-width: 768px) {
+            .dropdown .dropdown-content {
+                position: fixed;
+                right: 1rem;
+                left: auto;
+                max-width: calc(100vw - 2rem);
+            }
+        }
 
         /* Code block styling */
         code {
@@ -163,11 +233,11 @@
                 <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-ghost">Gallery</a>
                 <a href="{{ url_for('training.training_page') }}" class="btn btn-ghost">Train LoRA</a>
                 {% if current_user.is_admin() %}
-                    <div class="dropdown dropdown-hover">
-                        <label tabindex="0" class="btn btn-ghost m-1">Admin</label>
-                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52">
+                    <div class="dropdown dropdown-end" id="admin-dropdown">
+                        <label tabindex="0" class="btn btn-ghost">Admin</label>
+                        <ul tabindex="0" class="dropdown-content z-[1000] menu p-2 shadow-lg bg-base-200/95 backdrop-blur-sm rounded-box w-64 border border-base-300">
                             <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
-                            <li><a href="{{ url_for('admin.dashboard') }}">Manage Users</a></li>
+                            <li><a href="{{ url_for('admin.manage') }}">Manage Users</a></li>
                             <li><a href="{{ url_for('admin_subscription.manage_subscriptions') }}">Manage Subscriptions</a></li>
                             <li><a href="{{ url_for('admin_api.manage_api_keys') }}">API Key Management</a></li>
                             <li><a href="{{ url_for('admin.email_settings') }}">Email Settings</a></li>
@@ -192,7 +262,7 @@
                             <span class="text-primary text-lg">{{ current_user.username[0].upper() }}</span>
                         </div>
                     </label>
-                    <ul tabindex="0" class="mt-3 z-[1] p-2 shadow-lg menu menu-sm dropdown-content bg-base-200 rounded-box w-52">
+                    <ul tabindex="0" class="dropdown-content z-[1000] menu p-2 shadow-lg bg-base-200/95 backdrop-blur-sm rounded-box w-52 border border-base-300">
                         <li><a href="{{ url_for('core.subscription') }}">Subscription</a></li>
                         <li><a href="{{ url_for('core.settings') }}">Settings</a></li>
                         <li><a href="{{ url_for('auth.logout') }}" class="text-error">Logout</a></li>
@@ -238,6 +308,43 @@
                 }, 200);
             }, 3000);
         }
+
+        // Dropdown functionality for click-based menus
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle all non-hover dropdowns (profile and admin)
+            const clickDropdowns = document.querySelectorAll('.dropdown:not(.dropdown-hover)');
+            
+            clickDropdowns.forEach(function(dropdown) {
+                const button = dropdown.querySelector('label[tabindex="0"]');
+                const content = dropdown.querySelector('.dropdown-content');
+                
+                if (button && content) {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Close other dropdowns first
+                        clickDropdowns.forEach(function(otherDropdown) {
+                            if (otherDropdown !== dropdown) {
+                                otherDropdown.classList.remove('dropdown-open');
+                            }
+                        });
+                        
+                        // Toggle current dropdown
+                        dropdown.classList.toggle('dropdown-open');
+                    });
+                }
+            });
+            
+            // Close all dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                clickDropdowns.forEach(function(dropdown) {
+                    if (!dropdown.contains(e.target)) {
+                        dropdown.classList.remove('dropdown-open');
+                    }
+                });
+            });
+        });
 
         // Theme switcher functionality
         if (!localStorage.getItem('theme')) {

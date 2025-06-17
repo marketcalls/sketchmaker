@@ -36,6 +36,7 @@
 
                 {% if auth_settings.regular_auth_enabled %}
                 <form method="POST" action="{{ url_for('auth.login') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="form-control">
                         <label class="label">
                             <span class="label-text">Email Address</span>

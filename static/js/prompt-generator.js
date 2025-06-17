@@ -3,6 +3,7 @@ export async function generatePrompt(formData, regenerate = false) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': window.csrf_token
         },
         body: JSON.stringify({ ...formData, regenerate_prompt: regenerate }),
     });

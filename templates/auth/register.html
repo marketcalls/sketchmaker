@@ -35,6 +35,7 @@
 
             {% if auth_settings.regular_auth_enabled %}
             <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-4" id="registerForm" onsubmit="return validateForm()">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">Username</span>

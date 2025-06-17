@@ -150,7 +150,10 @@ def dashboard():
     
     # Check scheduler status with error handling
     try:
-        scheduler_running = subscription_scheduler.running if hasattr(subscription_scheduler, 'running') else False
+        scheduler_running = False
+        if subscription_scheduler.scheduler:
+            scheduler_running = subscription_scheduler.scheduler.running
+        
         if not scheduler_running:
             alerts.append({
                 'type': 'error',
@@ -174,8 +177,10 @@ def dashboard():
     }
     
     try:
-        # Get scheduler status
-        scheduler_running = subscription_scheduler.running if hasattr(subscription_scheduler, 'running') else False
+        # Get scheduler status (consistent with alerts checking above)
+        scheduler_running = False
+        if subscription_scheduler.scheduler:
+            scheduler_running = subscription_scheduler.scheduler.running
         system_status['scheduler_running'] = scheduler_running
         
         # Get database size

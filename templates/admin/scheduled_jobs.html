@@ -41,8 +41,8 @@
         
         <div class="stat">
             <div class="stat-title">Scheduler Status</div>
-            <div class="stat-value text-success text-sm">Running</div>
-            <div class="stat-desc">APScheduler active</div>
+            <div class="stat-value text-{% if scheduler_running %}success{% else %}error{% endif %} text-sm">{{ scheduler_status }}</div>
+            <div class="stat-desc">{% if scheduler_running %}APScheduler active{% else %}APScheduler inactive{% endif %}</div>
         </div>
     </div>
 

@@ -238,6 +238,19 @@ def view_scheduled_jobs():
     """View all scheduled credit reset jobs"""
     jobs = subscription_scheduler.get_scheduled_jobs()
     
+    # Check scheduler status
+    scheduler_running = False
+    scheduler_status = "Unknown"
+    try:
+        if subscription_scheduler.scheduler:
+            scheduler_running = subscription_scheduler.scheduler.running
+            scheduler_status = "Running" if scheduler_running else "Stopped"
+        else:
+            scheduler_status = "Not Initialized"
+    except Exception as e:
+        scheduler_status = "Error"
+        print(f"Error checking scheduler status: {e}")
+    
     # Enrich job data with user information
     enriched_jobs = []
     for job in jobs:
@@ -253,7 +266,9 @@ def view_scheduled_jobs():
     # Use timezone-aware datetime to match APScheduler's timezone-aware datetimes
     return render_template('admin/scheduled_jobs.html', 
                          jobs=enriched_jobs,
-                         current_time=datetime.now(timezone.utc))
+                         current_time=datetime.now(timezone.utc),
+                         scheduler_running=scheduler_running,
+                         scheduler_status=scheduler_status)
 
 @admin_subscription_bp.route('/force-reset/<int:subscription_id>', methods=['POST'])
 @login_required

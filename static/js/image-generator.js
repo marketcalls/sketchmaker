@@ -8,6 +8,7 @@ export async function generateImages(prompt, imageSize) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': window.csrf_token
         },
         body: JSON.stringify(formData),
     });
