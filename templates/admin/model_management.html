@@ -279,6 +279,7 @@ document.getElementById('modelForm').addEventListener('submit', async (e) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: JSON.stringify(data)
         });
@@ -307,6 +308,7 @@ async function deleteModel(modelId, modelName) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             }
         });
         

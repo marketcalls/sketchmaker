@@ -166,7 +166,8 @@ async function togglePlan(planId) {
         const response = await fetch('{{ url_for("admin_subscription.manage_plans") }}', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: JSON.stringify({
                 action: 'toggle',
@@ -211,7 +212,8 @@ document.getElementById('planForm').addEventListener('submit', async (e) => {
         const response = await fetch('{{ url_for("admin_subscription.manage_plans") }}', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: JSON.stringify(data)
         });

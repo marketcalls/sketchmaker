@@ -166,7 +166,8 @@
                     <div class="dropdown dropdown-hover">
                         <label tabindex="0" class="btn btn-ghost m-1">Admin</label>
                         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52">
-                            <li><a href="{{ url_for('admin.manage') }}">Manage Users</a></li>
+                            <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                            <li><a href="{{ url_for('admin.dashboard') }}">Manage Users</a></li>
                             <li><a href="{{ url_for('admin_subscription.manage_subscriptions') }}">Manage Subscriptions</a></li>
                             <li><a href="{{ url_for('admin_api.manage_api_keys') }}">API Key Management</a></li>
                             <li><a href="{{ url_for('admin.email_settings') }}">Email Settings</a></li>
@@ -210,6 +211,9 @@
     <div id="toast-container"></div>
     
     <script>
+        // CSRF token for forms
+        window.csrf_token = '{{ csrf_token() }}';
+        
         // Toast functionality
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');

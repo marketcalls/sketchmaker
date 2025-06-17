@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+        <div class="text-sm text-base-content/70">
+            Welcome back, {{ current_user.username }}
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="stat bg-base-100 rounded-lg shadow">
+            <div class="stat-title">Total Users</div>
+            <div class="stat-value text-primary">{{ stats.total_users }}</div>
+            <div class="stat-desc">{{ stats.new_users_today }} new today</div>
+        </div>
+        
+        <div class="stat bg-base-100 rounded-lg shadow">
+            <div class="stat-title">Active Subscriptions</div>
+            <div class="stat-value text-success">{{ stats.active_subscriptions }}</div>
+            <div class="stat-desc">{{ stats.subscription_plans }} plans available</div>
+        </div>
+        
+        <div class="stat bg-base-100 rounded-lg shadow">
+            <div class="stat-title">Images Generated</div>
+            <div class="stat-value text-info">{{ stats.total_images }}</div>
+            <div class="stat-desc">{{ stats.images_today }} today</div>
+        </div>
+        
+        <div class="stat bg-base-100 rounded-lg shadow">
+            <div class="stat-title">System Health</div>
+            <div class="stat-value text-{% if stats.api_status %}success{% else %}error{% endif %}">
+                {% if stats.api_status %}Healthy{% else %}Issues{% endif %}
+            </div>
+            <div class="stat-desc">{{ stats.api_providers_active }}/{{ stats.api_providers_total }} APIs active</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Quick Actions</h2>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        Manage Users
+                    </a>
+                    
+                    <a href="{{ url_for('admin_subscription.manage_subscriptions') }}" class="btn btn-secondary btn-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
+                        Subscriptions
+                    </a>
+                    
+                    <a href="{{ url_for('admin_api.manage_api_keys') }}" class="btn btn-accent btn-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2H7v-2H4a1 1 0 01-1-1v-4c0-1.108.806-2.013 1.871-2.149L8 4s0 0 0 0 1.5-.5 3.5-.5S15 4 15 4l3.129.851A2.001 2.001 0 0120 7z"></path>
+                        </svg>
+                        API Keys
+                    </a>
+                    
+                    <a href="{{ url_for('admin.email_settings') }}" class="btn btn-ghost btn-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        Email Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Recent Activity</h2>
+                <div class="space-y-2 mt-4">
+                    {% for activity in recent_activities %}
+                    <div class="flex items-center gap-3 p-2 rounded-lg bg-base-200">
+                        <div class="w-2 h-2 rounded-full bg-primary"></div>
+                        <div class="flex-1">
+                            <div class="text-sm">{{ activity.description }}</div>
+                            <div class="text-xs text-base-content/70">{{ activity.time_ago }}</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-base-content/50 py-4">
+                        No recent activity
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts and Notifications -->
+    {% if alerts %}
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-4">System Alerts</h2>
+        <div class="space-y-3">
+            {% for alert in alerts %}
+            <div class="alert alert-{{ alert.type }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                    {% if alert.type == 'warning' %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    {% elif alert.type == 'error' %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    {% endif %}
+                </svg>
+                <div>
+                    <h3 class="font-bold">{{ alert.title }}</h3>
+                    <div class="text-sm">{{ alert.message }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- System Status -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">System Status</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div class="space-y-2">
+                    <div class="text-sm font-medium">API Services</div>
+                    {% for service in system_status.api_services %}
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-{% if service.status %}success{% else %}error{% endif %}"></div>
+                        <span class="text-sm">{{ service.name }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="text-sm font-medium">Background Jobs</div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-{% if system_status.scheduler_running %}success{% else %}error{% endif %}"></div>
+                        <span class="text-sm">Credit Reset Scheduler</span>
+                    </div>
+                    <div class="text-xs text-base-content/70">
+                        {{ system_status.scheduled_jobs }} jobs scheduled
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="text-sm font-medium">Database</div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-success"></div>
+                        <span class="text-sm">Connection Active</span>
+                    </div>
+                    <div class="text-xs text-base-content/70">
+                        {{ system_status.db_size }} total records
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh dashboard every 30 seconds
+setTimeout(() => {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

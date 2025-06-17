@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, request
-from extensions import db, login_manager, limiter, get_rate_limit_string
+from extensions import db, login_manager, limiter, get_rate_limit_string, csrf
 from flask_migrate import Migrate
 from services.scheduler import subscription_scheduler
 import os
@@ -35,6 +35,7 @@ def create_app():
     db.init_app(app)
     limiter.init_app(app)
     login_manager.init_app(app)
+    csrf.init_app(app)
     migrate = Migrate(app, db)
     
     # Initialize scheduler

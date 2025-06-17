@@ -6,11 +6,11 @@
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Manage User Subscriptions</h1>
-        <a href="{{ url_for('admin.manage') }}" class="btn btn-ghost">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
-            Back to Admin
+            Back to Dashboard
         </a>
     </div>
 
@@ -240,7 +240,8 @@ document.getElementById('assignPlanForm').addEventListener('submit', async (e) =
         const response = await fetch('/admin/subscriptions/assign', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: JSON.stringify(data)
         });
@@ -272,7 +273,8 @@ document.getElementById('modifyCreditsForm').addEventListener('submit', async (e
         const response = await fetch('/admin/subscriptions/modify-credits', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: JSON.stringify(data)
         });

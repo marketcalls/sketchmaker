@@ -250,6 +250,7 @@ async function sendTestEmail(event) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: JSON.stringify({ test_email: testEmail })
         });
@@ -279,6 +280,9 @@ async function saveEmailSettings(event) {
     try {
         const response = await fetch("{{ url_for('admin.update_email_settings') }}", {
             method: 'POST',
+            headers: {
+                'X-CSRFToken': window.csrf_token
+            },
             body: formData
         });
         

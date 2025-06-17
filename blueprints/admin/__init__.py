@@ -9,6 +9,7 @@ from .email_routes import email_settings, update_email_settings, test_email_sett
 from .system_routes import update_settings
 from .auth_routes import auth_settings, update_auth_settings
 from .subscription_routes import admin_subscription_bp
+from .api_routes import admin_api_bp
 
 # Register routes directly on the admin blueprint
 admin.add_url_rule('/manage', 'manage', manage)
@@ -25,3 +26,8 @@ admin.add_url_rule('/manage/settings', 'update_settings', update_settings, metho
 # Register auth settings routes
 admin.add_url_rule('/manage/auth', 'auth_settings', auth_settings)
 admin.add_url_rule('/manage/auth/update', 'update_auth_settings', update_auth_settings, methods=['POST'])
+
+# Add dashboard route
+from .dashboard_routes import dashboard
+admin.add_url_rule('/', 'dashboard', dashboard)
+admin.add_url_rule('/dashboard', 'dashboard', dashboard)

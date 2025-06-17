@@ -154,7 +154,8 @@ async function forceReset(subscriptionId, username) {
         const response = await fetch(`/admin/subscriptions/force-reset/${subscriptionId}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             }
         });
         

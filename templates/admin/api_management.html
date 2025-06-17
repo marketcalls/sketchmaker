@@ -13,11 +13,11 @@
                 </svg>
                 Manage Models
             </a>
-            <a href="{{ url_for('admin.manage') }}" class="btn btn-ghost">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
-                Back to Admin
+                Back to Dashboard
             </a>
         </div>
     </div>
@@ -282,7 +282,8 @@ async function testProvider(provider) {
         const response = await fetch('/admin/api/test', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: JSON.stringify({ provider })
         });
@@ -320,6 +321,9 @@ async function saveAllSettings() {
     try {
         const response = await fetch('/admin/api/update', {
             method: 'POST',
+            headers: {
+                'X-CSRFToken': window.csrf_token
+            },
             body: formData
         });
         
@@ -345,7 +349,12 @@ async function clearAllKeys() {
     
     for (const provider of providers) {
         try {
-            await fetch(`/admin/api/clear/${provider}`, { method: 'POST' });
+            await fetch(`/admin/api/clear/${provider}`, { 
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.csrf_token
+                }
+            });
         } catch (error) {
             console.error(`Failed to clear ${provider}:`, error);
         }

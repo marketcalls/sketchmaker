@@ -288,7 +288,7 @@ function showToast(message, type = 'info') {
 
 function searchUsers() {
     const query = document.getElementById('searchInput').value;
-    window.location.href = "{{ url_for('admin.manage') }}?search=" + encodeURIComponent(query);
+    window.location.href = "{{ url_for('admin.dashboard') }}?search=" + encodeURIComponent(query);
 }
 
 document.getElementById('searchInput').addEventListener('keypress', function(e) {
@@ -305,7 +305,8 @@ async function updateApprovalSetting(checked) {
         const response = await fetch("{{ url_for('admin.update_settings') }}", {
             method: 'POST',
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: formData
         });
@@ -423,7 +424,8 @@ async function confirmDeleteUser(userId) {
         const response = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', userId), {
             method: 'POST',
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: formData
         });
@@ -452,7 +454,8 @@ async function updateUser(userId, action, additionalData = {}) {
         const response = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', userId), {
             method: 'POST',
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: formData
         });
@@ -493,7 +496,8 @@ async function addUser() {
         const response = await fetch("{{ url_for('admin.add_user') }}", {
             method: 'POST',
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: formData
         });
