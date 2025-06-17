@@ -14,6 +14,16 @@ A sophisticated web application that leverages multiple AI providers and models 
 
 ![AI Generated Social Media Expert](https://marketcalls.in/wp-content/uploads/2024/08/The-Social-Media-Expert.png)
 
+### Image Magix
+- Interactive image editing with AI-powered generation
+- Draw and mask specific areas for targeted modifications
+- Real-time canvas interface with undo/redo functionality
+- Precise brush control for detailed selections
+- AI-powered content generation in marked areas
+- Integration with FAL's flux-pro/v1/fill model
+- Support for multiple image formats (JPEG, PNG, WebP)
+- Download generated results in high quality
+
 ### Banner Generation
 - SVG banner creation with precise control
 - Multiple style presets (modern, minimalist, artistic, corporate, playful, tech, elegant)
@@ -119,6 +129,7 @@ A sophisticated web application that leverages multiple AI providers and models 
 - Tailwind CSS
 - GSAP animations
 - Responsive design
+- Fabric.js for canvas manipulation
 
 ![AI Generated Portrait](https://marketcalls.in/wp-content/uploads/2024/08/Man-with-a-Cat.jpg)
 
@@ -244,6 +255,7 @@ Configure either SMTP or Amazon SES:
 2. Content Generation:
    - Create banners with custom styles
    - Generate images with various models
+   - Use Image Magix for targeted edits
    - Train custom models
    - Manage gallery content
 
