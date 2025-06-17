@@ -4,17 +4,28 @@ A sophisticated web application that leverages multiple AI providers and models 
 
 ![SketchMaker AI Dashboard](https://marketcalls.in/wp-content/uploads/2024/11/SketchMaker-AI.webp)
 
-## Core Features
+## 🚀 Core Features
 
-### Multi-Provider AI Support
-- OpenAI: Advanced language models for prompt enhancement
-- Anthropic: State-of-the-art language models with Claude capabilities
-- Google Gemini: Next-generation AI with multimodal understanding
-- Groq: High-performance inference with ultra-low latency
+### 🤖 Multi-Provider AI Support
+- **OpenAI**: GPT-4.1, GPT-4.1 Mini, GPT-4.1 Nano (Latest models)
+- **Anthropic**: Claude Opus 4, Sonnet 4, Haiku 3.5 (June 2025 versions)
+- **Google Gemini**: Gemini 2.5 Pro, Flash, Flash Lite Preview
+- **Groq**: Compound Beta, Llama 3.3 70B Versatile, and more
 
 ![AI Generated Social Media Expert](https://marketcalls.in/wp-content/uploads/2024/08/The-Social-Media-Expert.png)
 
-### Image Magix
+### 🎨 Advanced Image Generation
+- **Multiple Models**:
+  - Flux Pro v1.1 & v1.1 Ultra (High-quality generation)
+  - Flux LoRA (Custom style training)
+  - Flux Dev & Realism
+  - Ideogram v2 & v2a
+  - Recraft V3 (Advanced style control)
+- **Format Support**: PNG, WebP, JPEG with automatic conversion
+- **Advanced Controls**: Resolution, style, inference steps, guidance scale
+- **Batch Generation**: Multiple images per request
+
+### 🖼️ Image Magix (AI Inpainting)
 - Interactive image editing with AI-powered generation
 - Draw and mask specific areas for targeted modifications
 - Real-time canvas interface with undo/redo functionality
@@ -24,38 +35,76 @@ A sophisticated web application that leverages multiple AI providers and models 
 - Support for multiple image formats (JPEG, PNG, WebP)
 - Download generated results in high quality
 
-### Banner Generation
+### 🎯 Banner Generation
 - SVG banner creation with precise control
 - Multiple style presets (modern, minimalist, artistic, corporate, playful, tech, elegant)
 - Dynamic text alignment and positioning
 - Automatic viewBox and preserveAspectRatio handling
 - Support for gradients, patterns, and effects
+- Auto-conversion to PNG, WebP, JPEG formats
 
 ![AI Generated Banner](https://marketcalls.in/wp-content/uploads/2024/08/Converge-2024.jpg)
 
-### Image Generation (FAL Integration)
-- Flux Pro: High-quality standard image generation
-- Flux Pro Ultra: Advanced generation with aspect ratio control
-- Flux Lora: Custom model training support
-- Flux Dev: Development and testing environment
-- Flux Realism: Enhanced photorealistic generation
-- Recraft V3: Advanced style control with color customization
-
-![AI Generated LinkedIn Headshot](https://marketcalls.in/wp-content/uploads/2024/08/0f811820-55c0-4f5d-823a-967ed102ba64.webp)
-
-### Custom Model Training
-- Support for 5-20 training images
+### 🎓 Custom LoRA Training
+- Upload 5-20 images for custom style training
 - Automatic mask generation
 - Real-time training progress monitoring
 - Webhook integration for status updates
 - Training history management
 - Easy access to trained model files
-- Trigger word management
+- Trigger word management for custom styles
+
+
+### 💎 Subscription Management System
+- **Credit-Based System**: Monthly credit allocations
+- **Three-tier Plans**:
+  - **Free**: 10 credits/month, basic features
+  - **Premium**: 100 credits/month, all models, LoRA training
+  - **Pro**: 1000 credits/month, API access, priority support
+- **Personalized Reset Dates**: Credits reset based on subscription start date
+- **Automatic Scheduling**: APScheduler handles all credit resets
+- **Usage Tracking**: Complete audit trail with metadata
+- **Admin Controls**: Plan assignment, credit modification, reports
+
+### 🔐 Advanced Security & Authentication
+- **Multiple Auth Methods**:
+  - Username/password authentication
+  - Google OAuth integration
+  - OTP-based password reset
+- **Role-Based Access**:
+  - Regular users
+  - Admins
+  - Superadmins
+- **Security Features**:
+  - Encrypted API key storage (Fernet encryption)
+  - Rate limiting protection
+  - CSRF protection
+  - Secure password hashing
+  - User approval system
+
+### 👨‍💼 Comprehensive Admin Panel
+- **User Management**: Role assignment, approval system, activity monitoring
+- **API Management**: 
+  - Centralized encrypted API key configuration
+  - Dynamic model management (add/update/remove models)
+  - Default provider/model selection
+  - API health monitoring
+- **Subscription Controls**: Plan management, credit adjustments, usage analytics
+- **System Configuration**: Email settings, authentication controls, rate limits
 
 ![AI Generated Thumbnail](https://marketcalls.in/wp-content/uploads/2024/08/thumbnail-1.png)
 
-### Gallery & Asset Management
+### 📧 Email System
+- Support for both SMTP and Amazon SES
+- HTML email templates
+- Welcome emails for new users
+- Password reset functionality with OTP
+- Test email functionality
+- Email service status monitoring
+
+### 🖼️ Gallery & Asset Management
 - Personal image galleries
+- Public gallery view
 - Multiple format support (WebP, PNG, JPEG)
 - Automatic format conversion
 - Secure download system
@@ -64,355 +113,254 @@ A sophisticated web application that leverages multiple AI providers and models 
 
 ![AI Generated Art](https://marketcalls.in/wp-content/uploads/2024/08/bannana.jpeg)
 
-### Subscription Management System
-- **Admin-managed subscriptions**: No external payment gateways required
-- **Three-tier system**: Free (10), Premium (100), Pro (1000) monthly credits
-- **Credit-based usage**: 1 credit per image generation
-- **Personalized reset schedule**: Credits reset monthly based on individual subscription start dates
-- **Automatic scheduling**: APScheduler handles all credit resets without manual intervention
-- **Usage tracking**: Complete audit trail of all activities with detailed metadata
-- **Admin controls**: Plan assignment, credit modification, usage reports, job monitoring
-- **Real-time monitoring**: Dashboard shows remaining credits, plan status, and next reset date
-
-### Advanced Security
-- Role-based access control (User/Admin/Superadmin)
-- Secure API key management
-- Rate limiting protection
-- First-user superadmin privileges
-- User account management
-- Activity monitoring
-
-### Authentication System
-- Multiple authentication methods:
-  * Regular username/password authentication
-  * Google OAuth integration
-  * Configurable authentication controls
-- Admin authentication controls:
-  * Enable/disable regular authentication
-  * Enable/disable Google authentication
-  * Configure Google OAuth credentials
-  * Manage authentication settings through admin interface
-- Google OAuth features:
-  * Secure OAuth 2.0 implementation
-  * Automatic account creation for new Google users
-  * Account linking for existing users
-  * Profile information synchronization
-  * Secure callback handling
-- Authentication security:
-  * Password strength requirements
-  * Secure password hashing
-  * Rate limiting on login attempts
-  * Session management
-  * Account recovery options
-
-### Email System
-- Support for both SMTP and Amazon SES
-- HTML email templates
-- Welcome emails for new users
-- Password reset functionality with OTP
-- Test email functionality
-- Email service status monitoring
-
-### User Management
-- User registration with approval system
-- Role management (User/Admin/Superadmin)
-- Account status control
-- Password reset with email verification
-- User search functionality
-- Bulk user management
-
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Backend
-- Python 3.12+
-- Flask Web Framework
-- SQLAlchemy ORM
-- Flask-Login for authentication
-- Flask-Limiter for rate limiting
-- APScheduler for background tasks
-- Boto3 for AWS services
-- Multiple AI provider SDKs
+- **Framework**: Flask 3.0.3
+- **Database**: SQLAlchemy with SQLite/PostgreSQL support
+- **Authentication**: Flask-Login, OAuth 2.0
+- **Task Scheduling**: APScheduler
+- **Encryption**: Cryptography (Fernet)
+- **API Clients**: OpenAI, Anthropic, Google Generative AI, Groq, FAL
 
 ### Frontend
-- HTML5/CSS3
-- JavaScript (ES6+)
-- DaisyUI components
-- Tailwind CSS
-- GSAP animations
-- Responsive design
-- Fabric.js for canvas manipulation
+- **CSS Framework**: Tailwind CSS with DaisyUI components
+- **JavaScript**: Vanilla ES6+ with modular architecture
+- **Canvas**: Fabric.js for image editing
+- **Animations**: GSAP
+- **Image Processing**: Pillow, CairoSVG
 
-![AI Generated Portrait](https://marketcalls.in/wp-content/uploads/2024/08/Man-with-a-Cat.jpg)
+### Infrastructure
+- **Rate Limiting**: Flask-Limiter
+- **Migrations**: Alembic
+- **Environment**: python-dotenv
+- **File Storage**: Local filesystem with multi-format support
 
-### Database
-- SQLite (development)
-- PostgreSQL (production ready)
+## 📋 Installation
 
-### Email Services
-- SMTP support
-- Amazon SES integration
-- HTML email templates
-- Email queue management
+### Prerequisites
+- Python 3.12+
+- pip (Python package manager)
+- Virtual environment (recommended)
 
-### Security
-- Rate limiting
-- Secure password hashing
-- Role-based access control
-- API key management
+### Step-by-Step Installation
 
-### Development Tools
-- Python virtual environment
-- Git version control
-- VSCode integration
-
-## Installation
-
-1. Clone the repository:
+1. **Clone the repository**:
 ```bash
 git clone https://github.com/marketcalls/sketchmaker.git
 cd sketchmaker
 ```
 
-2. Create and activate virtual environment:
+2. **Create and activate virtual environment**:
 ```bash
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
+3. **Install dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Initialize the database and subscription system:
+4. **Initialize the database**:
 ```bash
-# Option 1: Use the automated setup script (recommended)
+# Automated setup (recommended)
 python setup_subscriptions.py
 
-# Option 2: Manual setup
-flask shell
->>> from app import db
->>> db.create_all()
->>> exit()
+# This will:
+# - Create all database tables
+# - Initialize default subscription plans
+# - Assign free plans to existing users
+# - Set up the credit reset scheduler
 ```
 
-5. Run the application:
+5. **Run the application**:
 ```bash
 python app.py
 ```
 
-## Configuration
+The application will be available at `http://localhost:5000`
 
-### Authentication Configuration
-Configure authentication settings in the admin interface (/admin/manage/auth):
+## ⚙️ Configuration
 
-#### Regular Authentication
-- Enable/disable username/password authentication
-- Configure password requirements
-- Manage user registration settings
+### Initial Setup (First User = Superadmin)
+The first user to register automatically becomes the superadmin with full system access.
+
+### 🔑 API Configuration (Admin Only)
+Administrators configure API keys centrally for all users:
+
+1. Login as admin
+2. Navigate to **Admin → API Key Management**
+3. Configure required keys:
+   - **FAL API Key** (required for image generation)
+   - At least one AI provider key:
+     - OpenAI API Key
+     - Anthropic API Key
+     - Google Gemini API Key
+     - Groq API Key
+4. Select default provider and model
+5. Test each API connection
+
+### 🤖 Model Management (NEW)
+Admins can dynamically manage AI models without code changes:
+
+1. Navigate to **Admin → API Key Management → Manage Models**
+2. **Add New Models**: Click "Add Model" and fill in:
+   - Model name (e.g., "gpt-4.1")
+   - Display name and description
+   - Provider selection
+   - Context window size
+   - Mark as "latest" if applicable
+3. **Edit Models**: Update descriptions, status, or ordering
+4. **Remove Models**: Delete deprecated models
+
+### 🔐 Authentication Configuration
 
 #### Google OAuth Setup
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project or select existing one
-3. Configure OAuth consent screen:
-   - Select "External" user type
-   - Add required app information
-   - Add scopes: email and profile
-4. Create OAuth credentials:
-   - Create OAuth client ID
-   - Select "Web application"
-   - Add authorized JavaScript origins:
-     ```
-     http://localhost:5000 (development)
-     https://your-domain.com (production)
-     ```
-   - Add authorized redirect URIs:
-     ```
-     http://localhost:5000/auth/google/callback (development)
-     https://your-domain.com/auth/google/callback (production)
-     ```
-5. Copy Client ID and Client Secret
-6. Configure in admin interface:
+2. Create OAuth credentials
+3. Add authorized redirect URIs:
+   ```
+   http://localhost:5000/auth/google/callback (development)
+   https://your-domain.com/auth/google/callback (production)
+   ```
+4. Configure in admin panel:
    - Enable Google authentication
-   - Add Google Client ID
-   - Add Google Client Secret
+   - Add Client ID and Secret
 
-### Required API Keys (Admin Only)
-Administrators configure these centrally for all users:
-- **AI Providers**: OpenAI, Anthropic, Google Gemini, or Groq API key (at least one required)
-- **Image Generation**: FAL API key (required for all image features)
-- **Cost Control**: Centralized management prevents individual API key costs
-
-### Email Configuration
-Configure either SMTP or Amazon SES:
+### 📧 Email Configuration
+Configure in **Admin → Email Settings**:
 
 #### SMTP Settings
-- SMTP Host
-- SMTP Port
-- SMTP Username
-- SMTP Password
-- TLS Support
+- SMTP Host (e.g., smtp.gmail.com)
+- SMTP Port (e.g., 587)
+- Username and Password
+- TLS/SSL settings
 
-#### Amazon SES Settings
+#### Amazon SES
 - AWS Access Key
 - AWS Secret Key
 - AWS Region
 
-### Subscription System Configuration
+### 💳 Subscription System
 
-#### Initial Setup
-The subscription system is automatically configured when you run the setup script:
-
-```bash
-python setup_subscriptions.py
-```
-
-This script will:
-1. Create necessary database tables
-2. Initialize default subscription plans (Free, Premium, Pro)
-3. Assign free plans to all existing users
-4. Display setup summary and statistics
-
-#### Default Subscription Plans
-
+#### Default Plans
 | Plan | Monthly Credits | Features |
 |------|----------------|----------|
-| **Free** | 10 credits | Basic models, Standard resolution, Community support |
-| **Premium** | 100 credits | All models, High resolution, Priority support, Custom LoRA training |
-| **Pro** | 1000 credits | All models, Ultra-high resolution, Dedicated support, API access |
+| **Free** | 10 | Basic models, Standard resolution |
+| **Premium** | 100 | All models, LoRA training, High resolution |
+| **Pro** | 1000 | API access, Ultra-high resolution, Priority support |
 
-#### Automatic Credit Reset System
-The subscription system uses APScheduler for intelligent, personalized credit management:
+#### Credit System
+- **Simple model**: 1 credit per image (any model/size)
+- **Automatic resets**: Based on individual subscription dates
+- **Real-time tracking**: Dashboard shows remaining credits
+- **Usage history**: Complete audit trail
 
-**How It Works:**
-- Each user's credits reset monthly based on their individual subscription start date
-- If you subscribe on January 15th, your credits reset on the 15th of every month
-- APScheduler runs as a background service within the Flask application
-- No external cron jobs or server configuration required
+## 📖 Usage Guide
 
-**Key Benefits:**
-- **Fair allocation**: Users get their full monthly allowance regardless of when they join
-- **Zero maintenance**: Completely automatic with no admin intervention needed
-- **Precise scheduling**: Handles edge cases like month-end dates (Jan 31 → Feb 28)
-- **Persistent**: Survives application restarts and continues scheduling
-- **Transparent**: Users see exact reset dates and countdown on their dashboard
+### For Users
+1. **Register/Login**: Create account or login with Google
+2. **Check Credits**: View remaining credits on dashboard
+3. **Generate Images**: 
+   - Enter prompt description
+   - Select model and parameters
+   - Click generate (uses 1 credit)
+4. **Create Banners**: Design SVG banners with AI
+5. **Edit Images**: Use Magix for inpainting
+6. **Train Models**: Upload images for custom LoRA
+7. **View Gallery**: Access all your creations
 
-**Admin Features:**
-- Monitor all scheduled resets via the admin panel
-- Force manual credit reset for any user if needed
-- View upcoming reset schedule with exact dates and times
-- Automatic scheduling when assigning new subscription plans
-
-#### Admin Management
-
-**Access Subscription Management:**
-1. Login as admin/superadmin
-2. Navigate to **Admin → Manage Subscriptions**
-
-**Assign Subscription Plans:**
-1. Go to subscription management page
-2. Click "Change Plan" for any user
-3. Select desired plan and add optional notes
-4. Click "Assign Plan"
-
-**Modify User Credits:**
-1. Click "Modify Credits" for any user
-2. Choose to "Add Credits" or "Set Credits To" a specific amount
-3. Enter the credit amount
-4. Click "Update Credits"
-
-**View Usage Reports:**
-1. Click "View Reports" from subscription management
-2. Review plan distribution and top users
-3. Export reports as CSV for external analysis
-
-**Manage Subscription Plans:**
-1. Go to **Admin → Manage Subscriptions → Manage Plans**
-2. Edit existing plans (credits, features, descriptions)
-3. Add new custom plans
-4. Activate/deactivate plans as needed
-
-**Monitor Scheduled Jobs:**
-1. Go to **Admin → Manage Subscriptions → Scheduled Jobs**
-2. View all upcoming credit resets
-3. See exact reset dates and times for each user
-4. Force manual credit reset if needed
-
-#### User Experience
-
-**Dashboard Display:**
-- Current plan and remaining credits prominently displayed
-- Progress bar shows monthly usage with visual indicators
-- Complete list of plan features and benefits
-- **Personalized reset information**: "Next reset: February 15, 2025" and "Days until reset: 12"
-- Real-time credit updates after each generation
-
-**Credit Usage:**
-- **Simple model**: 1 credit per image generated (regardless of model or complexity)
-- Credits deducted immediately after successful generation
-- Real-time credit balance updates in the UI
-- Users prevented from generating when credits are exhausted
-- Clear error messages guide users to contact admin for plan upgrades
-
-**Usage Tracking & Analytics:**
-- Complete audit trail of all credit usage with timestamps
-- Detailed metadata for each action (model used, prompt, generation parameters)
-- Monthly usage statistics and patterns
-- Admin can view individual user usage history and trends
-- Automatic logging of credit resets and manual adjustments
-
-## Usage Guide
-
-1. Initial Setup:
-   - Register first user (becomes superadmin)
-   - Run subscription setup: `python setup_subscriptions.py`
-   - **Configure API keys via Admin → API Key Management** (admin only)
+### For Administrators
+1. **Initial Setup**:
+   - Configure API keys (centralized)
    - Set up email service
    - Configure authentication methods
-   - Set up Google OAuth (if needed)
-   - Credit resets are automatically scheduled (no additional setup needed)
+   - Initialize subscription plans
 
-2. Content Generation:
-   - Check credit balance on dashboard
-   - Create banners with custom styles
-   - Generate images with various models (uses credits)
-   - Use Image Magix for targeted edits
-   - Train custom models
-   - Manage gallery content
+2. **User Management**:
+   - Approve new registrations
+   - Assign roles and plans
+   - Monitor usage
+   - Adjust credits
 
-3. Admin Functions:
-   - Manage users and roles
-   - **Configure API keys centrally for all users**
-   - **Assign subscription plans to users**
-   - **Monitor credit usage and generate reports**
-   - **Modify user credits manually**
-   - Configure email settings
-   - Configure authentication settings
-   - Monitor system settings
-   - Track user activity
+3. **System Monitoring**:
+   - View scheduled jobs
+   - Check API status
+   - Generate usage reports
+   - Manage models dynamically
 
-4. Subscription Management:
-   - **Users**: View plan status and remaining credits with personalized reset dates
-   - **Admins**: Assign plans, modify credits, view usage reports, monitor scheduled jobs
-   - **System**: Automatic personalized credit resets via APScheduler
+### API Rate Limits
+- Default: 60 requests per minute
+- Configurable per user role
+- Automatic rate limit headers
 
-## Contributing
+## 🚧 Troubleshooting
+
+### Common Issues
+
+1. **"No API keys configured"**
+   - Admin must configure API keys in Admin → API Key Management
+
+2. **"No credits remaining"**
+   - Contact admin for plan upgrade or credit adjustment
+
+3. **"Generation failed"**
+   - Check if API keys are valid
+   - Verify selected model is active
+   - Check rate limits
+
+4. **Database Issues**
+   - Run migrations: `python setup_subscriptions.py`
+   - Check database permissions
+
+### Logs
+- Application logs: Check console output
+- Error logs: Stored in Flask debug mode
+- API logs: Available in admin panel
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
-## License
+### Development Guidelines
+- Follow PEP 8 for Python code
+- Use meaningful commit messages
+- Add tests for new features
+- Update documentation
+- Ensure backward compatibility
+
+## 📄 License
 
 This project is licensed under the AGPL v3.0 License - see the [LICENSE](LICENSE) file for details.
 
-## Author
+## 👥 Author
 
-[marketcalls](https://github.com/marketcalls)
+Created and maintained by [marketcalls](https://github.com/marketcalls)
 
-## Credits
+## 🙏 Credits
 
 ### Icons and Images
 - Favicon and logo: [Sketch book icons created by RA_IC0N21 - Flaticon](https://www.flaticon.com/packs/design-thinking-14670943)
+
+### AI Services
+- OpenAI for GPT models
+- Anthropic for Claude models
+- Google for Gemini models
+- Groq for Llama models
+- FAL for image generation
+
+## 📞 Support
+
+For issues, questions, or contributions:
+- Open an issue on [GitHub](https://github.com/marketcalls/sketchmaker/issues)
+- Submit pull requests for improvements
+- Check documentation for common solutions
+
+---
+
+**Note**: This application requires API keys from AI service providers. Costs are managed centrally by administrators to prevent individual user charges.

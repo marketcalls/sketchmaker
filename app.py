@@ -130,50 +130,171 @@ def create_app():
                 db.session.add_all([openai, anthropic, gemini, groq])
                 db.session.commit()
 
-                # OpenAI models
+                # OpenAI models - Latest as of June 2025
                 openai_models = [
-                    "gpt-4o",
-                    "gpt-4o-mini",
-                    "o1-preview",
-                    "o1-mini"
+                    {
+                        "name": "gpt-4.1",
+                        "display_name": "GPT-4.1",
+                        "description": "Smartest model for complex tasks",
+                        "is_latest": True,
+                        "sort_order": 1
+                    },
+                    {
+                        "name": "gpt-4.1-mini",
+                        "display_name": "GPT-4.1 Mini",
+                        "description": "Affordable model balancing speed and intelligence",
+                        "is_latest": True,
+                        "sort_order": 2
+                    },
+                    {
+                        "name": "gpt-4.1-nano",
+                        "display_name": "GPT-4.1 Nano",
+                        "description": "Fastest, most cost-effective model for low-latency tasks",
+                        "is_latest": True,
+                        "sort_order": 3
+                    },
+                    {
+                        "name": "gpt-4o",
+                        "display_name": "GPT-4o",
+                        "description": "Previous generation model",
+                        "sort_order": 4
+                    },
+                    {
+                        "name": "gpt-4o-mini",
+                        "display_name": "GPT-4o Mini",
+                        "description": "Previous generation mini model",
+                        "sort_order": 5
+                    }
                 ]
-                for model in openai_models:
-                    db.session.add(AIModel(name=model, provider_id=openai.id))
+                for model_data in openai_models:
+                    model = AIModel(provider_id=openai.id, **model_data)
+                    db.session.add(model)
 
-                # Anthropic models
+                # Anthropic models - Latest as of June 2025
                 anthropic_models = [
-                    "claude-3-5-sonnet-20241022",
-                    "claude-3-5-haiku-20241022",
-                    "claude-3-opus-20240229",
-                    "claude-3-haiku-20240307"
+                    {
+                        "name": "claude-opus-4-20250514",
+                        "display_name": "Claude Opus 4",
+                        "description": "Powerful, large model for complex challenges",
+                        "is_latest": True,
+                        "sort_order": 1
+                    },
+                    {
+                        "name": "claude-sonnet-4-20250514",
+                        "display_name": "Claude Sonnet 4",
+                        "description": "Smart, efficient model for everyday use",
+                        "is_latest": True,
+                        "sort_order": 2
+                    },
+                    {
+                        "name": "claude-3-5-haiku-20241022",
+                        "display_name": "Claude 3.5 Haiku",
+                        "description": "Fastest model for daily tasks",
+                        "is_latest": True,
+                        "sort_order": 3
+                    },
+                    {
+                        "name": "claude-3-7-sonnet-20250219",
+                        "display_name": "Claude 3.7 Sonnet",
+                        "description": "Enhanced Sonnet model",
+                        "sort_order": 4
+                    },
+                    {
+                        "name": "claude-3-5-sonnet-20241022",
+                        "display_name": "Claude 3.5 Sonnet",
+                        "description": "Previous Sonnet version",
+                        "sort_order": 5
+                    }
                 ]
-                for model in anthropic_models:
-                    db.session.add(AIModel(name=model, provider_id=anthropic.id))
+                for model_data in anthropic_models:
+                    model = AIModel(provider_id=anthropic.id, **model_data)
+                    db.session.add(model)
 
-                # Google Gemini models
+                # Google Gemini models - Latest as of June 2025
                 gemini_models = [
-                    "gemini-1.5-flash-002",
-                    "gemini-1.5-flash-exp-0827",
-                    "gemini-1.5-flash-8b-exp-0827",
-                    "gemini-1.5-pro-002",
-                    "gemini-1.5-pro-exp-0827"
+                    {
+                        "name": "gemini-2.5-pro",
+                        "display_name": "Gemini 2.5 Pro",
+                        "description": "Latest and most capable Gemini model",
+                        "is_latest": True,
+                        "sort_order": 1
+                    },
+                    {
+                        "name": "gemini-2.5-flash",
+                        "display_name": "Gemini 2.5 Flash",
+                        "description": "Fast and efficient for most tasks",
+                        "is_latest": True,
+                        "sort_order": 2
+                    },
+                    {
+                        "name": "gemini-2.5-flash-lite-preview-06-17",
+                        "display_name": "Gemini 2.5 Flash Lite Preview",
+                        "description": "Ultra-light preview model",
+                        "is_latest": True,
+                        "sort_order": 3
+                    },
+                    {
+                        "name": "gemini-2.5-pro-preview-05-06",
+                        "display_name": "Gemini 2.5 Pro Preview",
+                        "description": "Preview version of Pro model",
+                        "sort_order": 4
+                    },
+                    {
+                        "name": "gemini-2.5-flash-preview-04-17",
+                        "display_name": "Gemini 2.5 Flash Preview",
+                        "description": "Preview version of Flash model",
+                        "sort_order": 5
+                    }
                 ]
-                for model in gemini_models:
-                    db.session.add(AIModel(name=model, provider_id=gemini.id))
+                for model_data in gemini_models:
+                    model = AIModel(provider_id=gemini.id, **model_data)
+                    db.session.add(model)
 
-                # Groq models
+                # Groq models - Latest as of June 2025
                 groq_models = [
-                    "llama-3.1-70b-versatile",
-                    "llama-3.1-8b-instant",
-                    "llama-3.2-11b-text-preview",
-                    "llama-3.2-11b-vision-preview",
-                    "llama-3.2-1b-preview",
-                    "llama-3.2-3b-preview",
-                    "llama-3.2-90b-text-preview",
-                    "llama-3.2-90b-vision-preview"
+                    {
+                        "name": "compound-beta",
+                        "display_name": "Compound Beta",
+                        "description": "Latest compound model from Groq",
+                        "is_latest": True,
+                        "sort_order": 1
+                    },
+                    {
+                        "name": "compound-beta-mini",
+                        "display_name": "Compound Beta Mini",
+                        "description": "Smaller compound model",
+                        "is_latest": True,
+                        "sort_order": 2
+                    },
+                    {
+                        "name": "llama-3.3-70b-versatile",
+                        "display_name": "Llama 3.3 70B Versatile",
+                        "description": "Latest Llama model, versatile for various tasks",
+                        "is_latest": True,
+                        "sort_order": 3
+                    },
+                    {
+                        "name": "llama-3.1-8b-instant",
+                        "display_name": "Llama 3.1 8B Instant",
+                        "description": "Fast 8B model for instant responses",
+                        "sort_order": 4
+                    },
+                    {
+                        "name": "llama3-8b-8192",
+                        "display_name": "Llama 3 8B",
+                        "description": "8B model with 8192 context",
+                        "sort_order": 5
+                    },
+                    {
+                        "name": "llama3-70b-8192",
+                        "display_name": "Llama 3 70B",
+                        "description": "70B model with 8192 context",
+                        "sort_order": 6
+                    }
                 ]
-                for model in groq_models:
-                    db.session.add(AIModel(name=model, provider_id=groq.id))
+                for model_data in groq_models:
+                    model = AIModel(provider_id=groq.id, **model_data)
+                    db.session.add(model)
 
                 db.session.commit()
         

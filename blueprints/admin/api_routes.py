@@ -238,3 +238,111 @@ def api_status():
     }
     
     return jsonify(status)
+
+@admin_api_bp.route('/models')
+@login_required
+@admin_required
+def manage_models():
+    """Manage AI models"""
+    providers = APIProvider.query.filter_by(is_active=True).all()
+    models = AIModel.query.order_by(AIModel.provider_id, AIModel.sort_order, AIModel.name).all()
+    return render_template('admin/model_management.html', providers=providers, models=models)
+
+@admin_api_bp.route('/models/add', methods=['POST'])
+@login_required
+@admin_required
+def add_model():
+    """Add a new AI model"""
+    data = request.get_json()
+    
+    # Validate required fields
+    if not data.get('name') or not data.get('provider_id'):
+        return jsonify({'success': False, 'message': 'Model name and provider are required'}), 400
+    
+    # Check if model already exists
+    existing = AIModel.query.filter_by(
+        name=data['name'], 
+        provider_id=data['provider_id']
+    ).first()
+    
+    if existing:
+        return jsonify({'success': False, 'message': 'Model already exists'}), 400
+    
+    # Create new model
+    model = AIModel(
+        name=data['name'],
+        display_name=data.get('display_name', data['name']),
+        provider_id=data['provider_id'],
+        description=data.get('description'),
+        context_window=data.get('context_window'),
+        is_latest=data.get('is_latest', False),
+        capabilities=data.get('capabilities', []),
+        sort_order=data.get('sort_order', 0),
+        is_active=data.get('is_active', True)
+    )
+    
+    # If marking as latest, unmark other models from same provider
+    if model.is_latest:
+        AIModel.query.filter_by(
+            provider_id=model.provider_id,
+            is_latest=True
+        ).update({'is_latest': False})
+    
+    db.session.add(model)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Model added successfully'})
+
+@admin_api_bp.route('/models/<int:model_id>/update', methods=['POST'])
+@login_required
+@admin_required
+def update_model(model_id):
+    """Update an existing AI model"""
+    model = AIModel.query.get_or_404(model_id)
+    data = request.get_json()
+    
+    # Update fields
+    if 'display_name' in data:
+        model.display_name = data['display_name']
+    if 'description' in data:
+        model.description = data['description']
+    if 'context_window' in data:
+        model.context_window = data['context_window']
+    if 'is_latest' in data:
+        # If marking as latest, unmark others
+        if data['is_latest'] and not model.is_latest:
+            AIModel.query.filter_by(
+                provider_id=model.provider_id,
+                is_latest=True
+            ).update({'is_latest': False})
+        model.is_latest = data['is_latest']
+    if 'capabilities' in data:
+        model.capabilities = data['capabilities']
+    if 'sort_order' in data:
+        model.sort_order = data['sort_order']
+    if 'is_active' in data:
+        model.is_active = data['is_active']
+    
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Model updated successfully'})
+
+@admin_api_bp.route('/models/<int:model_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_model(model_id):
+    """Delete an AI model"""
+    model = AIModel.query.get_or_404(model_id)
+    
+    # Check if model is being used as default
+    api_settings = APISettings.get_settings()
+    if api_settings.default_model_id == model_id:
+        return jsonify({
+            'success': False, 
+            'message': 'Cannot delete the default model. Please change the default model first.'
+        }), 400
+    
+    db.session.delete(model)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Model deleted successfully'})

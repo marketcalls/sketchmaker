@@ -86,7 +86,7 @@
                                 <span class="font-bold">{{ usage.credits_used }}</span>
                             </td>
                             <td>
-                                {% if usage.metadata %}
+                                {% if usage.extra_data %}
                                 <div class="dropdown dropdown-end">
                                     <label tabindex="0" class="btn btn-xs btn-ghost">
                                         View Details
@@ -95,7 +95,7 @@
                                         <div class="card-body">
                                             <h3 class="font-bold">Action Details</h3>
                                             <div class="text-sm space-y-1">
-                                                {% for key, value in usage.metadata.items() %}
+                                                {% for key, value in usage.extra_data.items() %}
                                                 <div>
                                                     <span class="font-semibold">{{ key.replace('_', ' ').title() }}:</span>
                                                     {% if key == 'prompt' and value|length > 50 %}

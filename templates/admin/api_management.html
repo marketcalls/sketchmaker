@@ -6,12 +6,20 @@
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">API Key Management</h1>
-        <a href="{{ url_for('admin.manage') }}" class="btn btn-ghost">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Back to Admin
-        </a>
+        <div class="flex gap-2">
+            <a href="{{ url_for('admin_api.manage_models') }}" class="btn btn-secondary">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+                Manage Models
+            </a>
+            <a href="{{ url_for('admin.manage') }}" class="btn btn-ghost">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Admin
+            </a>
+        </div>
     </div>
 
     <!-- System Status -->
