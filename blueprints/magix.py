@@ -43,6 +43,22 @@ def magix_page():
 @login_required
 def generate_magix():
     try:
+        # Check if user can use Magix (credit-based limit)
+        if not current_user.can_use_feature('magix'):
+            subscription = current_user.get_subscription()
+            plan_name = subscription.plan.display_name if subscription else 'No Plan'
+            credits_remaining = current_user.get_credits_remaining()
+            credit_cost = current_user.get_credit_cost('magix')
+            return jsonify({
+                'error': 'Insufficient credits for Magix editing',
+                'details': f'You need {credit_cost} credit{"s" if credit_cost > 1 else ""} to use Magix. You have {credits_remaining} credits remaining. Your current plan is: {plan_name}',
+                'type': 'insufficient_credits',
+                'feature': 'magix',
+                'credits_needed': credit_cost,
+                'credits_remaining': credits_remaining,
+                'plan': plan_name
+            }), 403
+            
         data = request.get_json()
         if not data:
             return jsonify({'error': 'No data provided'}), 400
@@ -92,6 +108,17 @@ def generate_magix():
 
                 # Save the result image locally
                 local_url = save_result_image(img['url'])
+                
+                # Track Magix usage
+                current_user.use_feature(
+                    feature_type='magix',
+                    amount=1,
+                    extra_data={
+                        'prompt': data['prompt'],
+                        'image_url': local_url
+                    }
+                )
+                
                 return jsonify({'image_url': local_url})
 
             raise ValueError("No images were generated")

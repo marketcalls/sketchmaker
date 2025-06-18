@@ -23,15 +23,33 @@
         </div>
         
         <div class="stat">
-            <div class="stat-title">Monthly Credits Used</div>
-            <div class="stat-value">{{ monthly_usage }}</div>
-            <div class="stat-desc">Current month</div>
+            <div class="stat-title">Total Credits Used</div>
+            <div class="stat-value text-accent">{{ credit_usage.total_credits or 0 }}</div>
+            <div class="stat-desc">This month</div>
         </div>
         
         <div class="stat">
-            <div class="stat-title">Active Subscriptions</div>
-            <div class="stat-value">{{ plan_stats|length }}</div>
-            <div class="stat-desc">Different plan types</div>
+            <div class="stat-title">AI Images Generated</div>
+            <div class="stat-value text-blue-500">{{ feature_usage.total_images or 0 }}</div>
+            <div class="stat-desc">{{ ((feature_usage.total_images or 0) * system_settings.credit_cost_images)|int }} credits used</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Banners Created</div>
+            <div class="stat-value text-green-500">{{ feature_usage.total_banners or 0 }}</div>
+            <div class="stat-desc">{{ ((feature_usage.total_banners or 0) * system_settings.credit_cost_banners)|round(1) }} credits used</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">Magix Edits</div>
+            <div class="stat-value text-purple-500">{{ feature_usage.total_magix or 0 }}</div>
+            <div class="stat-desc">{{ ((feature_usage.total_magix or 0) * system_settings.credit_cost_magix)|int }} credits used</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-title">LoRA Trainings</div>
+            <div class="stat-value text-orange-500">{{ feature_usage.total_lora or 0 }}</div>
+            <div class="stat-desc">{{ ((feature_usage.total_lora or 0) * system_settings.credit_cost_lora_training)|int }} credits used</div>
         </div>
     </div>
 
@@ -63,30 +81,45 @@
             </div>
         </div>
 
-        <!-- Top Users -->
+        <!-- Top Users by Credits -->
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
-                <h2 class="card-title">Top Users This Month</h2>
+                <h2 class="card-title">Top Users by Credits</h2>
                 
                 <div class="overflow-x-auto">
                     <table class="table table-zebra">
                         <thead>
                             <tr>
                                 <th>User</th>
+                                <th>Plan</th>
                                 <th>Credits Used</th>
+                                <th>Utilization</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for username, credits in top_users %}
+                            {% for user_data in top_users %}
                             <tr>
-                                <td>{{ username }}</td>
+                                <td>{{ user_data.username }}</td>
                                 <td>
-                                    <span class="font-bold text-primary">{{ credits }}</span>
+                                    <span class="badge badge-outline">{{ user_data.plan_name }}</span>
+                                </td>
+                                <td>
+                                    <span class="font-bold text-primary">{{ user_data.credits_used }}</span>
+                                </td>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <progress class="progress progress-primary w-16" 
+                                                 value="{{ user_data.credits_used }}" 
+                                                 max="{{ user_data.monthly_credits }}"></progress>
+                                        <span class="text-xs">
+                                            {{ "%.0f"|format((user_data.credits_used / user_data.monthly_credits * 100) if user_data.monthly_credits > 0 else 0) }}%
+                                        </span>
+                                    </div>
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="2" class="text-center text-base-content/70">
+                                <td colspan="4" class="text-center text-base-content/70">
                                     No usage data for this month
                                 </td>
                             </tr>
@@ -98,17 +131,186 @@
         </div>
     </div>
 
+    <!-- Feature Usage Tables -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 mt-6">
+        <!-- Top Image Users -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h3 class="card-title text-blue-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Top Image Users
+                </h3>
+                <div class="space-y-2">
+                    <div class="text-xs text-base-content/60 mb-2">{{ system_settings.credit_cost_images }} {{ 'credit' if system_settings.credit_cost_images == 1 else 'credits' }} per image</div>
+                    {% for username, usage in top_image_users %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">{{ username }}</span>
+                        <div class="flex items-center gap-1">
+                            <span class="badge badge-primary badge-sm">{{ usage }}</span>
+                            <span class="text-xs opacity-60">{{ (usage * system_settings.credit_cost_images)|int }}c</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-sm text-base-content/70">No image usage this month</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Banner Users -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h3 class="card-title text-green-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4h10m-10 0V6a1 1 0 011-1h8a1 1 0 011 1v2m-10 0v10a1 1 0 001 1h8a1 1 0 001-1V8"></path>
+                    </svg>
+                    Top Banner Users
+                </h3>
+                <div class="space-y-2">
+                    <div class="text-xs text-base-content/60 mb-2">{{ system_settings.credit_cost_banners }} {{ 'credit' if system_settings.credit_cost_banners == 1 else 'credits' }} per banner</div>
+                    {% for username, usage in top_banner_users %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">{{ username }}</span>
+                        <div class="flex items-center gap-1">
+                            <span class="badge badge-success badge-sm">{{ usage }}</span>
+                            <span class="text-xs opacity-60">{{ (usage * system_settings.credit_cost_banners)|round(1) }}c</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-sm text-base-content/70">No banner usage this month</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Magix Users -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h3 class="card-title text-purple-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                    Top Magix Users
+                </h3>
+                <div class="space-y-2">
+                    <div class="text-xs text-base-content/60 mb-2">{{ system_settings.credit_cost_magix }} {{ 'credit' if system_settings.credit_cost_magix == 1 else 'credits' }} per edit</div>
+                    {% for username, usage in top_magix_users %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">{{ username }}</span>
+                        <div class="flex items-center gap-1">
+                            <span class="badge badge-secondary badge-sm">{{ usage }}</span>
+                            <span class="text-xs opacity-60">{{ (usage * system_settings.credit_cost_magix)|int }}c</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-sm text-base-content/70">No Magix usage this month</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top LoRA Users -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h3 class="card-title text-orange-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                    Top LoRA Users
+                </h3>
+                <div class="space-y-2">
+                    <div class="text-xs text-base-content/60 mb-2">{{ system_settings.credit_cost_lora_training }} {{ 'credit' if system_settings.credit_cost_lora_training == 1 else 'credits' }} per training</div>
+                    {% for username, usage in top_lora_users %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">{{ username }}</span>
+                        <div class="flex items-center gap-1">
+                            <span class="badge badge-warning badge-sm">{{ usage }}</span>
+                            <span class="text-xs opacity-60">{{ (usage * system_settings.credit_cost_lora_training)|int }}c</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-sm text-base-content/70">No LoRA usage this month</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Credit Breakdown by Plan -->
+    <div class="card bg-base-100 shadow-xl mt-6">
+        <div class="card-body">
+            <h2 class="card-title">Credit Usage Breakdown by Plan</h2>
+            
+            <div class="overflow-x-auto mt-4">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>Plan</th>
+                            <th>Users</th>
+                            <th>Total Credits Allocated</th>
+                            <th>Credits Used</th>
+                            <th>Credits Remaining</th>
+                            <th>Utilization Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plan_data in plan_credit_breakdown %}
+                        <tr>
+                            <td>
+                                <span class="badge badge-outline">{{ plan_data.plan_name }}</span>
+                            </td>
+                            <td>{{ plan_data.user_count }}</td>
+                            <td>{{ plan_data.total_allocated }}</td>
+                            <td>
+                                <span class="font-bold text-primary">{{ plan_data.total_used }}</span>
+                            </td>
+                            <td>{{ plan_data.total_remaining }}</td>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <progress class="progress progress-primary w-20" 
+                                             value="{{ plan_data.total_used }}" 
+                                             max="{{ plan_data.total_allocated }}"></progress>
+                                    <span class="text-sm font-bold">
+                                        {{ "%.1f"|format((plan_data.total_used / plan_data.total_allocated * 100) if plan_data.total_allocated > 0 else 0) }}%
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-base-content/70">
+                                No subscription data available
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Monthly Usage Trend -->
     <div class="card bg-base-100 shadow-xl mt-6">
         <div class="card-body">
             <h2 class="card-title">Usage Summary</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
                 <div class="stat bg-base-200 rounded-lg">
                     <div class="stat-title">Average Credits per User</div>
                     <div class="stat-value text-sm">
-                        {{ "%.1f"|format((monthly_usage / total_users) if total_users > 0 else 0) }}
+                        {{ "%.1f"|format((credit_usage.total_credits / total_users) if total_users > 0 else 0) }}
                     </div>
+                    <div class="stat-desc">This month</div>
+                </div>
+                
+                <div class="stat bg-base-200 rounded-lg">
+                    <div class="stat-title">Overall Utilization</div>
+                    <div class="stat-value text-sm">
+                        {{ "%.1f"|format(credit_usage.utilization_rate) if credit_usage.utilization_rate else 0 }}%
+                    </div>
+                    <div class="stat-desc">Credits used vs allocated</div>
                 </div>
                 
                 <div class="stat bg-base-200 rounded-lg">

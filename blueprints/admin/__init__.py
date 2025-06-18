@@ -6,7 +6,7 @@ admin = Blueprint('admin', __name__, url_prefix='/admin')
 # Import route functions
 from .user_routes import manage, update_user, add_user, search_users
 from .email_routes import email_settings, update_email_settings, test_email_settings
-from .system_routes import update_settings
+from .system_routes import update_settings, credit_configuration, get_credit_costs
 from .auth_routes import auth_settings, update_auth_settings
 from .subscription_routes import admin_subscription_bp
 from .api_routes import admin_api_bp
@@ -22,6 +22,10 @@ admin.add_url_rule('/manage/email/update', 'update_email_settings', update_email
 admin.add_url_rule('/manage/email/test', 'test_email_settings', test_email_settings, methods=['POST'])
 
 admin.add_url_rule('/manage/settings', 'update_settings', update_settings, methods=['POST'])
+
+# Add credit configuration routes
+admin.add_url_rule('/manage/credits', 'credit_configuration', credit_configuration, methods=['GET', 'POST'])
+admin.add_url_rule('/api/credit-costs', 'get_credit_costs', get_credit_costs)
 
 # Register auth settings routes
 admin.add_url_rule('/manage/auth', 'auth_settings', auth_settings)

@@ -5,7 +5,12 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+        <div>
+            <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+            <div class="text-sm text-base-content/70 mt-1">
+                {{ display_version }} • Build {{ app_version.build_date }}
+            </div>
+        </div>
         <div class="text-sm text-base-content/70">
             Welcome back, {{ current_user.username }}
         </div>
@@ -26,9 +31,9 @@
         </div>
         
         <div class="stat bg-base-100 rounded-lg shadow">
-            <div class="stat-title">Images Generated</div>
-            <div class="stat-value text-info">{{ stats.total_images }}</div>
-            <div class="stat-desc">{{ stats.images_today }} today</div>
+            <div class="stat-title">Credits Used Today</div>
+            <div class="stat-value text-info">{{ stats.credits_used_today }}</div>
+            <div class="stat-desc">{{ stats.credits_used_this_month }} this month</div>
         </div>
         
         <div class="stat bg-base-100 rounded-lg shadow">
@@ -40,8 +45,62 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Credit Usage Overview -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Today's Credit Usage by Feature</h2>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-figure text-blue-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-title text-xs">AI Images</div>
+                        <div class="stat-value text-sm">{{ credit_breakdown.images or 0 }}c</div>
+                    </div>
+                    
+                    <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-figure text-green-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4h10m-10 0V6a1 1 0 011-1h8a1 1 0 011 1v2m-10 0v10a1 1 0 001 1h8a1 1 0 001-1V8"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-title text-xs">Banners</div>
+                        <div class="stat-value text-sm">{{ credit_breakdown.banners or 0 }}c</div>
+                    </div>
+                    
+                    <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-figure text-purple-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-title text-xs">Magix Edits</div>
+                        <div class="stat-value text-sm">{{ credit_breakdown.magix or 0 }}c</div>
+                    </div>
+                    
+                    <div class="stat bg-base-200 rounded-lg p-3">
+                        <div class="stat-figure text-orange-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-title text-xs">LoRA Training</div>
+                        <div class="stat-value text-sm">{{ credit_breakdown.lora_training or 0 }}c</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('admin_subscription.subscription_reports') }}" class="btn btn-primary btn-sm">
+                        View Detailed Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
                 <h2 class="card-title">Quick Actions</h2>
@@ -72,6 +131,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
                         Email Settings
+                    </a>
+                    
+                    <a href="{{ url_for('admin.credit_configuration') }}" class="btn btn-warning btn-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                        Credit Config
                     </a>
                 </div>
             </div>

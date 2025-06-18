@@ -165,6 +165,22 @@ def upload_training_images():
 @login_required
 def start_training():
     try:
+        # Check if user can start LoRA training (credit-based limit)
+        if not current_user.can_use_feature('lora_training'):
+            subscription = current_user.get_subscription()
+            plan_name = subscription.plan.display_name if subscription else 'No Plan'
+            credits_remaining = current_user.get_credits_remaining()
+            credit_cost = current_user.get_credit_cost('lora_training')
+            return jsonify({
+                'error': 'Insufficient credits for LoRA training',
+                'details': f'You need {credit_cost} credits to start LoRA training. You have {credits_remaining} credits remaining. Your current plan is: {plan_name}',
+                'type': 'insufficient_credits',
+                'feature': 'lora_training',
+                'credits_needed': credit_cost,
+                'credits_remaining': credits_remaining,
+                'plan': plan_name
+            }), 403
+        
         # Check if system has required API keys
         from models import APISettings
         api_settings = APISettings.get_settings()
@@ -237,6 +253,17 @@ def start_training():
                 training_record.logs = format_logs(getattr(status, 'logs', ''))
             
             db.session.commit()
+            
+            # Track LoRA training usage
+            current_user.use_feature(
+                feature_type='lora_training',
+                amount=1,
+                extra_data={
+                    'trigger_word': data['trigger_word'],
+                    'training_id': training_record.training_id,
+                    'steps': data.get('steps', 1000)
+                }
+            )
 
             return jsonify({
                 'status': 'success',

@@ -169,6 +169,7 @@ export function initializeForm() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': window.csrf_token
                 },
                 body: JSON.stringify(formData),
             });

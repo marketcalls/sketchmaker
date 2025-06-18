@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Credit Configuration - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Credit Configuration</h1>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Credit Costs Configuration -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title mb-6">Configure Feature Credit Costs</h2>
+            
+            <div class="alert alert-info mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <h3 class="font-bold">Dynamic Credit System</h3>
+                    <div class="text-sm">Changes to credit costs will immediately affect all users and be reflected throughout the system.</div>
+                </div>
+            </div>
+
+            <form id="creditConfigForm" class="space-y-6">
+                <!-- AI Images -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            <svg class="w-5 h-5 inline mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            AI Images
+                        </span>
+                        <span class="label-text-alt">Credits per image generation</span>
+                    </label>
+                    <input type="number" 
+                           name="images" 
+                           id="credit_cost_images"
+                           value="{{ settings.credit_cost_images }}" 
+                           min="0.1" 
+                           max="100" 
+                           step="0.1" 
+                           class="input input-bordered" 
+                           required>
+                </div>
+
+                <!-- Banners -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            <svg class="w-5 h-5 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4h10m-10 0V6a1 1 0 011-1h8a1 1 0 011 1v2m-10 0v10a1 1 0 001 1h8a1 1 0 001-1V8"></path>
+                            </svg>
+                            Banners
+                        </span>
+                        <span class="label-text-alt">Credits per banner creation</span>
+                    </label>
+                    <input type="number" 
+                           name="banners" 
+                           id="credit_cost_banners"
+                           value="{{ settings.credit_cost_banners }}" 
+                           min="0.1" 
+                           max="100" 
+                           step="0.1" 
+                           class="input input-bordered" 
+                           required>
+                </div>
+
+                <!-- Magix Edits -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            <svg class="w-5 h-5 inline mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                            Magix Edits
+                        </span>
+                        <span class="label-text-alt">Credits per image edit</span>
+                    </label>
+                    <input type="number" 
+                           name="magix" 
+                           id="credit_cost_magix"
+                           value="{{ settings.credit_cost_magix }}" 
+                           min="0.1" 
+                           max="100" 
+                           step="0.1" 
+                           class="input input-bordered" 
+                           required>
+                </div>
+
+                <!-- LoRA Training -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">
+                            <svg class="w-5 h-5 inline mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                            </svg>
+                            LoRA Training
+                        </span>
+                        <span class="label-text-alt">Credits per training session</span>
+                    </label>
+                    <input type="number" 
+                           name="lora_training" 
+                           id="credit_cost_lora_training"
+                           value="{{ settings.credit_cost_lora_training }}" 
+                           min="1" 
+                           max="1000" 
+                           step="1" 
+                           class="input input-bordered" 
+                           required>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4 mt-8">
+                    <button type="submit" class="btn btn-primary" id="saveButton">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Save Changes
+                    </button>
+                    
+                    <button type="button" class="btn btn-ghost" onclick="resetForm()">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Current Impact Preview -->
+    <div class="card bg-base-100 shadow-xl mt-6">
+        <div class="card-body">
+            <h2 class="card-title">Current Credit System Impact</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <!-- Free Plan Impact -->
+                <div class="stat bg-base-200 rounded-lg">
+                    <div class="stat-title">Free Plan (3 Credits)</div>
+                    <div class="stat-desc text-sm space-y-1" id="freePlanImpact">
+                        <div>• <span id="freeImages">3</span> AI Images</div>
+                        <div>• <span id="freeBanners">6</span> Banners</div>
+                        <div>• <span id="freeMagix">3</span> Magix Edits</div>
+                        <div>• <span id="freeLora">0</span> LoRA Trainings</div>
+                    </div>
+                </div>
+                
+                <!-- Premium Plan Impact -->
+                <div class="stat bg-base-200 rounded-lg">
+                    <div class="stat-title">Premium Plan (100 Credits)</div>
+                    <div class="stat-desc text-sm space-y-1" id="premiumPlanImpact">
+                        <div>• <span id="premiumImages">100</span> AI Images</div>
+                        <div>• <span id="premiumBanners">200</span> Banners</div>
+                        <div>• <span id="premiumMagix">100</span> Magix Edits</div>
+                        <div>• <span id="premiumLora">2</span> LoRA Trainings</div>
+                    </div>
+                </div>
+                
+                <!-- Professional Plan Impact -->
+                <div class="stat bg-base-200 rounded-lg">
+                    <div class="stat-title">Professional Plan (1000 Credits)</div>
+                    <div class="stat-desc text-sm space-y-1" id="proPlanImpact">
+                        <div>• <span id="proImages">1000</span> AI Images</div>
+                        <div>• <span id="proBanners">2000</span> Banners</div>
+                        <div>• <span id="proMagix">1000</span> Magix Edits</div>
+                        <div>• <span id="proLora">25</span> LoRA Trainings</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Store original values for reset
+const originalValues = {
+    images: {{ settings.credit_cost_images }},
+    banners: {{ settings.credit_cost_banners }},
+    magix: {{ settings.credit_cost_magix }},
+    lora_training: {{ settings.credit_cost_lora_training }}
+};
+
+// Update impact preview when values change
+function updateImpactPreview() {
+    const images = parseFloat(document.getElementById('credit_cost_images').value) || 1;
+    const banners = parseFloat(document.getElementById('credit_cost_banners').value) || 0.5;
+    const magix = parseFloat(document.getElementById('credit_cost_magix').value) || 1;
+    const lora = parseFloat(document.getElementById('credit_cost_lora_training').value) || 40;
+    
+    // Free plan (3 credits)
+    document.getElementById('freeImages').textContent = Math.floor(3 / images);
+    document.getElementById('freeBanners').textContent = Math.floor(3 / banners);
+    document.getElementById('freeMagix').textContent = Math.floor(3 / magix);
+    document.getElementById('freeLora').textContent = Math.floor(3 / lora);
+    
+    // Premium plan (100 credits)
+    document.getElementById('premiumImages').textContent = Math.floor(100 / images);
+    document.getElementById('premiumBanners').textContent = Math.floor(100 / banners);
+    document.getElementById('premiumMagix').textContent = Math.floor(100 / magix);
+    document.getElementById('premiumLora').textContent = Math.floor(100 / lora);
+    
+    // Professional plan (1000 credits)
+    document.getElementById('proImages').textContent = Math.floor(1000 / images);
+    document.getElementById('proBanners').textContent = Math.floor(1000 / banners);
+    document.getElementById('proMagix').textContent = Math.floor(1000 / magix);
+    document.getElementById('proLora').textContent = Math.floor(1000 / lora);
+}
+
+// Add event listeners to inputs
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = ['credit_cost_images', 'credit_cost_banners', 'credit_cost_magix', 'credit_cost_lora_training'];
+    inputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', updateImpactPreview);
+    });
+    
+    // Initial update
+    updateImpactPreview();
+});
+
+// Handle form submission
+document.getElementById('creditConfigForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const saveButton = document.getElementById('saveButton');
+    const originalText = saveButton.innerHTML;
+    
+    // Show loading state
+    saveButton.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Saving...';
+    saveButton.disabled = true;
+    
+    const formData = new FormData(this);
+    const creditCosts = {
+        images: parseFloat(formData.get('images')),
+        banners: parseFloat(formData.get('banners')),
+        magix: parseFloat(formData.get('magix')),
+        lora_training: parseFloat(formData.get('lora_training'))
+    };
+    
+    fetch('{{ url_for("admin.credit_configuration") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            credit_costs: creditCosts
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Credit costs updated successfully!', 'success');
+            // Update original values
+            Object.assign(originalValues, creditCosts);
+        } else {
+            showToast(data.message || 'Failed to update credit costs', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('An error occurred while updating credit costs', 'error');
+    })
+    .finally(() => {
+        // Restore button state
+        saveButton.innerHTML = originalText;
+        saveButton.disabled = false;
+    });
+});
+
+// Reset form to original values
+function resetForm() {
+    document.getElementById('credit_cost_images').value = originalValues.images;
+    document.getElementById('credit_cost_banners').value = originalValues.banners;
+    document.getElementById('credit_cost_magix').value = originalValues.magix;
+    document.getElementById('credit_cost_lora_training').value = originalValues.lora_training;
+    updateImpactPreview();
+}
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-top toast-end`;
+    
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `<span>${message}</span>`;
+    
+    toast.appendChild(alert);
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

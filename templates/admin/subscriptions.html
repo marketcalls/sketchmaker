@@ -84,6 +84,10 @@
                                        class="btn btn-sm btn-ghost">
                                         View Usage
                                     </a>
+                                    <a href="{{ url_for('admin_subscription.edit_user_limits', user_id=item.user.id) }}" 
+                                       class="btn btn-sm btn-primary">
+                                        Edit Limits
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -155,10 +159,10 @@
     </form>
 </dialog>
 
-<!-- Modify Credits Modal -->
+<!-- Modify Features Modal -->
 <dialog id="modifyCreditsModal" class="modal">
-    <div class="modal-box">
-        <h3 class="font-bold text-lg mb-4">Modify User Credits</h3>
+    <div class="modal-box max-w-2xl">
+        <h3 class="font-bold text-lg mb-4">Modify User Features & Credits</h3>
         <form id="modifyCreditsForm">
             <input type="hidden" id="modifyUserId" name="user_id">
             
@@ -169,33 +173,51 @@
                 <input type="text" id="modifyUsername" class="input input-bordered" readonly>
             </div>
             
+            <!-- Feature Type Selection -->
             <div class="form-control mb-4">
                 <label class="label">
-                    <span class="label-text">Current Credits</span>
+                    <span class="label-text">Modify Type</span>
                 </label>
-                <input type="text" id="currentCredits" class="input input-bordered" readonly>
+                <select id="modifyType" name="modify_type" class="select select-bordered" required onchange="updateModifyForm()">
+                    <option value="credits">Credits</option>
+                    <option value="images">AI Images</option>
+                    <option value="banners">Banners</option>
+                    <option value="magix">Magix Edits</option>
+                    <option value="lora_training">LoRA Training</option>
+                </select>
             </div>
             
+            <!-- Current Value Display -->
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text" id="currentValueLabel">Current Credits</span>
+                </label>
+                <input type="text" id="currentValue" class="input input-bordered" readonly>
+            </div>
+            
+            <!-- Action Selection -->
             <div class="form-control mb-4">
                 <label class="label">
                     <span class="label-text">Action</span>
                 </label>
-                <select id="creditAction" name="action" class="select select-bordered" required>
-                    <option value="add">Add Credits</option>
-                    <option value="set">Set Credits To</option>
+                <select id="featureAction" name="action" class="select select-bordered" required>
+                    <option value="add">Add</option>
+                    <option value="set">Set To</option>
+                    <option value="reset">Reset to 0</option>
                 </select>
             </div>
             
-            <div class="form-control mb-4">
+            <!-- Amount Input -->
+            <div class="form-control mb-4" id="amountContainer">
                 <label class="label">
-                    <span class="label-text">Credits</span>
+                    <span class="label-text" id="amountLabel">Amount</span>
                 </label>
-                <input type="number" id="creditAmount" name="credits" 
+                <input type="number" id="featureAmount" name="amount" 
                        class="input input-bordered" min="0" required>
             </div>
             
             <div class="modal-action">
-                <button type="submit" class="btn btn-primary">Update Credits</button>
+                <button type="submit" class="btn btn-primary">Update</button>
                 <button type="button" class="btn" onclick="modifyCreditsModal.close()">Cancel</button>
             </div>
         </form>
@@ -219,14 +241,84 @@ function showAssignPlanModal(userId, username) {
     assignPlanModal.showModal();
 }
 
-// Show modify credits modal
+// Store user data for modal
+let currentUserData = {};
+
+// Show modify features modal
 function showModifyCreditsModal(userId, username, currentCredits) {
-    document.getElementById('modifyUserId').value = userId;
-    document.getElementById('modifyUsername').value = username;
-    document.getElementById('currentCredits').value = currentCredits;
-    document.getElementById('creditAction').value = 'add';
-    document.getElementById('creditAmount').value = '';
-    modifyCreditsModal.showModal();
+    // Fetch user data first
+    fetch(`/admin/subscriptions/user-data/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            currentUserData = data;
+            
+            document.getElementById('modifyUserId').value = userId;
+            document.getElementById('modifyUsername').value = username;
+            document.getElementById('modifyType').value = 'credits';
+            document.getElementById('currentValue').value = currentCredits;
+            document.getElementById('featureAction').value = 'add';
+            document.getElementById('featureAmount').value = '';
+            
+            modifyCreditsModal.showModal();
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+            // Fallback to basic modal
+            document.getElementById('modifyUserId').value = userId;
+            document.getElementById('modifyUsername').value = username;
+            document.getElementById('currentValue').value = currentCredits;
+            modifyCreditsModal.showModal();
+        });
+}
+
+// Update form when modify type changes
+function updateModifyForm() {
+    const modifyType = document.getElementById('modifyType').value;
+    const currentValueLabel = document.getElementById('currentValueLabel');
+    const currentValue = document.getElementById('currentValue');
+    const amountLabel = document.getElementById('amountLabel');
+    const amountContainer = document.getElementById('amountContainer');
+    const featureAction = document.getElementById('featureAction');
+    
+    // Update labels and current value based on type
+    switch(modifyType) {
+        case 'credits':
+            currentValueLabel.textContent = 'Current Credits';
+            amountLabel.textContent = 'Credits';
+            currentValue.value = currentUserData.credits_remaining || 0;
+            break;
+        case 'images':
+            currentValueLabel.textContent = 'Current Images Used';
+            amountLabel.textContent = 'Images';
+            currentValue.value = currentUserData.images_used_this_month || 0;
+            break;
+        case 'banners':
+            currentValueLabel.textContent = 'Current Banners Used';
+            amountLabel.textContent = 'Banners';
+            currentValue.value = currentUserData.banners_used_this_month || 0;
+            break;
+        case 'magix':
+            currentValueLabel.textContent = 'Current Magix Used';
+            amountLabel.textContent = 'Magix Edits';
+            currentValue.value = currentUserData.magix_used_this_month || 0;
+            break;
+        case 'lora_training':
+            currentValueLabel.textContent = 'Current LoRA Used';
+            amountLabel.textContent = 'LoRA Trainings';
+            currentValue.value = currentUserData.lora_training_used_this_month || 0;
+            break;
+    }
+    
+    // Show/hide amount input for reset action
+    featureAction.onchange = function() {
+        if (this.value === 'reset') {
+            amountContainer.style.display = 'none';
+            document.getElementById('featureAmount').required = false;
+        } else {
+            amountContainer.style.display = 'block';
+            document.getElementById('featureAmount').required = true;
+        }
+    };
 }
 
 // Handle assign plan form submission
@@ -261,16 +353,20 @@ document.getElementById('assignPlanForm').addEventListener('submit', async (e) =
     }
 });
 
-// Handle modify credits form submission
+// Handle modify features form submission
 document.getElementById('modifyCreditsForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
-    data.credits = parseInt(data.credits);
+    
+    // Parse amount if it exists
+    if (data.amount) {
+        data.amount = parseInt(data.amount);
+    }
     
     try {
-        const response = await fetch('/admin/subscriptions/modify-credits', {
+        const response = await fetch('/admin/subscriptions/modify-features', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -286,7 +382,7 @@ document.getElementById('modifyCreditsForm').addEventListener('submit', async (e
             modifyCreditsModal.close();
             setTimeout(() => location.reload(), 1500);
         } else {
-            showToast(result.message || 'Failed to modify credits', 'error');
+            showToast(result.message || 'Failed to modify features', 'error');
         }
     } catch (error) {
         showToast('An error occurred', 'error');

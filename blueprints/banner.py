@@ -255,6 +255,22 @@ def banner_page():
 @login_required
 def generate_banner():
     try:
+        # Check if user can create banners (credit-based limit)
+        if not current_user.can_use_feature('banners'):
+            subscription = current_user.get_subscription()
+            plan_name = subscription.plan.display_name if subscription else 'No Plan'
+            credits_remaining = current_user.get_credits_remaining()
+            credit_cost = current_user.get_credit_cost('banners')
+            return jsonify({
+                'error': 'Insufficient credits for banner creation',
+                'details': f'You need {credit_cost} credit{"s" if credit_cost > 1 else ""} to create a banner. You have {credits_remaining} credits remaining. Your current plan is: {plan_name}',
+                'type': 'insufficient_credits',
+                'feature': 'banners',
+                'credits_needed': credit_cost,
+                'credits_remaining': credits_remaining,
+                'plan': plan_name
+            }), 403
+        
         # Check if system has required API keys
         from models import APISettings
         api_settings = APISettings.get_settings()
@@ -297,6 +313,19 @@ def generate_banner():
 
                 # Save banner and create database record
                 image = save_banner_image(svg_content, prompt, width, height, style)
+                
+                # Track banner usage
+                current_user.use_feature(
+                    feature_type='banners',
+                    amount=1,
+                    extra_data={
+                        'prompt': prompt,
+                        'style': style,
+                        'width': width,
+                        'height': height,
+                        'image_id': image.id
+                    }
+                )
                 
                 return jsonify({
                     'svg': svg_content,

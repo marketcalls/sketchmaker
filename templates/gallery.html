@@ -84,7 +84,8 @@ document.getElementById('confirmDelete').addEventListener('click', async () => {
         const response = await fetch(`/gallery/${imageIdToDelete}/delete`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             }
         });
         

@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify, request
 from extensions import db, login_manager, limiter, get_rate_limit_string, csrf
 from flask_migrate import Migrate
 from services.scheduler import subscription_scheduler
+from version import get_version_info, get_display_version
 import os
 import atexit
 from dotenv import load_dotenv
@@ -332,6 +333,14 @@ def create_app():
         init_api_providers()
         init_subscription_plans()
         init_api_settings()
+        
+        # Add version information to template context
+        @app.context_processor
+        def inject_version():
+            return {
+                'app_version': get_version_info(),
+                'display_version': get_display_version()
+            }
     
     return app
 

@@ -92,6 +92,13 @@ class SubscriptionScheduler:
         """Schedule credit resets for all active subscriptions"""
         try:
             with self.app.app_context():
+                # Check if the table exists first
+                from sqlalchemy import inspect
+                inspector = inspect(db.engine)
+                if 'user_subscriptions' not in inspector.get_table_names():
+                    logger.info("Database tables not yet created, skipping user scheduling")
+                    return
+                
                 active_subscriptions = UserSubscription.query.filter_by(is_active=True).all()
                 
                 scheduled_count = 0

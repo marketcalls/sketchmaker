@@ -232,7 +232,8 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
         const response = await fetch('/banner/generate', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrf_token
             },
             body: JSON.stringify(formData)
         });

@@ -154,6 +154,62 @@ class User(UserMixin, db.Model):
             db.session.commit()
             return True
         return False
+    
+    def can_use_feature(self, feature_type, amount=1):
+        """Check if user can use a specific feature"""
+        sub = self.get_subscription()
+        if not sub:
+            return False
+        
+        # Check if credits need to be reset
+        if sub.should_reset_credits():
+            sub.reset_monthly_credits()
+        
+        return sub.can_use_feature(feature_type, amount)
+    
+    def use_feature(self, feature_type, amount=1, extra_data=None):
+        """Use credits for a feature and log the usage"""
+        from .subscription import UsageHistory
+        
+        sub = self.get_subscription()
+        if not sub:
+            return False
+        
+        # Check if credits need to be reset
+        if sub.should_reset_credits():
+            sub.reset_monthly_credits()
+        
+        # Get credit cost for this feature
+        credit_cost = sub.get_credit_cost(feature_type)
+        total_cost = credit_cost * amount
+        
+        if sub.use_feature(feature_type, amount):
+            # Log usage with actual credit cost
+            usage = UsageHistory(
+                user_id=self.id,
+                subscription_id=sub.id,
+                action=feature_type,
+                credits_used=total_cost,
+                extra_data=extra_data
+            )
+            db.session.add(usage)
+            db.session.commit()
+            return True
+        return False
+    
+    def get_feature_usage_count(self, feature_type):
+        """Get count of feature usage this month"""
+        sub = self.get_subscription()
+        if not sub:
+            return 0
+        return sub.get_feature_usage_count(feature_type)
+    
+    def get_credit_cost(self, feature_type):
+        """Get credit cost for a feature"""
+        sub = self.get_subscription()
+        if not sub:
+            return 1.0
+        return sub.get_credit_cost(feature_type)
 
     @staticmethod
     def get_first_user():

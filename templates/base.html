@@ -226,6 +226,7 @@
                 </svg>
                 <span>Sketch Maker AI</span>
             </a>
+            <a href="{{ url_for('core.pricing') }}" class="btn btn-ghost">Pricing</a>
             {% if current_user.is_authenticated %}
                 <a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost">Dashboard</a>
                 <a href="{{ url_for('banner.banner_page') }}" class="btn btn-ghost">Banner</a>
@@ -276,6 +277,22 @@
     </div>
     
     {% block content %}{% endblock %}
+
+    <!-- Footer with Version Info -->
+    <footer class="footer footer-center p-4 bg-base-200/50 backdrop-blur-lg border-t border-base-300 text-base-content/70 mt-8">
+        <div class="flex items-center justify-center gap-4 text-sm">
+            <div class="flex items-center gap-2">
+                <span>{{ app_version.product_name }}</span>
+                <span class="badge badge-sm badge-ghost">v{{ app_version.version }}</span>
+                {% if app_version.product_codename %}
+                <span class="text-xs opacity-60">({{ app_version.product_codename }})</span>
+                {% endif %}
+            </div>
+            <div class="text-xs opacity-50">
+                {{ app_version.copyright }}
+            </div>
+        </div>
+    </footer>
 
     <!-- Toast Container -->
     <div id="toast-container"></div>

@@ -93,15 +93,19 @@ def generate_prompt_route():
 @login_required
 def generate_image_route():
     try:
-        # Check if user has credits
-        if not current_user.can_generate_image():
+        # Check if user can generate images (credit-based limit)
+        if not current_user.can_use_feature('images'):
             subscription = current_user.get_subscription()
             plan_name = subscription.plan.display_name if subscription else 'No Plan'
+            credits_remaining = current_user.get_credits_remaining()
+            credit_cost = current_user.get_credit_cost('images')
             return jsonify({
-                'error': 'Insufficient credits',
-                'details': f'You have no credits remaining. Your current plan is: {plan_name}',
+                'error': 'Insufficient credits for image generation',
+                'details': f'You need {credit_cost} credit{"s" if credit_cost > 1 else ""} to generate an image. You have {credits_remaining} credits remaining. Your current plan is: {plan_name}',
                 'type': 'insufficient_credits',
-                'credits_remaining': 0,
+                'feature': 'images',
+                'credits_needed': credit_cost,
+                'credits_remaining': credits_remaining,
                 'plan': plan_name
             }), 403
         
@@ -302,17 +306,17 @@ def generate_image_route():
         
         db.session.commit()
         
-        # Use credits after successful generation
-        credits_used = len(saved_images)  # Use 1 credit per image generated
-        if credits_used > 0:
-            current_user.use_credits(
-                amount=credits_used,
-                action='image_generation',
+        # Track feature usage after successful generation
+        images_generated = len(saved_images)
+        if images_generated > 0:
+            current_user.use_feature(
+                feature_type='images',
+                amount=images_generated,
                 extra_data={
                     'model': model,
                     'prompt': prompt,
                     'art_style': art_style,
-                    'images_generated': credits_used
+                    'images_generated': images_generated
                 }
             )
 

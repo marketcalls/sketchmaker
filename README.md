@@ -56,15 +56,16 @@ A sophisticated web application that leverages multiple AI providers and models 
 
 
 ### 💎 Subscription Management System
-- **Credit-Based System**: Monthly credit allocations
+- **Credit-Based System**: Monthly credit allocations with dynamic cost configuration
 - **Three-tier Plans**:
-  - **Free**: 10 credits/month, basic features
+  - **Free**: 3 credits/month, basic features
   - **Premium**: 100 credits/month, all models, LoRA training
-  - **Pro**: 1000 credits/month, API access, priority support
+  - **Professional**: 1000 credits/month, API access, priority support
+- **Dynamic Credit Costs**: Administrators can configure credit costs per feature
 - **Personalized Reset Dates**: Credits reset based on subscription start date
 - **Automatic Scheduling**: APScheduler handles all credit resets
 - **Usage Tracking**: Complete audit trail with metadata
-- **Admin Controls**: Plan assignment, credit modification, reports
+- **Admin Controls**: Plan assignment, credit modification, reports, dynamic cost configuration
 
 ### 🔐 Advanced Security & Authentication
 - **Multiple Auth Methods**:
@@ -90,6 +91,7 @@ A sophisticated web application that leverages multiple AI providers and models 
   - Default provider/model selection
   - API health monitoring
 - **Subscription Controls**: Plan management, credit adjustments, usage analytics
+- **Dynamic Credit Configuration**: Real-time credit cost adjustments per feature
 - **System Configuration**: Email settings, authentication controls, rate limits
 
 ![AI Generated Thumbnail](https://marketcalls.in/wp-content/uploads/2024/08/thumbnail-1.png)
@@ -247,15 +249,20 @@ Configure in **Admin → Email Settings**:
 #### Default Plans
 | Plan | Monthly Credits | Features |
 |------|----------------|----------|
-| **Free** | 10 | Basic models, Standard resolution |
+| **Free** | 3 | Basic models, Standard resolution |
 | **Premium** | 100 | All models, LoRA training, High resolution |
-| **Pro** | 1000 | API access, Ultra-high resolution, Priority support |
+| **Professional** | 1000 | API access, Ultra-high resolution, Priority support |
 
-#### Credit System
-- **Simple model**: 1 credit per image (any model/size)
+#### Dynamic Credit System
+- **Configurable Costs**: Administrators can adjust credit costs per feature
+  - AI Images: Default 1 credit (configurable)
+  - Banners: Default 0.5 credits (configurable)
+  - Magix Edits: Default 1 credit (configurable)
+  - LoRA Training: Default 40 credits (configurable)
 - **Automatic resets**: Based on individual subscription dates
 - **Real-time tracking**: Dashboard shows remaining credits
 - **Usage history**: Complete audit trail
+- **Immediate Updates**: Credit cost changes reflect instantly across all interfaces
 
 ## 📖 Usage Guide
 
@@ -289,6 +296,7 @@ Configure in **Admin → Email Settings**:
    - Check API status
    - Generate usage reports
    - Manage models dynamically
+   - Configure dynamic credit costs
 
 ### API Rate Limits
 - Default: 60 requests per minute
