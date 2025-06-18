@@ -11,7 +11,7 @@
         <div class="aspect-square relative group">
             <a href="{{ url_for('gallery.view_image', image_id=image.id) }}" 
                class="block w-full h-full">
-                <img src="{{ image.get_url('webp') }}" 
+                <img src="{{ image.get_url() }}" 
                      alt="Generated image" 
                      class="w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-[1.02]">
                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">

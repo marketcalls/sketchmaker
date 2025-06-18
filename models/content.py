@@ -37,10 +37,28 @@ class Image(db.Model):
     @property
     def file_path(self):
         return os.path.join('static', 'images', self.filename)
+    
+    @property
+    def file_extension(self):
+        """Get the actual file extension"""
+        return os.path.splitext(self.filename)[1].lower().lstrip('.')
 
-    def get_url(self, format='png'):
-        base_filename = os.path.splitext(self.filename)[0]
-        return f'/static/images/{base_filename}.{format}'
+    def get_url(self, format=None):
+        """Get URL for the image. If format is None, use the actual file format"""
+        if format is None:
+            # Return the actual file URL
+            return f'/static/images/{self.filename}'
+        else:
+            # Check if the requested format file exists
+            base_filename = os.path.splitext(self.filename)[0]
+            requested_path = os.path.join('static', 'images', f'{base_filename}.{format}')
+            
+            # If the requested format exists, return it
+            if os.path.exists(os.path.join(os.path.dirname(__file__), '..', requested_path)):
+                return f'/static/images/{base_filename}.{format}'
+            else:
+                # Otherwise, return the original file
+                return f'/static/images/{self.filename}'
 
 class TrainingHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)

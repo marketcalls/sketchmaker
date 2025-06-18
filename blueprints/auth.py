@@ -87,7 +87,7 @@ Your account has been successfully created{"and is pending administrator approva
 With Sketch Maker AI, you can:
 - Generate stunning artwork using multiple AI models (1 credit each)
 - Create custom banners with various styles (0.5 credits each)
-- Edit images with Magix AI tools (1 credit each)
+- Enhance images with Magix AI (1 credit each)
 - Train your own custom models (40 credits each)
 - Manage your creations in a personal gallery
 

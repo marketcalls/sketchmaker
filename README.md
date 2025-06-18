@@ -25,15 +25,23 @@ A sophisticated web application that leverages multiple AI providers and models 
 - **Advanced Controls**: Resolution, style, inference steps, guidance scale
 - **Batch Generation**: Multiple images per request
 
-### 🖼️ Image Magix (AI Inpainting)
-- Interactive image editing with AI-powered generation
-- Draw and mask specific areas for targeted modifications
-- Real-time canvas interface with undo/redo functionality
-- Precise brush control for detailed selections
-- AI-powered content generation in marked areas
-- Integration with FAL's flux-pro/v1/fill model
-- Support for multiple image formats (JPEG, PNG, WebP)
-- Download generated results in high quality
+### 🖼️ Magix - AI Image Enhancement
+- **Intelligent Context-Aware Enhancement**: Upload an image and describe modifications in natural language
+- **Multiple Aspect Ratios**: Support for 10 different aspect ratios including:
+  - Default (maintains original), 21:9, 16:9, 4:3, 3:2, 1:1, 2:3, 3:4, 9:16, 9:21
+- **Advanced Controls**:
+  - Adjustable guidance scale (1-10) for prompt adherence control
+  - Seed support for reproducible results
+  - Real-time generation progress tracking
+- **Smart AI Understanding**: 
+  - Recognizes objects and spatial relationships in your image
+  - Seamlessly blends new elements while maintaining style consistency
+  - Understands complex prompts like "add a sunset", "place a donut next to the flour", etc.
+- **Professional UI**: Large image preview with side-by-side comparison
+- **Multiple format support**: JPEG, PNG, WebP (up to 25MB)
+- **High-quality downloads**: Export enhanced images in original quality
+- **Gallery Integration**: All generated images automatically saved to your personal gallery with prompts
+- **Powered by**: Latest Flux Pro Kontext model for superior results
 
 ### 🎯 Banner Generation
 - SVG banner creation with precise control

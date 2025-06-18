@@ -17,7 +17,7 @@
             <!-- Image Section -->
             <div class="space-y-6">
                 <div class="relative">
-                    <img src="{{ image.get_url('webp') }}" 
+                    <img src="{{ image.get_url() }}" 
                          alt="Generated image" 
                          class="w-full rounded-lg shadow-lg">
                     <!-- Dimensions Badge - Only show if dimensions are available -->
@@ -32,15 +32,23 @@
                 
                 <!-- Download Options -->
                 <div class="flex flex-wrap gap-4">
-                    <a href="{{ image.get_url('webp') }}" download class="btn btn-primary">
-                        Download WebP
-                    </a>
-                    <a href="{{ image.get_url('png') }}" download class="btn btn-primary">
-                        Download PNG
-                    </a>
-                    <a href="{{ image.get_url('jpeg') }}" download class="btn btn-primary">
-                        Download JPEG
-                    </a>
+                    {% if image.art_style == 'magix' %}
+                        <!-- For Magix images, only show JPEG download -->
+                        <a href="{{ image.get_url() }}" download class="btn btn-primary">
+                            Download JPEG
+                        </a>
+                    {% else %}
+                        <!-- For other images, show all format options -->
+                        <a href="{{ image.get_url('webp') }}" download class="btn btn-primary">
+                            Download WebP
+                        </a>
+                        <a href="{{ image.get_url('png') }}" download class="btn btn-primary">
+                            Download PNG
+                        </a>
+                        <a href="{{ image.get_url('jpeg') }}" download class="btn btn-primary">
+                            Download JPEG
+                        </a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -54,7 +62,13 @@
                 {% if image.art_style %}
                 <div>
                     <h3 class="text-lg font-semibold mb-2">Style</h3>
-                    <p class="text-base-content/80">{{ image.art_style }}</p>
+                    <p class="text-base-content/80">
+                        {% if image.art_style == 'magix' %}
+                            Magix AI Enhancement
+                        {% else %}
+                            {{ image.art_style }}
+                        {% endif %}
+                    </p>
                 </div>
                 {% endif %}
                 

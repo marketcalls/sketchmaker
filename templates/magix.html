@@ -5,93 +5,243 @@
 <!-- Add Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
-.canvas-container {
-    margin: 0 auto !important;
-}
-.canvas-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-    max-height: 400px;
-    overflow: hidden;
-    position: relative;
-}
-.canvas-container,
-.canvas-container.drawing,
-.canvas-container canvas,
-.upper-canvas {
-    cursor: crosshair !important;
-}
-#editor {
-    border: 1px solid rgba(var(--b3, var(--b2)) / var(--tw-border-opacity));
+.image-preview {
+    width: 100%;
+    height: auto;
+    max-height: 600px;
+    object-fit: contain;
     border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.upload-area {
+    border: 2px dashed rgba(var(--b3, var(--b2)) / var(--tw-border-opacity));
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+.upload-area:hover {
+    border-color: rgba(var(--p) / var(--tw-border-opacity));
+    background-color: rgba(var(--p) / 0.05);
+}
+.upload-area.dragover {
+    border-color: rgba(var(--p) / var(--tw-border-opacity));
+    background-color: rgba(var(--p) / 0.1);
+}
+.image-container {
+    background: var(--fallback-b1,oklch(var(--b1)));
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+.aspect-ratio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+.aspect-ratio-btn {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid rgba(var(--b3, var(--b2)) / var(--tw-border-opacity));
+    transition: all 0.2s;
+}
+.aspect-ratio-btn.active {
+    background-color: var(--fallback-p,oklch(var(--p)));
+    color: var(--fallback-pc,oklch(var(--pc)));
+    border-color: var(--fallback-p,oklch(var(--p)));
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-2">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-2xl font-bold mb-2">Image Magix Generator</h1>
+<div class="container mx-auto px-4 py-4">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-2">Magix - AI Image Enhancement</h1>
+        <p class="text-base-content/70 mb-6">Upload an image and describe what you want to add or modify. Magix AI will intelligently enhance your image based on your prompt.</p>
 
-        <div class="grid grid-cols-1 gap-1">
-            <!-- Image Upload Section -->
-            <div class="card bg-base-200 shadow-xl">
-                <div class="card-body p-2">
-                    <div class="form-control">
-                        <input type="file" id="imageUpload" accept="image/jpeg,image/png,image/webp" class="file-input file-input-bordered w-full" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Canvas Editor Section -->
-            <div class="card bg-base-200 shadow-xl">
-                <div class="card-body p-2">
-                    <div class="canvas-wrapper">
-                        <!-- Visible canvas for drawing on image -->
-                        <canvas id="editor"></canvas>
-                        <!-- Hidden canvas for mask -->
-                        <canvas id="maskCanvas" class="hidden"></canvas>
-                        <div class="absolute top-2 right-2 flex gap-2">
-                            <button id="undoBtn" class="btn btn-circle btn-sm" disabled>
-                                <i class="fas fa-undo"></i>
-                            </button>
-                            <button id="redoBtn" class="btn btn-circle btn-sm" disabled>
-                                <i class="fas fa-redo"></i>
-                            </button>
-                            <button id="drawTool" class="btn btn-circle btn-sm btn-primary">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            <button id="clearCanvas" class="btn btn-circle btn-sm">
-                                <i class="fas fa-trash"></i>
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <!-- Left Column: Upload and Image Preview -->
+            <div class="space-y-4">
+                <!-- Image Upload/Preview Section -->
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title text-lg mb-4">
+                            <i class="fas fa-image"></i>
+                            Original Image
+                        </h3>
+                        <div id="uploadArea" class="upload-area p-12 text-center cursor-pointer min-h-[400px] flex items-center justify-center">
+                            <input type="file" id="imageUpload" accept="image/jpeg,image/png,image/webp" class="hidden" />
+                            <div id="uploadContent">
+                                <i class="fas fa-cloud-upload-alt text-5xl text-base-content/50 mb-4"></i>
+                                <p class="text-xl font-medium">Click to upload or drag & drop</p>
+                                <p class="text-base text-base-content/70 mt-2">JPEG, PNG, WebP (max 25MB)</p>
+                            </div>
+                        </div>
+                        <div id="imagePreviewContainer" class="hidden">
+                            <div class="image-container">
+                                <img id="imagePreview" class="image-preview" />
+                            </div>
+                            <button id="changeImageBtn" class="btn btn-sm btn-outline mt-3 w-full">
+                                <i class="fas fa-exchange-alt"></i>
+                                Change Image
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Prompt Input Section -->
-            <div class="card bg-base-200 shadow-xl">
-                <div class="card-body p-2">
-                    <div class="flex flex-col gap-1">
-                        <textarea id="prompt" class="textarea textarea-bordered h-12" placeholder="Describe what you want to generate in the marked area..."></textarea>
-                        <button id="generateBtn" class="btn btn-primary w-full">
-                            Generate Magix
+                <!-- Controls Section -->
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title text-lg">
+                            <i class="fas fa-sliders-h"></i>
+                            Settings
+                        </h3>
+                        
+                        <!-- Prompt Input -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-medium">Prompt</span>
+                                <span class="label-text-alt text-xs">Describe what to add/modify</span>
+                            </label>
+                            <textarea id="prompt" class="textarea textarea-bordered h-24" placeholder="E.g., 'Put a donut next to the flour', 'Add a sunset in the background', 'Change the color to blue'"></textarea>
+                        </div>
+
+                        <!-- Aspect Ratio Selection -->
+                        <div class="form-control mt-4">
+                            <label class="label">
+                                <span class="label-text font-medium">Aspect Ratio</span>
+                                <span class="label-text-alt text-xs">Output image dimensions</span>
+                            </label>
+                            <div class="aspect-ratio-grid">
+                                <button class="btn aspect-ratio-btn active" data-ratio="">Default</button>
+                                <button class="btn aspect-ratio-btn" data-ratio="21:9">21:9</button>
+                                <button class="btn aspect-ratio-btn" data-ratio="16:9">16:9</button>
+                                <button class="btn aspect-ratio-btn" data-ratio="4:3">4:3</button>
+                                <button class="btn aspect-ratio-btn" data-ratio="3:2">3:2</button>
+                                <button class="btn aspect-ratio-btn" data-ratio="1:1">1:1</button>
+                                <button class="btn aspect-ratio-btn" data-ratio="2:3">2:3</button>
+                                <button class="btn aspect-ratio-btn" data-ratio="3:4">3:4</button>
+                                <button class="btn aspect-ratio-btn" data-ratio="9:16">9:16</button>
+                                <button class="btn aspect-ratio-btn" data-ratio="9:21">9:21</button>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Settings -->
+                        <div class="collapse collapse-arrow bg-base-100 mt-4">
+                            <input type="checkbox" />
+                            <div class="collapse-title text-sm font-medium">
+                                Advanced Settings
+                            </div>
+                            <div class="collapse-content space-y-3">
+                                <!-- Guidance Scale -->
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text text-sm">Guidance Scale</span>
+                                        <span class="label-text-alt text-xs" id="guidanceValue">3.5</span>
+                                    </label>
+                                    <input type="range" id="guidanceScale" min="1" max="10" step="0.5" value="3.5" class="range range-sm range-primary" />
+                                    <div class="w-full flex justify-between text-xs px-2 mt-1">
+                                        <span>1</span>
+                                        <span>5</span>
+                                        <span>10</span>
+                                    </div>
+                                </div>
+
+                                <!-- Seed -->
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text text-sm">Seed (optional)</span>
+                                        <span class="label-text-alt text-xs">For reproducible results</span>
+                                    </label>
+                                    <input type="number" id="seed" class="input input-bordered input-sm" placeholder="Leave empty for random" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button id="generateBtn" class="btn btn-primary w-full mt-4" disabled>
+                            <i class="fas fa-magic"></i>
+                            Generate Enhancement
                             <span class="loading loading-spinner loading-sm hidden"></span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Result Section -->
-            <div id="resultSection" class="card bg-base-200 shadow-xl hidden">
-                <div class="card-body p-2">
-                    <div class="flex flex-col gap-1">
-                        <img id="resultImage" class="w-full rounded-lg shadow-lg" />
-                        <button id="downloadBtn" class="btn btn-secondary w-full">
-                            Download Result
-                        </button>
+            <!-- Right Column: Results -->
+            <div class="space-y-4">
+                <!-- Result Section -->
+                <div id="resultSection" class="card bg-base-200 shadow-xl hidden">
+                    <div class="card-body">
+                        <h3 class="card-title text-lg mb-4">
+                            <i class="fas fa-star"></i>
+                            Enhanced Result
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="image-container">
+                                <img id="resultImage" class="image-preview" />
+                            </div>
+                            
+                            <!-- Result Info -->
+                            <div id="resultInfo" class="bg-base-100 p-4 rounded-lg">
+                                <div class="grid grid-cols-2 gap-3 mb-3">
+                                    <div>
+                                        <span class="text-sm font-medium text-base-content/70">Seed:</span>
+                                        <p class="font-mono text-sm" id="resultSeed">-</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm font-medium text-base-content/70">Guidance:</span>
+                                        <p class="text-sm" id="resultGuidance">-</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-base-content/70">Used Prompt:</span>
+                                    <p id="resultPrompt" class="text-sm mt-1">-</p>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-3">
+                                <button id="downloadBtn" class="btn btn-secondary flex-1">
+                                    <i class="fas fa-download"></i>
+                                    Download
+                                </button>
+                                <button id="viewInGalleryBtn" class="btn btn-primary flex-1 hidden">
+                                    <i class="fas fa-images"></i>
+                                    View in Gallery
+                                </button>
+                                <button id="regenerateBtn" class="btn btn-outline flex-1">
+                                    <i class="fas fa-redo"></i>
+                                    Regenerate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Placeholder when no result -->
+                <div id="placeholderSection" class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <div class="text-center py-16">
+                            <i class="fas fa-magic text-6xl text-base-content/20 mb-4"></i>
+                            <h3 class="text-xl font-medium text-base-content/70">Enhanced image will appear here</h3>
+                            <p class="text-sm text-base-content/50 mt-2">Upload an image and enter a prompt to get started</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Section -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title text-lg">
+                            <i class="fas fa-lightbulb"></i>
+                            Tips for Better Results
+                        </h3>
+                        <ul class="text-sm space-y-2 text-base-content/80">
+                            <li><i class="fas fa-check text-success mr-2"></i>Be specific about what you want to add or modify</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Describe the desired style, colors, or mood</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Use clear, descriptive language</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Higher guidance scale = more prompt adherence</li>
+                            <li><i class="fas fa-check text-success mr-2"></i>Choose aspect ratio based on your intended use</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -99,285 +249,210 @@
     </div>
 </div>
 
-<!-- Load Fabric.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-
 <!-- Custom JavaScript -->
 <script>
-let canvas;
-let maskCanvas;
-let originalImage = null;
-let canvasStates = [];
-let maskStates = [];
-let currentStateIndex = -1;
-const maxStates = 30;
-
-function setupDrawingMode() {
-    canvas.isDrawingMode = true;
-    canvas.freeDrawingBrush.color = 'rgba(255, 0, 0, 0.5)';
-    canvas.freeDrawingBrush.width = 5;
-}
-
-function saveState() {
-    // Remove any states after current index (for new actions after undo)
-    canvasStates = canvasStates.slice(0, currentStateIndex + 1);
-    maskStates = maskStates.slice(0, currentStateIndex + 1);
-    
-    // Add new states
-    const canvasState = canvas.toJSON(['backgroundImage']);
-    const maskState = maskCanvas.toJSON();
-    
-    canvasStates.push(JSON.stringify(canvasState));
-    maskStates.push(JSON.stringify(maskState));
-    
-    // Remove oldest states if we exceed maxStates
-    if (canvasStates.length > maxStates) {
-        canvasStates.shift();
-        maskStates.shift();
-    }
-    
-    currentStateIndex = canvasStates.length - 1;
-    
-    // Update undo/redo buttons
-    updateUndoRedoButtons();
-}
-
-function updateUndoRedoButtons() {
-    document.getElementById('undoBtn').disabled = currentStateIndex < 1;
-    document.getElementById('redoBtn').disabled = currentStateIndex >= canvasStates.length - 1;
-}
-
-function resetDrawing() {
-    // Clear both canvases but keep background
-    const bgImage = canvas.backgroundImage;
-    canvas.clear();
-    canvas.setBackgroundImage(bgImage, canvas.renderAll.bind(canvas));
-    
-    maskCanvas.clear();
-    maskCanvas.backgroundColor = 'black';
-    maskCanvas.renderAll();
-    
-    // Reset states but save initial state with background
-    canvasStates = [];
-    maskStates = [];
-    currentStateIndex = -1;
-    
-    if (bgImage) {
-        saveState();
-    }
-    
-    updateUndoRedoButtons();
-    setupDrawingMode();
-}
-
-function setupCanvas(img) {
-    // Set canvas dimensions to match image
-    canvas.setWidth(img.width);
-    canvas.setHeight(img.height);
-    maskCanvas.setWidth(img.width);
-    maskCanvas.setHeight(img.height);
-
-    // Get container dimensions
-    const container = document.querySelector('.canvas-wrapper');
-    const maxWidth = container.clientWidth - 20;
-    const maxHeight = container.clientHeight - 20;
-
-    // Calculate scale to fit within container
-    const scaleX = maxWidth / img.width;
-    const scaleY = maxHeight / img.height;
-    const scale = Math.min(scaleX, scaleY);
-
-    // Scale the canvas container using CSS transform
-    canvas.wrapperEl.style.transform = `scale(${scale})`;
-    canvas.wrapperEl.style.transformOrigin = 'center center';
-}
+let uploadedImageUrl = null;
+let currentImageFile = null;
+let selectedAspectRatio = '';
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize main canvas
-    canvas = new fabric.Canvas('editor', {
-        selection: false,
-        defaultCursor: 'crosshair',
-        hoverCursor: 'crosshair'
+    const uploadArea = document.getElementById('uploadArea');
+    const imageUpload = document.getElementById('imageUpload');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const uploadContent = document.getElementById('uploadContent');
+    const generateBtn = document.getElementById('generateBtn');
+    const guidanceScale = document.getElementById('guidanceScale');
+    const guidanceValue = document.getElementById('guidanceValue');
+    const aspectRatioButtons = document.querySelectorAll('.aspect-ratio-btn');
+
+    // Drag and drop functionality
+    uploadArea.addEventListener('click', () => imageUpload.click());
+    
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
     });
-
-    // Initialize mask canvas
-    maskCanvas = new fabric.Canvas('maskCanvas', {
-        backgroundColor: 'black'
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
     });
-
-    // Set up brush
-    setupDrawingMode();
-
-    // Handle image upload
-    document.getElementById('imageUpload').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                // Create a temporary image to get dimensions
-                const img = new Image();
-                img.onload = function() {
-                    // Store original image
-                    originalImage = img;
-
-                    // Reset drawing before loading new image
-                    canvas.clear();
-                    maskCanvas.clear();
-                    maskCanvas.backgroundColor = 'black';
-                    maskCanvas.renderAll();
-
-                    // Set image as background
-                    fabric.Image.fromURL(event.target.result, function(fabricImg) {
-                        canvas.setBackgroundImage(fabricImg, function() {
-                            setupCanvas(img);
-                            canvas.renderAll();
-                            saveState();
-                        });
-                    });
-
-                    // Reset states
-                    canvasStates = [];
-                    maskStates = [];
-                    currentStateIndex = -1;
-                    updateUndoRedoButtons();
-
-                    // Reset and reactivate drawing mode
-                    setupDrawingMode();
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleImageUpload(files[0]);
         }
     });
 
-    // Undo button
-    document.getElementById('undoBtn').addEventListener('click', function() {
-        if (currentStateIndex > 0) {
-            currentStateIndex--;
-            const canvasState = JSON.parse(canvasStates[currentStateIndex]);
-            const maskState = JSON.parse(maskStates[currentStateIndex]);
-            
-            canvas.loadFromJSON(canvasState, function() {
-                maskCanvas.loadFromJSON(maskState, function() {
-                    canvas.renderAll();
-                    maskCanvas.renderAll();
-                    updateUndoRedoButtons();
-                    setupDrawingMode();
-                });
-            });
+    // File input change
+    imageUpload.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleImageUpload(e.target.files[0]);
         }
     });
 
-    // Redo button
-    document.getElementById('redoBtn').addEventListener('click', function() {
-        if (currentStateIndex < canvasStates.length - 1) {
-            currentStateIndex++;
-            const canvasState = JSON.parse(canvasStates[currentStateIndex]);
-            const maskState = JSON.parse(maskStates[currentStateIndex]);
-            
-            canvas.loadFromJSON(canvasState, function() {
-                maskCanvas.loadFromJSON(maskState, function() {
-                    canvas.renderAll();
-                    maskCanvas.renderAll();
-                    updateUndoRedoButtons();
-                    setupDrawingMode();
-                });
-            });
-        }
+    // Change image button
+    document.getElementById('changeImageBtn').addEventListener('click', () => {
+        // Reset file input
+        imageUpload.value = '';
+        imageUpload.click();
     });
 
-    // Draw tool
-    document.getElementById('drawTool').addEventListener('click', function() {
-        setupDrawingMode();
+    // Guidance scale slider
+    guidanceScale.addEventListener('input', function() {
+        guidanceValue.textContent = this.value;
     });
-
-    // Setup path creation listener
-    canvas.on('path:created', function(e) {
-        const path = e.path;
-        const maskPath = fabric.util.object.clone(path);
-        maskPath.set({
-            stroke: 'white',
-            fill: 'white',
-            strokeWidth: 5
+    
+    // Aspect ratio selection
+    aspectRatioButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            aspectRatioButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            selectedAspectRatio = this.getAttribute('data-ratio');
         });
-        maskCanvas.add(maskPath);
-        maskCanvas.renderAll();
-        
-        // Save state for undo/redo
-        saveState();
     });
 
-    // Clear canvas
-    document.getElementById('clearCanvas').addEventListener('click', resetDrawing);
-
-    // Generate button
-    document.getElementById('generateBtn').addEventListener('click', async function() {
-        const prompt = document.getElementById('prompt').value;
-        if (!prompt) {
-            alert('Please enter a prompt');
+    function handleImageUpload(file) {
+        if (file.size > 25 * 1024 * 1024) {
+            alert('File size must be less than 25MB');
             return;
         }
 
-        if (!originalImage) {
-            alert('Please upload an image');
+        currentImageFile = file;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            uploadedImageUrl = e.target.result;
+            imagePreview.src = uploadedImageUrl;
+            uploadArea.classList.add('hidden');
+            imagePreviewContainer.classList.remove('hidden');
+            generateBtn.disabled = !document.getElementById('prompt').value;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Prompt input validation
+    document.getElementById('prompt').addEventListener('input', function() {
+        generateBtn.disabled = !this.value.trim() || !uploadedImageUrl;
+    });
+
+    // Generate button
+    generateBtn.addEventListener('click', async function() {
+        const prompt = document.getElementById('prompt').value.trim();
+        if (!prompt || !uploadedImageUrl) {
+            alert('Please upload an image and enter a prompt');
             return;
         }
 
         // Show loading state
         this.disabled = true;
         const loadingSpinner = this.querySelector('.loading');
+        const icon = this.querySelector('.fas');
         loadingSpinner.classList.remove('hidden');
+        icon.classList.add('hidden');
 
         try {
-            // Send to backend
+            const requestData = {
+                prompt: prompt,
+                image_url: uploadedImageUrl,
+                guidance_scale: parseFloat(document.getElementById('guidanceScale').value)
+            };
+
+            const seedValue = document.getElementById('seed').value;
+            if (seedValue) {
+                requestData.seed = parseInt(seedValue);
+            }
+            
+            // Add aspect ratio if selected
+            if (selectedAspectRatio) {
+                requestData.aspect_ratio = selectedAspectRatio;
+            }
+
             const response = await fetch('/api/magix/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': window.csrf_token
                 },
-                body: JSON.stringify({
-                    prompt: prompt,
-                    image_data: originalImage.src,
-                    mask_data: maskCanvas.toDataURL({
-                        format: 'png',
-                        backgroundColor: 'black'
-                    })
-                })
+                body: JSON.stringify(requestData)
             });
-
-            if (!response.ok) {
-                throw new Error('Generation failed');
-            }
 
             const result = await response.json();
 
+            if (!response.ok) {
+                throw new Error(result.error || 'Generation failed');
+            }
+
             // Display result
             document.getElementById('resultImage').src = result.image_url;
+            document.getElementById('resultSeed').textContent = result.seed || 'N/A';
+            document.getElementById('resultGuidance').textContent = requestData.guidance_scale;
+            document.getElementById('resultPrompt').textContent = result.prompt || prompt;
             document.getElementById('resultSection').classList.remove('hidden');
+            document.getElementById('placeholderSection').classList.add('hidden');
 
-            // Enable download button
+            // Setup download button
             document.getElementById('downloadBtn').onclick = () => {
-                window.location.href = result.image_url;
+                const link = document.createElement('a');
+                link.href = result.image_url;
+                link.download = `magix_enhanced_${Date.now()}.jpg`;
+                link.click();
             };
+
+            // Setup view in gallery button
+            if (result.gallery_id) {
+                const galleryBtn = document.getElementById('viewInGalleryBtn');
+                galleryBtn.classList.remove('hidden');
+                galleryBtn.onclick = () => {
+                    window.location.href = `/gallery/${result.gallery_id}`;
+                };
+            }
+
+            // Setup regenerate button
+            document.getElementById('regenerateBtn').onclick = () => {
+                generateBtn.click();
+            };
+            
+            // Show success notification
+            showNotification('Image generated and saved to gallery!', 'success');
 
         } catch (error) {
             console.error('Error:', error);
-            alert('Failed to generate image. Please try again.');
+            alert(error.message || 'Failed to generate enhanced image. Please try again.');
         } finally {
             // Reset button state
             this.disabled = false;
             loadingSpinner.classList.add('hidden');
+            icon.classList.remove('hidden');
+            
+            // Re-enable if conditions are met
+            this.disabled = !document.getElementById('prompt').value.trim() || !uploadedImageUrl;
         }
     });
-
-    // Handle window resize
-    window.addEventListener('resize', function() {
-        if (originalImage) {
-            setupCanvas(originalImage);
-            canvas.renderAll();
-        }
-    });
+    
+    // Simple notification function
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type} shadow-lg fixed bottom-4 right-4 z-50 max-w-md`;
+        notification.innerHTML = `
+            <div>
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
 });
 </script>
 {% endblock %}

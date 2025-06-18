@@ -175,52 +175,75 @@ Choose from popular formats:
 - **Call to Action**: Clear, action-oriented
 - **Font Pairing**: Maximum 2 font families
 
-## 🎨 Magix Image Editor
+## 🎨 Magix - AI Image Enhancement
 
-### **Editing Workflow**
+### **Enhancement Workflow**
 
-#### **Step 1: Upload Image**
-- Drag and drop files
-- Maximum 25MB file size
-- Supported formats: JPG, PNG, WebP
-- Multiple images for batch processing
+#### **Step 1: Upload Your Image**
+- **Drag & Drop Support**: Simple file upload interface
+- **File Size Limit**: Maximum 25MB per image
+- **Supported Formats**: JPEG, PNG, WebP
+- **Preview**: Immediate image preview after upload
 
-#### **Step 2: Select Tools**
-Available editing options:
-- **Background Removal**: AI-powered extraction
-- **Style Transfer**: Apply artistic styles
-- **Enhancement**: Improve quality and resolution
-- **Color Adjustment**: Hue, saturation, brightness
-- **Filters**: Artistic and photographic effects
+#### **Step 2: Describe Your Vision**
+Write a natural language prompt describing what you want to add or modify:
+- **Add Objects**: "Put a donut next to the flour"
+- **Change Background**: "Add a sunset in the background"
+- **Modify Colors**: "Change the color to blue"
+- **Add Elements**: "Add flowers in the garden"
+- **Style Changes**: "Make it look vintage"
 
-#### **Step 3: Apply Changes**
-- **Preview**: See changes before applying
-- **Undo/Redo**: Step-by-step history
-- **Compare**: Before/after view
-- **Save**: Export in desired format
+#### **Step 3: Configure Settings**
+Optional advanced settings:
+- **Guidance Scale (1-10)**: Controls how closely the AI follows your prompt
+  - Lower values = More creative freedom
+  - Higher values = Stricter prompt adherence
+- **Seed**: Set a specific number for reproducible results
+- **Output Format**: JPEG for final results
 
-### **Advanced Editing Features**
+#### **Step 4: Generate Enhancement**
+- Click "Generate Enhancement" to process
+- View real-time generation logs
+- Download result or regenerate with different settings
 
-#### **Background Removal**
-Perfect for:
-- **Product Photos**: Clean white backgrounds
-- **Profile Pictures**: Remove distracting elements
-- **Composite Images**: Combine multiple photos
-- **Professional Headshots**: Studio-quality results
+### **Advanced Features**
 
-#### **Style Transfer**
-Transform your images:
-- **Artistic Styles**: Van Gogh, Picasso, modern art
-- **Photography Styles**: Vintage, film, HDR
-- **Mood Changes**: Warm, cool, dramatic
-- **Texture Overlays**: Canvas, paper, metal
+#### **Context-Aware Processing**
+Magix AI understands your image content:
+- **Object Recognition**: Identifies existing elements
+- **Spatial Awareness**: Understands object relationships
+- **Natural Integration**: Seamlessly blends new elements
+- **Style Consistency**: Maintains image cohesion
 
-#### **Enhancement Tools**
-Improve image quality:
-- **Upscaling**: Increase resolution 2x-4x
-- **Noise Reduction**: Remove grain and artifacts
-- **Sharpening**: Enhance edge definition
-- **Color Correction**: Balance and vibrancy
+#### **Prompt Engineering Tips**
+For best results:
+- **Be Specific**: "Add red roses" vs "add flowers"
+- **Include Style**: "in watercolor style", "photorealistic"
+- **Specify Position**: "in the foreground", "in the background"
+- **Describe Colors**: "bright blue sky", "warm golden lighting"
+- **Set Mood**: "dramatic", "peaceful", "vibrant"
+
+#### **Use Case Examples**
+
+**Product Photography**:
+- "Add a clean white background"
+- "Place the product on a marble surface"
+- "Add soft studio lighting"
+
+**Landscape Enhancement**:
+- "Add a dramatic stormy sky"
+- "Include a rainbow after the rain"
+- "Add autumn colors to the trees"
+
+**Portrait Improvements**:
+- "Add a bokeh background"
+- "Include natural sunlight"
+- "Add a professional studio backdrop"
+
+**Creative Art**:
+- "Transform into a fantasy landscape"
+- "Add magical glowing effects"
+- "Include steampunk elements"
 
 ## 🔬 Custom LoRA Training
 
