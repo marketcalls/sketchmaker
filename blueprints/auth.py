@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, SystemSettings, EmailSettings, PasswordResetOTP, AuthSettings
+from models import db, User, SystemSettings, EmailSettings, PasswordResetOTP, AuthSettings, SubscriptionPlanModel, UserSubscription
 from extensions import limiter, get_rate_limit_string
 from jinja2 import Template
 import os
@@ -16,6 +16,39 @@ def is_valid_password(password):
     # Must have at least 8 characters, one uppercase, one lowercase, one number, and one special character
     pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
     return bool(re.match(pattern, password))
+
+def assign_free_plan(user):
+    """Assign free plan to a new user"""
+    try:
+        # Get the free plan
+        free_plan = SubscriptionPlanModel.query.filter_by(name='free').first()
+        
+        if not free_plan:
+            print("Warning: Free plan not found. Creating default free plan.")
+            # Initialize default plans if they don't exist
+            SubscriptionPlanModel.initialize_default_plans()
+            free_plan = SubscriptionPlanModel.query.filter_by(name='free').first()
+        
+        if free_plan:
+            # Create subscription for the user
+            subscription = UserSubscription(
+                user_id=user.id,
+                plan_id=free_plan.id,
+                credits_remaining=free_plan.monthly_credits,
+                credits_used_this_month=0,
+                subscription_start=datetime.utcnow()
+            )
+            db.session.add(subscription)
+            db.session.commit()
+            print(f"Assigned free plan to user {user.username}")
+            return True
+        else:
+            print("Error: Could not create or find free plan")
+            return False
+    except Exception as e:
+        print(f"Error assigning free plan to user {user.username}: {str(e)}")
+        db.session.rollback()
+        return False
 
 def send_welcome_email(user, requires_approval=False):
     """Send welcome email to newly registered user"""
@@ -49,10 +82,13 @@ Hello {user.username},
 
 Your account has been successfully created{"and is pending administrator approval" if requires_approval else ""}.
 
+{"🎉 You've been automatically enrolled in our Free Plan with 3 credits to get you started!" if not requires_approval else ""}
+
 With Sketch Maker AI, you can:
-- Generate stunning artwork using multiple AI models
-- Create custom banners with various styles
-- Train your own custom models
+- Generate stunning artwork using multiple AI models (1 credit each)
+- Create custom banners with various styles (0.5 credits each)
+- Edit images with Magix AI tools (1 credit each)
+- Train your own custom models (40 credits each)
 - Manage your creations in a personal gallery
 
 {"You will receive another email once your account has been approved by an administrator." if requires_approval else "You can now log in and start creating!"}
@@ -271,6 +307,9 @@ def google_callback():
             db.session.add(user)
             db.session.commit()
 
+            # Assign free plan to new user
+            assign_free_plan(user)
+
             # Send welcome email
             email_success, email_message = send_welcome_email(user, requires_approval)
             if not email_success:
@@ -359,6 +398,10 @@ def register():
 
         db.session.add(new_user)
         db.session.commit()
+
+        # Assign free plan to new user (except for first user who becomes superadmin)
+        if not is_first_user:
+            assign_free_plan(new_user)
 
         # Send welcome email
         email_success, email_message = send_welcome_email(new_user, requires_approval)

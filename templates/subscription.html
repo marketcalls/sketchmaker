@@ -11,48 +11,120 @@
     </div>
 
     <div class="container mx-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
-            {% include "partials/subscription_info.html" %}
-            
-            <!-- Upgrade Options -->
-            {% if subscription and subscription.plan.name != 'pro' %}
-            <div class="card bg-base-100 shadow-xl mt-6">
-                <div class="card-body">
-                    <h3 class="card-title">Upgrade Your Plan</h3>
-                    <p class="text-base-content/70">Get more credits and features by upgrading your subscription.</p>
-                    <div class="card-actions justify-end mt-4">
-                        <button class="btn btn-primary" onclick="showToast('Please contact an administrator to upgrade your plan.', 'info')">
-                            Contact Admin to Upgrade
-                        </button>
-                    </div>
-                </div>
+        <!-- Usage Tracking Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Subscription Info -->
+            <div>
+                {% include "partials/subscription_info.html" %}
             </div>
-            {% endif %}
             
-            <!-- Usage History Summary -->
-            <div class="card bg-base-100 shadow-xl mt-6">
+            <!-- Usage Statistics -->
+            <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
-                    <h3 class="card-title">Usage Summary</h3>
+                    <h2 class="card-title">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Usage Statistics
+                    </h2>
+                    
                     {% if subscription %}
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div class="stats stats-vertical shadow w-full">
                         <div class="stat">
-                            <div class="stat-title">Credits Used This Month</div>
-                            <div class="stat-value text-primary">{{ subscription.credits_used_this_month }}</div>
-                        </div>
-                        <div class="stat">
+                            <div class="stat-figure text-primary">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                </svg>
+                            </div>
                             <div class="stat-title">Credits Remaining</div>
-                            <div class="stat-value text-success">{{ subscription.credits_remaining }}</div>
+                            <div class="stat-value text-2xl">{{ subscription.credits_remaining }}</div>
+                            <div class="stat-desc">of {{ subscription.plan.monthly_credits }} monthly credits</div>
                         </div>
+                        
                         <div class="stat">
-                            <div class="stat-title">Monthly Allowance</div>
-                            <div class="stat-value">{{ subscription.plan.monthly_credits }}</div>
+                            <div class="stat-figure text-blue-500">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="stat-title">AI Images Created</div>
+                            <div class="stat-value text-2xl">{{ current_user.get_feature_usage_count('images') }}</div>
+                            <div class="stat-desc">{{ current_user.get_feature_usage_count('images') * subscription.get_credit_cost('images') }} credits used</div>
+                        </div>
+                        
+                        <div class="stat">
+                            <div class="stat-figure text-green-500">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4h10m-10 0V6a1 1 0 011-1h8a1 1 0 011 1v2m-10 0v10a1 1 0 001 1h8a1 1 0 001-1V8"></path>
+                                </svg>
+                            </div>
+                            <div class="stat-title">Banners Created</div>
+                            <div class="stat-value text-2xl">{{ current_user.get_feature_usage_count('banners') }}</div>
+                            <div class="stat-desc">{{ current_user.get_feature_usage_count('banners') * subscription.get_credit_cost('banners') }} credits used</div>
+                        </div>
+                        
+                        <div class="stat">
+                            <div class="stat-figure text-purple-500">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                            </div>
+                            <div class="stat-title">Magix Edits</div>
+                            <div class="stat-value text-2xl">{{ current_user.get_feature_usage_count('magix') }}</div>
+                            <div class="stat-desc">{{ current_user.get_feature_usage_count('magix') * subscription.get_credit_cost('magix') }} credits used</div>
+                        </div>
+                        
+                        <div class="stat">
+                            <div class="stat-figure text-orange-500">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                </svg>
+                            </div>
+                            <div class="stat-title">LoRA Trainings</div>
+                            <div class="stat-value text-2xl">{{ current_user.get_feature_usage_count('lora_training') }}</div>
+                            <div class="stat-desc">{{ current_user.get_feature_usage_count('lora_training') * subscription.get_credit_cost('lora_training') }} credits used</div>
                         </div>
                     </div>
                     {% else %}
-                    <p class="text-base-content/70">No subscription data available.</p>
+                    <div class="alert alert-warning">
+                        <span>No active subscription. Contact administrator for access.</span>
+                    </div>
                     {% endif %}
                 </div>
             </div>
+        </div>
+
+        <!-- Upgrade Options -->
+        {% if subscription and subscription.plan.name != 'professional' %}
+        <div class="card bg-base-100 shadow-xl mb-6">
+            <div class="card-body">
+                <h3 class="card-title">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    Upgrade Your Plan
+                </h3>
+                <p class="text-base-content/70">Get more credits and access to advanced features by upgrading your subscription.</p>
+                <div class="card-actions justify-end mt-4">
+                    <a href="{{ url_for('core.pricing') }}" class="btn btn-primary">
+                        View Plans
+                    </a>
+                    <button class="btn btn-secondary" onclick="showToast('Please contact an administrator to upgrade your plan.', 'info')">
+                        Contact Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Back to Dashboard -->
+        <div class="flex justify-center mt-8">
+            <a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Dashboard
+            </a>
         </div>
     </div>
 </div>

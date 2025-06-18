@@ -51,11 +51,16 @@
             
             <p>Welcome to Sketch Maker AI! We're excited to have you join our creative community. Your account has been successfully created{% if requires_approval %}, and it is currently pending administrator approval{% endif %}.</p>
 
+            {% if not requires_approval %}
+            <p><strong>🎉 You've been automatically enrolled in our Free Plan with 3 credits to get you started!</strong></p>
+            {% endif %}
+
             <p>With Sketch Maker AI, you can:</p>
             <ul>
-                <li>Generate stunning artwork using multiple AI models</li>
-                <li>Create custom banners with various styles</li>
-                <li>Train your own custom models</li>
+                <li>Generate stunning artwork using multiple AI models (1 credit each)</li>
+                <li>Create custom banners with various styles (0.5 credits each)</li>
+                <li>Edit images with Magix AI tools (1 credit each)</li>
+                <li>Train your own custom models (40 credits each)</li>
                 <li>Manage your creations in a personal gallery</li>
             </ul>
 

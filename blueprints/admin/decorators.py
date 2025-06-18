@@ -13,7 +13,7 @@ def admin_required(f):
                     'message': 'You do not have permission to access this page.'
                 }), 403
             flash('You do not have permission to access this page.', 'error')
-            return redirect(url_for('index'))
+            return redirect(url_for('core.index'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -28,6 +28,6 @@ def superadmin_required(f):
                     'message': 'You do not have superadmin permission to access this page.'
                 }), 403
             flash('You do not have superadmin permission to access this page.', 'error')
-            return redirect(url_for('index'))
+            return redirect(url_for('core.index'))
         return f(*args, **kwargs)
     return decorated_function
