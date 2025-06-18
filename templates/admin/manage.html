@@ -139,12 +139,15 @@
                     <dialog id="delete-user-modal-{{ user.id }}" class="modal">
                         <div class="modal-box">
                             <h3 class="font-bold text-lg">Delete User</h3>
-                            <p class="py-4">Are you sure you want to delete {{ user.username }}? This action cannot be undone and will delete all associated data including images and training history.</p>
+                            <p class="py-4">Are you sure you want to delete <strong>{{ user.username }}</strong>? This action cannot be undone and will delete all associated data including images, training history, and subscriptions.</p>
                             <div class="modal-action">
                                 <button onclick="confirmDeleteUser('{{ user.id }}')" class="btn btn-error">Delete</button>
                                 <button class="btn" onclick="document.getElementById('delete-user-modal-{{ user.id }}').close()">Cancel</button>
                             </div>
                         </div>
+                        <form method="dialog" class="modal-backdrop">
+                            <button>close</button>
+                        </form>
                     </dialog>
 
                     <!-- Password Reset Modal -->
@@ -288,7 +291,7 @@ function showToast(message, type = 'info') {
 
 function searchUsers() {
     const query = document.getElementById('searchInput').value;
-    window.location.href = "{{ url_for('admin.dashboard') }}?search=" + encodeURIComponent(query);
+    window.location.href = "{{ url_for('admin.manage') }}?search=" + encodeURIComponent(query);
 }
 
 document.getElementById('searchInput').addEventListener('keypress', function(e) {
@@ -305,7 +308,6 @@ async function updateApprovalSetting(checked) {
         const response = await fetch("{{ url_for('admin.update_settings') }}", {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': window.csrf_token
             },
             body: formData
@@ -333,7 +335,8 @@ async function updateApprovalSetting(checked) {
 }
 
 function updatePasswordStrength(userId) {
-    const password = document.getElementById(`new-password-${userId}`).value;
+    const passwordFieldId = userId === 'new-user' ? 'new-user-password' : `new-password-${userId}`;
+    const password = document.getElementById(passwordFieldId).value;
     let strength = 0;
     let strengthText = '';
     let strengthColor = '';
@@ -418,19 +421,31 @@ function resetPassword(userId) {
 
 async function confirmDeleteUser(userId) {
     try {
+        console.log('Attempting to delete user:', userId);
+        
         const formData = new FormData();
         formData.append('action', 'delete');
 
-        const response = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', userId), {
+        const url = `{{ url_for('admin.update_user', user_id=0) }}`.replace('0', userId);
+        console.log('DELETE URL:', url);
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': window.csrf_token
             },
             body: formData
         });
 
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
+        console.log('Response data:', data);
+        
         showToast(data.message, data.success ? 'success' : 'error');
 
         if (data.success) {
@@ -438,8 +453,8 @@ async function confirmDeleteUser(userId) {
             setTimeout(() => location.reload(), 1000);
         }
     } catch (error) {
-        console.error('Error:', error);
-        showToast('An error occurred while deleting the user', 'error');
+        console.error('Error deleting user:', error);
+        showToast('An error occurred while deleting the user: ' + error.message, 'error');
     }
 }
 
@@ -454,7 +469,6 @@ async function updateUser(userId, action, additionalData = {}) {
         const response = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', userId), {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': window.csrf_token
             },
             body: formData
@@ -496,7 +510,6 @@ async function addUser() {
         const response = await fetch("{{ url_for('admin.add_user') }}", {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': window.csrf_token
             },
             body: formData
@@ -514,5 +527,50 @@ async function addUser() {
         showToast('An error occurred while adding the user', 'error');
     }
 }
+
+// Initialize dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Fix dropdown behavior
+    document.querySelectorAll('.dropdown').forEach(dropdown => {
+        const trigger = dropdown.querySelector('label[tabindex="0"]');
+        const menu = dropdown.querySelector('.dropdown-content');
+        
+        if (trigger && menu) {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Close other dropdowns
+                document.querySelectorAll('.dropdown').forEach(otherDropdown => {
+                    if (otherDropdown !== dropdown) {
+                        otherDropdown.classList.remove('dropdown-open');
+                    }
+                });
+                
+                // Toggle current dropdown
+                dropdown.classList.toggle('dropdown-open');
+            });
+        }
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown').forEach(dropdown => {
+                dropdown.classList.remove('dropdown-open');
+            });
+        }
+    });
+    
+    // Ensure modals work properly
+    document.querySelectorAll('dialog.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            // Close modal when clicking on backdrop
+            if (e.target === modal) {
+                modal.close();
+            }
+        });
+    });
+});
 </script>
 {% endblock %}

@@ -318,6 +318,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     aspect_ratio: formData.aspect_ratio,
                     negative_prompt: formData.negative_prompt
                 });
+            } else if (selectedModel === 'fal-ai/ideogram/v3') {
+                // Add Ideogram V3 specific parameters
+                const imageSizeElement = document.getElementById('ideogramV3ImageSize');
+                const expandPromptElement = document.getElementById('ideogramV3ExpandPrompt');
+                const negativePromptElement = document.getElementById('ideogramV3NegativePrompt');
+                const renderingSpeedElement = document.getElementById('ideogramV3RenderingSpeed');
+                
+                formData.image_size = imageSizeElement ? imageSizeElement.value : 'square_hd';
+                formData.expand_prompt = expandPromptElement ? expandPromptElement.checked : true;
+                formData.rendering_speed = renderingSpeedElement ? renderingSpeedElement.value : 'BALANCED';
+                
+                if (negativePromptElement && negativePromptElement.value.trim()) {
+                    formData.negative_prompt = negativePromptElement.value;
+                }
+                
+                console.log('Ideogram V3 parameters:', {
+                    image_size: formData.image_size,
+                    expand_prompt: formData.expand_prompt,
+                    rendering_speed: formData.rendering_speed,
+                    negative_prompt: formData.negative_prompt
+                });
             } else {
                 formData.image_size = dimensions;
             }

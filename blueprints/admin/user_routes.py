@@ -94,16 +94,19 @@ def update_user(user_id):
             # Delete all user's images first
             images = Image.query.filter_by(user_id=user.id).all()
             for image in images:
-                # Delete the actual image files (both PNG and WebP versions)
+                # Delete the actual image files (multiple formats)
                 base_filename = os.path.splitext(image.filename)[0]
-                png_path = os.path.join('static', 'images', f'{base_filename}.png')
-                webp_path = os.path.join('static', 'images', f'{base_filename}.webp')
+                static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'static', 'images')
                 
-                # Try to delete both file versions if they exist
-                if os.path.exists(png_path):
-                    os.remove(png_path)
-                if os.path.exists(webp_path):
-                    os.remove(webp_path)
+                # Try to delete all possible file formats
+                for ext in ['.png', '.webp', '.jpeg', '.jpg']:
+                    file_path = os.path.join(static_dir, f'{base_filename}{ext}')
+                    if os.path.exists(file_path):
+                        try:
+                            os.remove(file_path)
+                            print(f"Deleted file: {file_path}")
+                        except Exception as e:
+                            print(f"Failed to delete file {file_path}: {e}")
                 
                 # Delete the image record
                 db.session.delete(image)
@@ -114,27 +117,29 @@ def update_user(user_id):
             # Delete associated password reset OTPs
             PasswordResetOTP.query.filter_by(user_id=user.id).delete()
             
-            # Clear provider and model selections
-            user.selected_provider_id = None
-            user.selected_model_id = None
+            # Delete user subscriptions and usage history
+            from models import UserSubscription, UsageHistory
+            UserSubscription.query.filter_by(user_id=user.id).delete()
+            UserSubscription.query.filter_by(assigned_by_id=user.id).update({'assigned_by_id': None})
+            UsageHistory.query.filter_by(user_id=user.id).delete()
             
-            # Clear API keys
-            user.openai_api_key = None
-            user.anthropic_api_key = None
-            user.gemini_api_key = None
-            user.groq_api_key = None
-            user.fal_key = None
-            
-            # Clear OAuth info
-            user.google_id = None
+            # Store username for success message before deletion
+            username = user.username
             
             # Finally delete the user
             db.session.delete(user)
         
         db.session.commit()
+        
+        # Handle different action messages
+        if action == 'delete':
+            message = f'User {username} has been deleted successfully.'
+        else:
+            message = f'User {user.username} has been updated successfully.'
+            
         return jsonify({
             'success': True,
-            'message': f'User {user.username} has been updated successfully.'
+            'message': message
         })
     except Exception as e:
         db.session.rollback()

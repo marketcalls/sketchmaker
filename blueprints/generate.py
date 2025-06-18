@@ -180,6 +180,16 @@ def generate_image_route():
             })
             if data.get('negative_prompt'):
                 generation_params['negative_prompt'] = data.get('negative_prompt')
+        elif model == 'fal-ai/ideogram/v3':
+            generation_params.update({
+                'rendering_speed': data.get('rendering_speed') or 'BALANCED',
+                'expand_prompt': data.get('expand_prompt') if data.get('expand_prompt') is not None else True,
+                'num_images': data.get('num_images', 1),
+                'image_size': data.get('image_size') or 'square_hd',
+                'image_urls': []
+            })
+            if data.get('negative_prompt'):
+                generation_params['negative_prompt'] = data.get('negative_prompt')
         else:
             generation_params['image_size'] = data.get('image_size', {
                 'width': 1024,

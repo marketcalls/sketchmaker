@@ -83,6 +83,18 @@ def get_model_arguments(model, data):
         # Add negative prompt if provided
         if data.get("negative_prompt"):
             model_args["negative_prompt"] = data.get("negative_prompt")
+    elif model == "fal-ai/ideogram/v3":
+        model_args = {
+            "rendering_speed": data.get("rendering_speed") or "BALANCED",
+            "expand_prompt": data.get("expand_prompt") if data.get("expand_prompt") is not None else True,
+            "num_images": data.get("num_images", 1),
+            "image_size": data.get("image_size") or "square_hd"
+        }
+        # Add negative prompt if provided
+        if data.get("negative_prompt"):
+            model_args["negative_prompt"] = data.get("negative_prompt")
+        # Add image_urls parameter (empty array as per API spec)
+        model_args["image_urls"] = []
     else:
         # All other models require image_size
         if not isinstance(data.get("image_size"), dict) or 'width' not in data["image_size"] or 'height' not in data["image_size"]:
@@ -166,7 +178,16 @@ def generate_image(data):
 
         image_urls = []
         for img in result['images']:
-            if not img.get('url'):
+            # Handle different response formats
+            if isinstance(img, dict):
+                image_url = img.get('url')
+            elif isinstance(img, str):
+                image_url = img
+            else:
+                print(f"Unexpected image format: {type(img)} - {img}")
+                continue
+                
+            if not image_url:
                 continue
 
             # Generate a unique filename
@@ -180,7 +201,7 @@ def generate_image(data):
             os.makedirs(images_dir, exist_ok=True)
             
             # Download image
-            response = requests.get(img['url'])
+            response = requests.get(image_url)
             response.raise_for_status()
             
             # Load image into memory

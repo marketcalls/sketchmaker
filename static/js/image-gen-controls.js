@@ -125,6 +125,12 @@ document.getElementById('model').addEventListener('change', function(e) {
     const imagen4AspectRatioControl = document.getElementById('imagen4AspectRatioControl');
     const imagen4NegativePromptControl = document.getElementById('imagen4NegativePromptControl');
     
+    // Get Ideogram V3 controls
+    const ideogramV3ImageSizeControl = document.getElementById('ideogramV3ImageSizeControl');
+    const ideogramV3ExpandPromptControl = document.getElementById('ideogramV3ExpandPromptControl');
+    const ideogramV3NegativePromptControl = document.getElementById('ideogramV3NegativePromptControl');
+    const ideogramV3RenderingSpeedControl = document.getElementById('ideogramV3RenderingSpeedControl');
+    
     // Reset all controls first
     imageSizeControl?.classList.remove('hidden');
     aspectRatioControl?.classList.add('hidden');
@@ -135,6 +141,10 @@ document.getElementById('model').addEventListener('change', function(e) {
     recraftColorsControl?.classList.add('hidden');
     imagen4AspectRatioControl?.classList.add('hidden');
     imagen4NegativePromptControl?.classList.add('hidden');
+    ideogramV3ImageSizeControl?.classList.add('hidden');
+    ideogramV3ExpandPromptControl?.classList.add('hidden');
+    ideogramV3NegativePromptControl?.classList.add('hidden');
+    ideogramV3RenderingSpeedControl?.classList.add('hidden');
     if (characterCount) characterCount.classList.add('hidden');
     if (enhancedCharacterCount) enhancedCharacterCount.classList.add('hidden');
 
@@ -167,6 +177,15 @@ document.getElementById('model').addEventListener('change', function(e) {
             imageSizeControl?.classList.add('hidden');
             imagen4AspectRatioControl?.classList.remove('hidden');
             imagen4NegativePromptControl?.classList.remove('hidden');
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+            break;
+        case 'fal-ai/ideogram/v3':
+            imageSizeControl?.classList.add('hidden');
+            ideogramV3ImageSizeControl?.classList.remove('hidden');
+            ideogramV3ExpandPromptControl?.classList.remove('hidden');
+            ideogramV3NegativePromptControl?.classList.remove('hidden');
+            ideogramV3RenderingSpeedControl?.classList.remove('hidden');
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
             break;

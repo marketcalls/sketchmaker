@@ -12,6 +12,7 @@
             <option value="fal-ai/recraft-v3">Recraft V3</option>
             <option value="fal-ai/ideogram/v2">Ideogram V2</option>
             <option value="fal-ai/ideogram/v2a">Ideogram V2a</option>
+            <option value="fal-ai/ideogram/v3">Ideogram V3</option>
             <option value="fal-ai/imagen4/preview">Imagen 4 (Preview)</option>
         </select>
     </div>
@@ -130,6 +131,49 @@
             <span class="label-text">Negative Prompt</span>
         </label>
         <textarea id="imagen4NegativePrompt" name="negative_prompt" class="textarea textarea-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" placeholder="Enter things to avoid in the image (e.g., 'studio light', 'low quality')"></textarea>
+    </div>
+
+    <!-- Ideogram V3 Controls -->
+    <div class="form-control hidden" id="ideogramV3ImageSizeControl">
+        <label class="label">
+            <span class="label-text">Image Size</span>
+        </label>
+        <select id="ideogramV3ImageSize" name="image_size" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="square">Square</option>
+            <option value="square_hd">Square HD</option>
+            <option value="portrait_3_4">Portrait 3:4</option>
+            <option value="portrait_9_16">Portrait 9:16</option>
+            <option value="landscape_4_3">Landscape 4:3</option>
+            <option value="landscape_16_9">Landscape 16:9</option>
+        </select>
+    </div>
+
+    <div class="form-control hidden" id="ideogramV3ExpandPromptControl">
+        <label class="label cursor-pointer justify-start gap-4">
+            <span class="label-text">Expand Prompt</span>
+            <input type="checkbox" id="ideogramV3ExpandPrompt" name="expand_prompt" class="toggle toggle-primary" checked />
+        </label>
+        <div class="text-xs opacity-70 mt-1">
+            Enhances your prompt with additional details for better results
+        </div>
+    </div>
+
+    <div class="form-control hidden" id="ideogramV3NegativePromptControl">
+        <label class="label">
+            <span class="label-text">Negative Prompt</span>
+        </label>
+        <textarea id="ideogramV3NegativePrompt" name="negative_prompt" class="textarea textarea-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200" placeholder="Enter things to avoid in the image"></textarea>
+    </div>
+
+    <div class="form-control hidden" id="ideogramV3RenderingSpeedControl">
+        <label class="label">
+            <span class="label-text">Rendering Speed</span>
+        </label>
+        <select id="ideogramV3RenderingSpeed" name="rendering_speed" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="BALANCED">Balanced</option>
+            <option value="FAST">Fast</option>
+            <option value="QUALITY">Quality</option>
+        </select>
     </div>
 
     <div class="form-control" id="imageSizeControl">
