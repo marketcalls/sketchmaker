@@ -173,6 +173,13 @@ def generate_image_route():
                 'style': data.get('style') or 'auto',
                 'negative_prompt': data.get('negative_prompt') or ''
             })
+        elif model == 'fal-ai/imagen4/preview':
+            generation_params.update({
+                'aspect_ratio': data.get('aspect_ratio') or '1:1',
+                'num_images': data.get('num_images', 1)
+            })
+            if data.get('negative_prompt'):
+                generation_params['negative_prompt'] = data.get('negative_prompt')
         else:
             generation_params['image_size'] = data.get('image_size', {
                 'width': 1024,

@@ -121,6 +121,10 @@ document.getElementById('model').addEventListener('change', function(e) {
     const characterCount = document.getElementById('characterCount');
     const enhancedCharacterCount = document.getElementById('enhancedCharacterCount');
     
+    // Get Imagen4 controls
+    const imagen4AspectRatioControl = document.getElementById('imagen4AspectRatioControl');
+    const imagen4NegativePromptControl = document.getElementById('imagen4NegativePromptControl');
+    
     // Reset all controls first
     imageSizeControl?.classList.remove('hidden');
     aspectRatioControl?.classList.add('hidden');
@@ -129,6 +133,8 @@ document.getElementById('model').addEventListener('change', function(e) {
     if (guidanceScaleControl) guidanceScaleControl.classList.remove('hidden');
     recraftStyleControl?.classList.add('hidden');
     recraftColorsControl?.classList.add('hidden');
+    imagen4AspectRatioControl?.classList.add('hidden');
+    imagen4NegativePromptControl?.classList.add('hidden');
     if (characterCount) characterCount.classList.add('hidden');
     if (enhancedCharacterCount) enhancedCharacterCount.classList.add('hidden');
 
@@ -156,6 +162,13 @@ document.getElementById('model').addEventListener('change', function(e) {
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
             if (characterCount) characterCount.classList.remove('hidden');
             if (enhancedCharacterCount) enhancedCharacterCount.classList.remove('hidden');
+            break;
+        case 'fal-ai/imagen4/preview':
+            imageSizeControl?.classList.add('hidden');
+            imagen4AspectRatioControl?.classList.remove('hidden');
+            imagen4NegativePromptControl?.classList.remove('hidden');
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
             break;
     }
     

@@ -303,6 +303,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     style: formData.style,
                     negative_prompt: formData.negative_prompt
                 });
+            } else if (selectedModel === 'fal-ai/imagen4/preview') {
+                // Add Imagen4 specific parameters
+                const aspectRatioElement = document.getElementById('imagen4AspectRatio');
+                const negativePromptElement = document.getElementById('imagen4NegativePrompt');
+                
+                formData.aspect_ratio = aspectRatioElement ? aspectRatioElement.value : '1:1';
+                
+                if (negativePromptElement && negativePromptElement.value.trim()) {
+                    formData.negative_prompt = negativePromptElement.value;
+                }
+                
+                console.log('Imagen4 parameters:', {
+                    aspect_ratio: formData.aspect_ratio,
+                    negative_prompt: formData.negative_prompt
+                });
             } else {
                 formData.image_size = dimensions;
             }

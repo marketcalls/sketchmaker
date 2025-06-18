@@ -75,6 +75,14 @@ def get_model_arguments(model, data):
             "style": data.get("style") or "auto",
             "negative_prompt": data.get("negative_prompt") or ""
         }
+    elif model == "fal-ai/imagen4/preview":
+        model_args = {
+            "aspect_ratio": data.get("aspect_ratio") or "1:1",
+            "num_images": data.get("num_images", 1)
+        }
+        # Add negative prompt if provided
+        if data.get("negative_prompt"):
+            model_args["negative_prompt"] = data.get("negative_prompt")
     else:
         # All other models require image_size
         if not isinstance(data.get("image_size"), dict) or 'width' not in data["image_size"] or 'height' not in data["image_size"]:
