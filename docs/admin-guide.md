@@ -181,11 +181,31 @@ Configure subscription tiers:
 #### **Current Plans Display**
 ```
 Default Subscription Tiers:
-- Free: 3 credits/month, basic features
+- Free: 3 credits/month, basic features (auto-assigned to new users)
 - Premium: 100 credits/month, all providers
 - Professional: 1000 credits/month, LoRA training
 - Enterprise: Unlimited, priority support
 ```
+
+#### **Automatic Plan Assignment**
+- **New User Registration**: All new users automatically receive the Free Plan
+- **Registration Methods**: Works for both regular signup and Google OAuth
+- **Credit Allocation**: 3 credits immediately available upon account creation
+- **Exception**: First user (becomes superadmin) doesn't get automatic plan assignment
+
+### **User Onboarding Process**
+
+#### **Automatic Registration Flow**
+1. **User Registration**: User creates account (email/password or Google OAuth)
+2. **Free Plan Assignment**: System automatically assigns Free Plan (3 credits)
+3. **Welcome Email**: User receives email notification with plan details
+4. **Immediate Access**: User can start using AI features right away
+5. **Admin Notification**: Admins can monitor new registrations in dashboard
+
+#### **Manual Intervention Cases**
+- **Approval Required**: If manual approval is enabled, users wait for admin approval
+- **Plan Upgrades**: Users contact admin for premium plan assignments
+- **Credit Adjustments**: Admins can manually adjust credits if needed
 
 ### **Subscription Operations**
 

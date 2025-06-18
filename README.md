@@ -57,8 +57,9 @@ A sophisticated web application that leverages multiple AI providers and models 
 
 ### 💎 Subscription Management System
 - **Credit-Based System**: Monthly credit allocations with dynamic cost configuration
+- **Automatic Free Plan Assignment**: New users automatically enrolled in Free Plan
 - **Three-tier Plans**:
-  - **Free**: 3 credits/month, basic features
+  - **Free**: 3 credits/month, basic features (auto-assigned to new users)
   - **Premium**: 100 credits/month, all models, LoRA training
   - **Professional**: 1000 credits/month, API access, priority support
 - **Dynamic Credit Costs**: Administrators can configure credit costs per feature
@@ -268,15 +269,16 @@ Configure in **Admin → Email Settings**:
 
 ### For Users
 1. **Register/Login**: Create account or login with Google
-2. **Check Credits**: View remaining credits on dashboard
-3. **Generate Images**: 
+2. **Automatic Free Plan**: Get 3 credits automatically upon registration
+3. **Check Credits**: View remaining credits on dashboard
+4. **Generate Images**: 
    - Enter prompt description
    - Select model and parameters
    - Click generate (uses 1 credit)
-4. **Create Banners**: Design SVG banners with AI
-5. **Edit Images**: Use Magix for inpainting
-6. **Train Models**: Upload images for custom LoRA
-7. **View Gallery**: Access all your creations
+5. **Create Banners**: Design SVG banners with AI (uses 0.5 credits)
+6. **Edit Images**: Use Magix for inpainting (uses 1 credit)
+7. **Train Models**: Upload images for custom LoRA (uses 40 credits)
+8. **View Gallery**: Access all your creations
 
 ### For Administrators
 1. **Initial Setup**:

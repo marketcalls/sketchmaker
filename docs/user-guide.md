@@ -16,14 +16,15 @@ This comprehensive user guide will help you master all features of SketchMaker A
    - Email address
    - Strong password (8+ characters)
 4. Verify your email address
-5. Choose your subscription plan
+5. **Automatic Free Plan**: Get 3 credits automatically assigned to your account
 
 #### **First Login**
 1. Navigate to the login page
 2. Enter your credentials
 3. Explore the dashboard
-4. Check your credit balance
-5. Review available features
+4. **Check your credit balance**: You'll have 3 credits ready to use
+5. **Start creating immediately**: No need to wait or purchase credits
+6. Review available features
 
 ### **Dashboard Overview**
 
