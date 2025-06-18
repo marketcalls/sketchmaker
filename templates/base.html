@@ -226,7 +226,9 @@
                 </svg>
                 <span>Sketch Maker AI</span>
             </a>
+            {% if request.endpoint == 'core.index' %}
             <a href="{{ url_for('core.pricing') }}" class="btn btn-ghost">Pricing</a>
+            {% endif %}
             {% if current_user.is_authenticated %}
                 <a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost">Dashboard</a>
                 <a href="{{ url_for('banner.banner_page') }}" class="btn btn-ghost">Banner</a>
@@ -234,19 +236,7 @@
                 <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-ghost">Gallery</a>
                 <a href="{{ url_for('training.training_page') }}" class="btn btn-ghost">Train LoRA</a>
                 {% if current_user.is_admin() %}
-                    <div class="dropdown dropdown-end" id="admin-dropdown">
-                        <label tabindex="0" class="btn btn-ghost">Admin</label>
-                        <ul tabindex="0" class="dropdown-content z-[1000] menu p-2 shadow-lg bg-base-200/95 backdrop-blur-sm rounded-box w-64 border border-base-300">
-                            <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
-                            <li><a href="{{ url_for('admin.manage') }}">Manage Users</a></li>
-                            <li><a href="{{ url_for('admin_subscription.manage_subscriptions') }}">Manage Subscriptions</a></li>
-                            <li><a href="{{ url_for('admin_api.manage_api_keys') }}">API Key Management</a></li>
-                            <li><a href="{{ url_for('admin.email_settings') }}">Email Settings</a></li>
-                            {% if current_user.is_superadmin() %}
-                            <li><a href="{{ url_for('admin.auth_settings') }}">Auth Settings</a></li>
-                            {% endif %}
-                        </ul>
-                    </div>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">Admin</a>
                 {% endif %}
             {% endif %}
         </div>
