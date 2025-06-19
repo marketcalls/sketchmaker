@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Refund Policy - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="prose lg:prose-xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-8">Refund Policy</h1>
+        <p class="text-sm text-base-content/70 text-center mb-8">Last updated: {{ current_year }}</p>
+
+        <div class="bg-base-200 p-6 rounded-lg mb-8">
+            <p class="text-lg">
+                At Sketch Maker AI, we strive to provide exceptional service and ensure customer satisfaction. This Refund Policy outlines the circumstances under which refunds may be granted and the process for requesting them.
+            </p>
+        </div>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">1. General Refund Policy</h2>
+        <p class="mb-4">We understand that sometimes our service may not meet your expectations. We offer refunds under specific circumstances and within certain timeframes as outlined below.</p>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">2. Subscription Refunds</h2>
+        
+        <h3 class="text-xl font-medium mt-6 mb-3">2.1 New Subscription Refunds</h3>
+        <ul class="list-disc pl-6 mb-4">
+            <li><strong>7-Day Window:</strong> Full refunds are available within 7 days of your initial subscription purchase</li>
+            <li><strong>Minimal Usage:</strong> Refunds are only available if you have used less than 10% of your monthly credit allocation</li>
+            <li><strong>First-Time Subscribers:</strong> This policy applies only to your first subscription with us</li>
+            <li><strong>No Questions Asked:</strong> If you meet the criteria above, we'll process your refund without requiring detailed explanations</li>
+        </ul>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">2.2 Subscription Renewal Refunds</h3>
+        <ul class="list-disc pl-6 mb-4">
+            <li><strong>Accidental Renewals:</strong> Refunds for unintended automatic renewals within 48 hours</li>
+            <li><strong>Price Changes:</strong> If we increase prices, you have 30 days to request a refund for the current billing period</li>
+            <li><strong>Service Changes:</strong> Major feature removals may qualify for prorated refunds</li>
+        </ul>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">2.3 Non-Refundable Situations</h3>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Subscriptions where more than 50% of monthly credits have been used</li>
+            <li>Requests made after the 7-day refund window (except for special circumstances)</li>
+            <li>Violations of our Terms of Service or Acceptable Use Policy</li>
+            <li>Fraudulent or chargebacks attempts</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">3. Credit Purchase Refunds</h2>
+        
+        <h3 class="text-xl font-medium mt-6 mb-3">3.1 Unused Credits</h3>
+        <ul class="list-disc pl-6 mb-4">
+            <li><strong>24-Hour Window:</strong> Full refunds for credit purchases within 24 hours if unused</li>
+            <li><strong>Partial Refunds:</strong> Prorated refunds for partially used credit packages within 48 hours</li>
+            <li><strong>Technical Issues:</strong> Full refunds if credits were consumed due to platform errors</li>
+        </ul>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">3.2 Used Credits</h3>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Credits that have been used for successful image generation are generally non-refundable</li>
+            <li>Exception: Technical failures that prevent proper service delivery</li>
+            <li>Bulk credit purchases may qualify for partial refunds on a case-by-case basis</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">4. Technical Issue Refunds</h2>
+        
+        <h3 class="text-xl font-medium mt-6 mb-3">4.1 Service Outages</h3>
+        <ul class="list-disc pl-6 mb-4">
+            <li><strong>Extended Downtime:</strong> Credits or partial refunds for outages exceeding 24 hours</li>
+            <li><strong>Service Degradation:</strong> Compensation for significantly reduced service quality</li>
+            <li><strong>Data Loss:</strong> Full refunds if we lose your generated content due to our error</li>
+        </ul>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">4.2 Platform Errors</h3>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Credits refunded for failed generations due to server errors</li>
+            <li>Refunds for billing errors or incorrect charges</li>
+            <li>Compensation for features that don't work as advertised</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">5. Refund Process</h2>
+        
+        <h3 class="text-xl font-medium mt-6 mb-3">5.1 How to Request a Refund</h3>
+        <ol class="list-decimal pl-6 mb-4">
+            <li><strong>Contact Support:</strong> Email us at <a href="mailto:refunds@sketchmaker.ai" class="link link-primary">refunds@sketchmaker.ai</a></li>
+            <li><strong>Provide Information:</strong> Include your account email, subscription details, and reason for refund</li>
+            <li><strong>Include Documentation:</strong> Screenshots or evidence for technical issues if applicable</li>
+            <li><strong>Await Response:</strong> We'll respond within 48 hours with a decision</li>
+        </ol>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">5.2 Required Information</h3>
+        <p class="mb-4">When requesting a refund, please provide:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Your registered email address</li>
+            <li>Transaction ID or receipt number</li>
+            <li>Date of purchase</li>
+            <li>Reason for refund request</li>
+            <li>Any relevant screenshots or error messages</li>
+        </ul>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">5.3 Processing Time</h3>
+        <ul class="list-disc pl-6 mb-4">
+            <li><strong>Review Period:</strong> 2-5 business days to review your request</li>
+            <li><strong>Approval Notification:</strong> Email confirmation if refund is approved</li>
+            <li><strong>Processing Time:</strong> 5-10 business days for refund to appear in your account</li>
+            <li><strong>Payment Method:</strong> Refunds are issued to the original payment method</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">6. Partial Refunds</h2>
+        <p class="mb-4">In certain circumstances, we may offer partial refunds:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li><strong>Prorated Refunds:</strong> Based on unused portion of subscription period</li>
+            <li><strong>Service Disruptions:</strong> Proportional to the impact on your usage</li>
+            <li><strong>Feature Limitations:</strong> If advertised features are temporarily unavailable</li>
+            <li><strong>Credit Adjustments:</strong> Additional credits instead of monetary refunds</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">7. Special Circumstances</h2>
+        
+        <h3 class="text-xl font-medium mt-6 mb-3">7.1 Exceptional Cases</h3>
+        <p class="mb-4">We may consider refunds outside our standard policy for:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Medical emergencies or family hardships</li>
+            <li>Significant changes to our service that affect your use case</li>
+            <li>Legal or compliance issues preventing service use</li>
+            <li>Other extraordinary circumstances at our discretion</li>
+        </ul>
+
+        <h3 class="text-xl font-medium mt-6 mb-3">7.2 Goodwill Gestures</h3>
+        <p class="mb-4">While not guaranteed, we may offer:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Service credits for minor inconveniences</li>
+            <li>Extended trial periods for evaluation</li>
+            <li>Custom payment arrangements for special situations</li>
+            <li>Alternative solutions that meet your needs</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">8. Non-Monetary Remedies</h2>
+        <p class="mb-4">Before processing refunds, we may offer alternative solutions:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li><strong>Technical Support:</strong> Help resolving issues that led to refund request</li>
+            <li><strong>Service Credits:</strong> Additional credits to compensate for problems</li>
+            <li><strong>Plan Changes:</strong> Switching to a more suitable subscription tier</li>
+            <li><strong>Feature Access:</strong> Early access to new features or improvements</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">9. Chargebacks and Disputes</h2>
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+            <p class="text-sm">
+                <strong>Important:</strong> Please contact us directly before initiating chargebacks or payment disputes. We're committed to resolving issues fairly and promptly.
+            </p>
+        </div>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Chargebacks may result in immediate account suspension</li>
+            <li>We prefer to resolve disputes through direct communication</li>
+            <li>Fraudulent chargebacks may result in permanent account termination</li>
+            <li>Legitimate disputes will be handled according to this policy</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">10. Policy Updates</h2>
+        <p class="mb-4">This Refund Policy may be updated from time to time. Changes will be communicated through:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Email notifications to active subscribers</li>
+            <li>Platform announcements and notifications</li>
+            <li>Updates to this page with revised effective dates</li>
+            <li>30-day notice for material changes affecting existing subscriptions</li>
+        </ul>
+
+        <h2 class="text-2xl font-semibold mt-8 mb-4">11. Contact Information</h2>
+        <p class="mb-4">For refund requests or questions about this policy:</p>
+        <div class="bg-base-200 p-4 rounded-lg mb-8">
+            <p><strong>Refunds Email:</strong> <a href="mailto:refunds@sketchmaker.ai" class="link link-primary">refunds@sketchmaker.ai</a></p>
+            <p><strong>General Support:</strong> <a href="mailto:support@sketchmaker.ai" class="link link-primary">support@sketchmaker.ai</a></p>
+            <p><strong>Business Hours:</strong> Monday - Friday, 9 AM - 6 PM (UTC)</p>
+            <p><strong>Response Time:</strong> Within 48 hours for refund requests</p>
+        </div>
+
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mt-8">
+            <h3 class="font-semibold mb-2">Fair Refund Guarantee</h3>
+            <p class="text-sm">
+                We're committed to fair treatment of all customers. If you believe you have a legitimate case for a refund that falls outside this policy, please contact us. We review each situation individually and strive to find reasonable solutions that work for everyone.
+            </p>
+        </div>
+
+        <div class="text-center mt-8">
+            <p class="text-sm text-base-content/70">
+                This Refund Policy is part of our Terms of Service and is subject to the same governing law and dispute resolution procedures.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -11,6 +11,12 @@ admin_api_bp = Blueprint('admin_api', __name__, url_prefix='/admin/api')
 @admin_required
 def manage_api_keys():
     """Manage centralized API keys"""
+    if not current_user.is_superadmin():
+        return jsonify({
+            'success': False,
+            'message': 'Only superadmins can access API management.'
+        }), 403
+    
     api_settings = APISettings.get_settings()
     providers = APIProvider.query.filter_by(is_active=True).all()
     models = AIModel.query.filter_by(is_active=True).all()
@@ -28,6 +34,11 @@ def manage_api_keys():
 @login_required
 @admin_required
 def update_api_keys():
+    if not current_user.is_superadmin():
+        return jsonify({
+            'success': False,
+            'message': 'Only superadmins can update API keys.'
+        }), 403
     """Update API keys and settings"""
     try:
         api_settings = APISettings.get_settings()
@@ -85,6 +96,12 @@ def update_api_keys():
 @admin_required
 def test_api_keys():
     """Test API key connectivity"""
+    if not current_user.is_superadmin():
+        return jsonify({
+            'success': False,
+            'message': 'Only superadmins can test API keys.'
+        }), 403
+    
     try:
         api_settings = APISettings.get_settings()
         provider_name = request.json.get('provider')

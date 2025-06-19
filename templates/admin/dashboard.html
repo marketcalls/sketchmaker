@@ -105,6 +105,7 @@
             <div class="card-body">
                 <h2 class="card-title">Quick Actions</h2>
                 <div class="grid grid-cols-2 gap-4 mt-4">
+                    <!-- Available to both Admin and SuperAdmin -->
                     <a href="{{ url_for('admin.manage') }}" class="btn btn-primary btn-sm">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
@@ -119,6 +120,8 @@
                         Subscriptions
                     </a>
                     
+                    <!-- SuperAdmin Only Actions -->
+                    {% if current_user.is_superadmin() %}
                     <a href="{{ url_for('admin_api.manage_api_keys') }}" class="btn btn-accent btn-sm">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v-2H7v-2H4a1 1 0 01-1-1v-4c0-1.108.806-2.013 1.871-2.149L8 4s0 0 0 0 1.5-.5 3.5-.5S15 4 15 4l3.129.851A2.001 2.001 0 0120 7z"></path>
@@ -146,6 +149,7 @@
                         </svg>
                         Auth Settings
                     </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

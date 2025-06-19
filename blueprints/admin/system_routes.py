@@ -1,5 +1,5 @@
 from flask import jsonify, request, render_template
-from flask_login import login_required
+from flask_login import login_required, current_user
 from models import db, SystemSettings
 from extensions import limiter, get_rate_limit_string
 from .decorators import admin_required, superadmin_required
@@ -32,6 +32,12 @@ def update_settings():
 @admin_required
 def credit_configuration():
     """Credit configuration page"""
+    if not current_user.is_superadmin():
+        return jsonify({
+            'success': False,
+            'message': 'Only superadmins can access credit configuration.'
+        }), 403
+    
     try:
         settings = SystemSettings.get_settings()
         
@@ -66,6 +72,12 @@ def credit_configuration():
 @admin_required
 def get_credit_costs():
     """API endpoint to get current credit costs"""
+    if not current_user.is_superadmin():
+        return jsonify({
+            'success': False,
+            'message': 'Only superadmins can access credit costs.'
+        }), 403
+    
     try:
         settings = SystemSettings.get_settings()
         return jsonify({

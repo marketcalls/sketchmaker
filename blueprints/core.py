@@ -78,3 +78,33 @@ def settings():
                          subscription=subscription,
                          system_settings=system_settings)
 
+@core_bp.route('/privacy')
+@limiter.limit(get_rate_limit_string())
+def privacy_policy():
+    """Privacy Policy page"""
+    return render_template('privacy.html', current_year=datetime.now().year)
+
+@core_bp.route('/terms')
+@limiter.limit(get_rate_limit_string())
+def terms_conditions():
+    """Terms and Conditions page"""
+    return render_template('terms.html', current_year=datetime.now().year)
+
+@core_bp.route('/faq')
+@limiter.limit(get_rate_limit_string())
+def faq():
+    """FAQ page"""
+    return render_template('faq.html')
+
+@core_bp.route('/refund-policy')
+@limiter.limit(get_rate_limit_string())
+def refund_policy():
+    """Refund Policy page"""
+    return render_template('refund.html', current_year=datetime.now().year)
+
+@core_bp.route('/about')
+@limiter.limit(get_rate_limit_string())
+def about():
+    """About Us page"""
+    return render_template('about.html', current_year=datetime.now().year)
+

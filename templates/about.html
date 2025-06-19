@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="prose lg:prose-xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-8">About Sketch Maker AI</h1>
+        <p class="text-xl text-center text-base-content/70 mb-12">Transforming imagination into visual reality through the power of artificial intelligence</p>
+
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-r from-primary/10 to-secondary/10 p-8 rounded-lg mb-12">
+            <h2 class="text-2xl font-semibold mb-4 text-center">Our Mission</h2>
+            <p class="text-lg text-center">
+                To democratize creative expression by making professional-quality AI image generation accessible to everyone, from individual creators to enterprise teams.
+            </p>
+        </div>
+
+        <!-- Our Story -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Our Story</h2>
+        <p class="mb-4">
+            Sketch Maker AI was born from a simple belief: creativity should have no boundaries. In {{ current_year }}, our team of AI researchers, designers, and engineers came together with a shared vision of making advanced AI image generation technology accessible to creators worldwide.
+        </p>
+        <p class="mb-4">
+            We recognized that while AI image generation technology was advancing rapidly, it remained complex and expensive for most users. Traditional design tools required extensive training and expertise, while emerging AI tools were either too technical or too limited for practical use.
+        </p>
+        <p class="mb-6">
+            Our solution was to build a platform that combines the latest AI models with an intuitive interface, making it possible for anyone to create stunning visuals from simple text descriptions. Whether you're a marketer creating campaign assets, an artist exploring new mediums, or a business owner designing promotional materials, Sketch Maker AI empowers you to bring your ideas to life.
+        </p>
+
+        <!-- What We Do -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">What We Do</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-base-200 p-6 rounded-lg">
+                <h3 class="text-xl font-medium mb-3">🎨 AI Image Generation</h3>
+                <p class="text-sm">Transform text descriptions into high-quality images using state-of-the-art AI models. From photorealistic renders to artistic illustrations, create any visual you can imagine.</p>
+            </div>
+            <div class="bg-base-200 p-6 rounded-lg">
+                <h3 class="text-xl font-medium mb-3">🖼️ Image Enhancement</h3>
+                <p class="text-sm">Enhance, edit, and refine your images with AI-powered tools. Upscale resolution, adjust styles, and perfect your creations with advanced editing capabilities.</p>
+            </div>
+            <div class="bg-base-200 p-6 rounded-lg">
+                <h3 class="text-xl font-medium mb-3">📊 Marketing Materials</h3>
+                <p class="text-sm">Create professional banners, social media graphics, and marketing assets tailored to your brand. Generate consistent, high-quality visuals for all your campaigns.</p>
+            </div>
+            <div class="bg-base-200 p-6 rounded-lg">
+                <h3 class="text-xl font-medium mb-3">🎯 Custom AI Models</h3>
+                <p class="text-sm">Train personalized AI models on your content and style preferences. Create unique artistic styles and maintain brand consistency across all your generated content.</p>
+            </div>
+        </div>
+
+        <!-- Our Technology -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Our Technology</h2>
+        <p class="mb-4">
+            At the heart of Sketch Maker AI lies cutting-edge artificial intelligence technology. We leverage multiple state-of-the-art AI models, each optimized for different types of content generation:
+        </p>
+        <ul class="list-disc pl-6 mb-6">
+            <li><strong>Diffusion Models:</strong> For photorealistic image generation with incredible detail and accuracy</li>
+            <li><strong>Transformer Networks:</strong> For understanding and interpreting complex text prompts</li>
+            <li><strong>Style Transfer Models:</strong> For applying artistic styles and maintaining visual consistency</li>
+            <li><strong>Upscaling Networks:</strong> For enhancing image resolution and quality</li>
+            <li><strong>Custom Training Pipelines:</strong> For creating personalized AI models</li>
+        </ul>
+        <p class="mb-6">
+            Our platform is built on scalable cloud infrastructure that ensures fast generation times and high availability. We continuously update our models with the latest research advances, ensuring you always have access to the most capable AI technology.
+        </p>
+
+        <!-- Our Values -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Our Values</h2>
+        <div class="space-y-6 mb-8">
+            <div class="border-l-4 border-primary pl-6">
+                <h3 class="text-xl font-medium mb-2">Accessibility</h3>
+                <p>We believe powerful creative tools should be accessible to everyone, regardless of technical expertise or budget. Our platform is designed to be intuitive while remaining powerful.</p>
+            </div>
+            <div class="border-l-4 border-secondary pl-6">
+                <h3 class="text-xl font-medium mb-2">Innovation</h3>
+                <p>We're committed to pushing the boundaries of what's possible with AI. Our team continuously explores new techniques and models to improve the quality and capabilities of our platform.</p>
+            </div>
+            <div class="border-l-4 border-accent pl-6">
+                <h3 class="text-xl font-medium mb-2">Responsibility</h3>
+                <p>We take seriously our role in shaping how AI is used for creative purposes. We implement safeguards to prevent misuse while empowering legitimate creative expression.</p>
+            </div>
+            <div class="border-l-4 border-info pl-6">
+                <h3 class="text-xl font-medium mb-2">Community</h3>
+                <p>Our users are at the center of everything we do. We actively listen to feedback, support creative communities, and foster an environment where creativity can flourish.</p>
+            </div>
+        </div>
+
+        <!-- Our Team -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Our Team</h2>
+        <p class="mb-6">
+            Sketch Maker AI is powered by a diverse team of passionate individuals from various backgrounds:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-primary-content" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="font-medium">AI Researchers</h3>
+                <p class="text-sm text-base-content/70">PhD experts in machine learning and computer vision</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-secondary rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-secondary-content" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+                    </svg>
+                </div>
+                <h3 class="font-medium">Software Engineers</h3>
+                <p class="text-sm text-base-content/70">Full-stack developers building scalable platforms</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 bg-accent rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-accent-content" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="font-medium">Designers & Artists</h3>
+                <p class="text-sm text-base-content/70">Creative professionals ensuring quality and usability</p>
+            </div>
+        </div>
+
+        <!-- Why Choose Us -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Why Choose Sketch Maker AI?</h2>
+        <div class="space-y-4 mb-8">
+            <div class="flex items-start gap-4">
+                <div class="w-6 h-6 bg-success rounded-full flex items-center justify-center mt-1">
+                    <svg class="w-4 h-4 text-success-content" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium">State-of-the-Art AI Models</h3>
+                    <p class="text-sm text-base-content/70">Access to the latest and most advanced AI image generation technology</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-4">
+                <div class="w-6 h-6 bg-success rounded-full flex items-center justify-center mt-1">
+                    <svg class="w-4 h-4 text-success-content" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium">User-Friendly Interface</h3>
+                    <p class="text-sm text-base-content/70">Intuitive design that makes AI image generation accessible to everyone</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-4">
+                <div class="w-6 h-6 bg-success rounded-full flex items-center justify-center mt-1">
+                    <svg class="w-4 h-4 text-success-content" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium">Fast & Reliable</h3>
+                    <p class="text-sm text-base-content/70">Optimized infrastructure ensuring quick generation times and high availability</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-4">
+                <div class="w-6 h-6 bg-success rounded-full flex items-center justify-center mt-1">
+                    <svg class="w-4 h-4 text-success-content" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium">Flexible Pricing</h3>
+                    <p class="text-sm text-base-content/70">Plans for every need, from individual creators to enterprise teams</p>
+                </div>
+            </div>
+            <div class="flex items-start gap-4">
+                <div class="w-6 h-6 bg-success rounded-full flex items-center justify-center mt-1">
+                    <svg class="w-4 h-4 text-success-content" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium">Dedicated Support</h3>
+                    <p class="text-sm text-base-content/70">Expert support team ready to help you succeed with your creative projects</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Future Vision -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Our Vision for the Future</h2>
+        <p class="mb-4">
+            We envision a future where AI amplifies human creativity rather than replacing it. Our roadmap includes:
+        </p>
+        <ul class="list-disc pl-6 mb-6">
+            <li>Advanced collaboration tools for creative teams</li>
+            <li>Real-time image editing and manipulation</li>
+            <li>Integration with popular design and marketing platforms</li>
+            <li>Expanded AI model library for specialized use cases</li>
+            <li>Enhanced customization and brand consistency tools</li>
+            <li>Mobile applications for on-the-go creativity</li>
+        </ul>
+
+        <!-- Contact CTA -->
+        <div class="bg-base-200 p-8 rounded-lg text-center mt-12">
+            <h3 class="text-2xl font-semibold mb-4">Ready to Transform Your Creative Process?</h3>
+            <p class="text-lg mb-6">Join thousands of creators who are already using AI to bring their ideas to life.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ url_for('core.index') }}" class="btn btn-primary">
+                    Get Started Free
+                </a>
+                <a href="{{ url_for('core.pricing') }}" class="btn btn-outline">
+                    View Pricing
+                </a>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <h2 class="text-2xl font-semibold mt-12 mb-6">Get in Touch</h2>
+        <p class="mb-4">We'd love to hear from you! Whether you have questions, feedback, or just want to say hello:</p>
+        <div class="bg-base-200 p-6 rounded-lg">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium mb-2">General Inquiries</h4>
+                    <p><strong>Email:</strong> <a href="mailto:hello@sketchmaker.ai" class="link link-primary">hello@sketchmaker.ai</a></p>
+                    <p><strong>Support:</strong> <a href="mailto:support@sketchmaker.ai" class="link link-primary">support@sketchmaker.ai</a></p>
+                </div>
+                <div>
+                    <h4 class="font-medium mb-2">Business & Partnerships</h4>
+                    <p><strong>Business:</strong> <a href="mailto:business@sketchmaker.ai" class="link link-primary">business@sketchmaker.ai</a></p>
+                    <p><strong>Press:</strong> <a href="mailto:press@sketchmaker.ai" class="link link-primary">press@sketchmaker.ai</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-8">
+            <p class="text-sm text-base-content/70">
+                Thank you for being part of the Sketch Maker AI community. Together, we're reshaping the future of creative expression.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

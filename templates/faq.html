@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="prose lg:prose-xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-8">Frequently Asked Questions</h1>
+        <p class="text-lg text-center text-base-content/70 mb-12">Find answers to common questions about Sketch Maker AI</p>
+
+        <!-- General Questions -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">General Questions</h2>
+        
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="general-accordion" checked="checked" />
+            <div class="collapse-title text-xl font-medium">
+                What is Sketch Maker AI?
+            </div>
+            <div class="collapse-content">
+                <p>Sketch Maker AI is an advanced AI-powered platform that transforms your text descriptions into stunning, high-quality images. Our platform uses cutting-edge artificial intelligence models to generate artwork, marketing materials, banners, and creative content from simple text prompts.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="general-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                How does AI image generation work?
+            </div>
+            <div class="collapse-content">
+                <p>Our AI models are trained on vast datasets of images and text descriptions. When you provide a text prompt, the AI analyzes your description and generates original images that match your specifications. The process typically takes 10-30 seconds depending on complexity and current server load.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="general-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                Do I need any special skills to use Sketch Maker AI?
+            </div>
+            <div class="collapse-content">
+                <p>No special skills are required! Our platform is designed to be user-friendly for everyone, from beginners to professionals. Simply describe what you want to create in plain English, and our AI will generate images for you. We also provide prompt enhancement features to help you get better results.</p>
+            </div>
+        </div>
+
+        <!-- Account & Subscription -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Account & Subscription</h2>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="account-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                How do I create an account?
+            </div>
+            <div class="collapse-content">
+                <p>Creating an account is simple! Click the "Get Started" button, provide your email address and create a password. You can also sign up using your Google account for faster registration. Once registered, you'll have immediate access to our free tier.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="account-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                What subscription plans do you offer?
+            </div>
+            <div class="collapse-content">
+                <p>We offer several subscription plans to meet different needs:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li><strong>Free Plan:</strong> Limited credits for trying our service</li>
+                    <li><strong>Basic Plan:</strong> Perfect for personal use and small projects</li>
+                    <li><strong>Professional Plan:</strong> Ideal for freelancers and small businesses</li>
+                    <li><strong>Enterprise Plan:</strong> Designed for teams and large organizations</li>
+                </ul>
+                <p class="mt-2">Visit our <a href="{{ url_for('core.pricing') }}" class="link link-primary">pricing page</a> for detailed information about features and credits included in each plan.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="account-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                How does the credit system work?
+            </div>
+            <div class="collapse-content">
+                <p>Our platform uses a credit-based system where different actions consume different amounts of credits:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li>Basic image generation: 1-2 credits per image</li>
+                    <li>High-resolution images: 3-5 credits per image</li>
+                    <li>Complex edits and enhancements: 2-4 credits</li>
+                    <li>Custom model training: Variable based on complexity</li>
+                </ul>
+                <p class="mt-2">Credits reset monthly with your subscription and don't carry over to the next billing cycle.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="account-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                Can I cancel my subscription anytime?
+            </div>
+            <div class="collapse-content">
+                <p>Yes! You can cancel your subscription at any time from your account settings. When you cancel:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li>You'll retain access to paid features until the end of your billing period</li>
+                    <li>You can continue using any remaining credits</li>
+                    <li>Your account will automatically switch to the free plan</li>
+                    <li>All your generated images and data remain accessible</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Technical Questions -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Technical Questions</h2>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="technical-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                What image formats are supported?
+            </div>
+            <div class="collapse-content">
+                <p>We generate images in multiple formats for your convenience:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li><strong>PNG:</strong> High-quality images with transparency support</li>
+                    <li><strong>JPEG:</strong> Optimized for web use and sharing</li>
+                    <li><strong>WebP:</strong> Modern format with excellent compression</li>
+                </ul>
+                <p class="mt-2">You can download images in any of these formats directly from your gallery.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="technical-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                What are the image size limits?
+            </div>
+            <div class="collapse-content">
+                <p>Image sizes vary depending on your subscription plan and the AI model used:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li><strong>Standard:</strong> 512x512 to 1024x1024 pixels</li>
+                    <li><strong>High Resolution:</strong> Up to 2048x2048 pixels</li>
+                    <li><strong>Custom Dimensions:</strong> Available for specific use cases</li>
+                </ul>
+                <p class="mt-2">Higher resolution images consume more credits but provide better detail and quality.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="technical-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                How long does image generation take?
+            </div>
+            <div class="collapse-content">
+                <p>Generation times vary based on several factors:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li><strong>Simple images:</strong> 10-20 seconds</li>
+                    <li><strong>Complex images:</strong> 30-60 seconds</li>
+                    <li><strong>High-resolution images:</strong> 1-3 minutes</li>
+                    <li><strong>Server load:</strong> May increase wait times during peak usage</li>
+                </ul>
+                <p class="mt-2">We're constantly optimizing our infrastructure to reduce generation times.</p>
+            </div>
+        </div>
+
+        <!-- Usage & Features -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Usage & Features</h2>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="usage-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                How can I write better prompts?
+            </div>
+            <div class="collapse-content">
+                <p>Here are some tips for creating effective prompts:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li><strong>Be specific:</strong> Include details about style, colors, mood, and composition</li>
+                    <li><strong>Use descriptive adjectives:</strong> "vibrant," "ethereal," "detailed," "photorealistic"</li>
+                    <li><strong>Specify the medium:</strong> "oil painting," "digital art," "photograph," "sketch"</li>
+                    <li><strong>Add artistic references:</strong> "in the style of Van Gogh" or "Studio Ghibli style"</li>
+                    <li><strong>Use our prompt enhancer:</strong> Let AI improve your prompts automatically</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="usage-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                Can I use generated images commercially?
+            </div>
+            <div class="collapse-content">
+                <p>Yes! You retain full commercial rights to images you generate with Sketch Maker AI. You can:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li>Use images in commercial projects and products</li>
+                    <li>Sell prints or merchandise featuring your generated art</li>
+                    <li>Use images in marketing materials and advertisements</li>
+                    <li>Include images in client work and presentations</li>
+                </ul>
+                <p class="mt-2">However, you're responsible for ensuring your content doesn't infringe on existing copyrights or trademarks.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="usage-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                Is there a mobile app available?
+            </div>
+            <div class="collapse-content">
+                <p>Currently, Sketch Maker AI is available as a web application that works on all devices including mobile phones and tablets. Our web platform is fully responsive and optimized for mobile use. We're working on dedicated mobile apps for iOS and Android, which will be announced on our platform when available.</p>
+            </div>
+        </div>
+
+        <!-- Support & Troubleshooting -->
+        <h2 class="text-2xl font-semibold mt-8 mb-6">Support & Troubleshooting</h2>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="support-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                What should I do if image generation fails?
+            </div>
+            <div class="collapse-content">
+                <p>If you encounter generation failures, try these steps:</p>
+                <ol class="list-decimal pl-6 mt-2">
+                    <li>Check your internet connection and refresh the page</li>
+                    <li>Verify you have sufficient credits in your account</li>
+                    <li>Try simplifying your prompt or removing potentially problematic content</li>
+                    <li>Clear your browser cache and cookies</li>
+                    <li>Try again during off-peak hours if servers are busy</li>
+                </ol>
+                <p class="mt-2">If problems persist, contact our support team with details about your issue.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="support-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                How can I contact customer support?
+            </div>
+            <div class="collapse-content">
+                <p>We offer multiple ways to get help:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li><strong>Email Support:</strong> support@sketchmaker.ai (Response within 24 hours)</li>
+                    <li><strong>Help Center:</strong> Browse our documentation and tutorials</li>
+                    <li><strong>Community Forum:</strong> Connect with other users and share tips</li>
+                    <li><strong>Live Chat:</strong> Available for premium subscribers during business hours</li>
+                </ul>
+                <p class="mt-2">For technical issues, please include details about your browser, operating system, and steps to reproduce the problem.</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-plus bg-base-200 mb-4">
+            <input type="radio" name="support-accordion" />
+            <div class="collapse-title text-xl font-medium">
+                Do you offer refunds?
+            </div>
+            <div class="collapse-content">
+                <p>We offer refunds under certain circumstances as outlined in our <a href="{{ url_for('core.refund_policy') }}" class="link link-primary">Refund Policy</a>. Generally:</p>
+                <ul class="list-disc pl-6 mt-2">
+                    <li>Refunds are available within 7 days of purchase for unused subscriptions</li>
+                    <li>Technical issues preventing service use may qualify for refunds</li>
+                    <li>Partial refunds may be available for service disruptions</li>
+                    <li>Credit purchases are generally non-refundable once used</li>
+                </ul>
+                <p class="mt-2">Contact our support team to discuss your specific situation.</p>
+            </div>
+        </div>
+
+        <!-- Still have questions? -->
+        <div class="bg-base-200 p-8 rounded-lg mt-12 text-center">
+            <h3 class="text-2xl font-semibold mb-4">Still Have Questions?</h3>
+            <p class="text-lg mb-6">Can't find what you're looking for? Our support team is here to help!</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="mailto:support@sketchmaker.ai" class="btn btn-primary">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Email Support
+                </a>
+                <a href="{{ url_for('core.index') }}" class="btn btn-outline">
+                    Get Started
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-close other accordions when one is opened
+document.addEventListener('DOMContentLoaded', function() {
+    const accordions = document.querySelectorAll('.collapse input[type="radio"]');
+    accordions.forEach(accordion => {
+        accordion.addEventListener('change', function() {
+            if (this.checked) {
+                // Close other accordions in the same group
+                const groupName = this.name;
+                const otherAccordions = document.querySelectorAll(`input[name="${groupName}"]:not(:checked)`);
+                otherAccordions.forEach(other => {
+                    other.checked = false;
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

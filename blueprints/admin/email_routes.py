@@ -1,5 +1,5 @@
 from flask import render_template, request, jsonify
-from flask_login import login_required
+from flask_login import login_required, current_user
 from models import db, EmailSettings
 from extensions import limiter, get_rate_limit_string
 from datetime import datetime
@@ -9,6 +9,12 @@ from .decorators import admin_required
 @login_required
 @admin_required
 def email_settings():
+    if not current_user.is_superadmin():
+        return jsonify({
+            'success': False,
+            'message': 'Only superadmins can access email settings.'
+        }), 403
+    
     settings = EmailSettings.get_settings()
     return render_template('admin/email.html', settings=settings)
 
@@ -16,6 +22,11 @@ def email_settings():
 @login_required
 @admin_required
 def update_email_settings():
+    if not current_user.is_superadmin():
+        return jsonify({
+            'success': False,
+            'message': 'Only superadmins can modify email settings.'
+        }), 403
     settings = EmailSettings.get_settings()
     
     try:
@@ -61,6 +72,12 @@ def update_email_settings():
 @login_required
 @admin_required
 def test_email_settings():
+    if not current_user.is_superadmin():
+        return jsonify({
+            'success': False,
+            'message': 'Only superadmins can test email settings.'
+        }), 403
+    
     try:
         data = request.get_json()
         test_email = data.get('test_email')
