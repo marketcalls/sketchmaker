@@ -137,24 +137,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
+            const formData = new URLSearchParams({
+                'regular_auth_enabled': regularAuthToggle.checked.toString(),
+                'google_auth_enabled': googleAuthToggle.checked.toString(),
+                'google_client_id': document.getElementById('googleClientId').value.trim(),
+                'google_client_secret': document.getElementById('googleClientSecret').value.trim()
+            });
+
+            console.log('Submitting auth settings:', Object.fromEntries(formData));
+
             const response = await fetch('{{ url_for("admin.update_auth_settings") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': window.csrf_token
                 },
-                body: new URLSearchParams({
-                    'regular_auth_enabled': regularAuthToggle.checked.toString(),
-                    'google_auth_enabled': googleAuthToggle.checked.toString(),
-                    'google_client_id': document.getElementById('googleClientId').value.trim(),
-                    'google_client_secret': document.getElementById('googleClientSecret').value.trim()
-                })
+                body: formData
             });
 
+            if (!response.ok) {
+                console.error('Response not OK:', response.status, response.statusText);
+            }
+
             const data = await response.json();
+            console.log('Response data:', data);
             
             if (data.success) {
                 showToast('Auth settings updated successfully', 'success');
+                // Optionally reload the page after a short delay to show updated settings
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             } else {
                 showToast(data.message || 'Failed to update auth settings', 'error');
             }

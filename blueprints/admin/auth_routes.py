@@ -1,7 +1,8 @@
 from flask import render_template, request, jsonify, current_app
 from flask_login import login_required, current_user
-from models import db, AuthSettings
-from extensions import limiter, get_rate_limit_string
+from sketchmaker.models.auth import AuthSettings
+from sketchmaker.extensions import db
+from sketchmaker.extensions import limiter, get_rate_limit_string
 from .decorators import admin_required
 
 @limiter.limit(get_rate_limit_string())
@@ -23,6 +24,12 @@ def auth_settings():
 @admin_required
 def update_auth_settings():
     """Update auth settings - only accessible by superadmin"""
+    if request.method != 'POST':
+        return jsonify({
+            'success': False,
+            'message': 'Method not allowed'
+        }), 405
+        
     if not current_user.is_superadmin():
         return jsonify({
             'success': False,
