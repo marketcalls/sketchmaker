@@ -24,15 +24,37 @@ def get_absolute_path(filename):
 @limiter.limit(get_rate_limit_string())
 @login_required
 def generate_prompt_route():
-    data = request.get_json()
-    if not data or 'topic' not in data:
-        return jsonify({
-            'error': 'No topic provided',
-            'details': 'Please provide a topic to generate a prompt',
-            'type': 'missing_topic'
-        }), 400
-
     try:
+        # Check if request has JSON content
+        if not request.is_json:
+            return jsonify({
+                'error': 'Invalid content type',
+                'details': 'Request must be JSON',
+                'type': 'invalid_content_type'
+            }), 400
+            
+        data = request.get_json()
+        if data is None:
+            return jsonify({
+                'error': 'Invalid JSON',
+                'details': 'Could not parse JSON data',
+                'type': 'invalid_json'
+            }), 400
+            
+        if 'topic' not in data:
+            return jsonify({
+                'error': 'No topic provided',
+                'details': 'Please provide a topic to generate a prompt',
+                'type': 'missing_topic'
+            }), 400
+            
+        if not data['topic'].strip():
+            return jsonify({
+                'error': 'Empty topic provided',
+                'details': 'Topic cannot be empty',
+                'type': 'empty_topic'
+            }), 400
+
         # Check if system has required API keys
         api_settings = APISettings.get_settings()
         if not api_settings.has_required_keys():
@@ -73,19 +95,28 @@ def generate_prompt_route():
                     'type': 'api_error'
                 }), 400
 
-    except APIKeyError as e:
-        return jsonify({
-            'error': str(e),
-            'details': 'Contact administrator - system API configuration issue',
-            'type': 'api_key_error'
-        }), 400
+        except APIKeyError as e:
+            return jsonify({
+                'error': str(e),
+                'details': 'Contact administrator - system API configuration issue',
+                'type': 'api_key_error'
+            }), 400
+        except Exception as e:
+            print(f"Error generating prompt: {str(e)}")
+            print(traceback.format_exc())
+            return jsonify({
+                'error': 'Failed to generate prompt',
+                'details': str(e),
+                'type': 'generation_error'
+            }), 500
+
     except Exception as e:
-        print(f"Error generating prompt: {str(e)}")
+        print(f"Unexpected error in generate_prompt_route: {str(e)}")
         print(traceback.format_exc())
         return jsonify({
-            'error': 'Failed to generate prompt',
+            'error': 'An unexpected error occurred',
             'details': str(e),
-            'type': 'generation_error'
+            'type': 'unexpected_error'
         }), 500
 
 @generate_bp.route('/generate/image', methods=['POST'])
