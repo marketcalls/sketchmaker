@@ -1,8 +1,7 @@
 from flask import render_template, request, jsonify, current_app
 from flask_login import login_required, current_user
-from sketchmaker.models.auth import AuthSettings
-from sketchmaker.extensions import db
-from sketchmaker.extensions import limiter, get_rate_limit_string
+from models.auth import AuthSettings
+from extensions import db, limiter, get_rate_limit_string
 from .decorators import admin_required
 
 @limiter.limit(get_rate_limit_string())
