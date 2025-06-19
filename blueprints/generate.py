@@ -4,7 +4,7 @@ from .image_generator import generate_image
 from .prompt_generator import generate_prompt
 from .clients import APIKeyError
 from models import db, Image, APISettings
-from extensions import limiter, get_rate_limit_string
+from extensions import limiter, get_rate_limit_string, csrf
 import os
 from PIL import Image as PILImage
 import uuid
@@ -21,15 +21,23 @@ def get_absolute_path(filename):
     return os.path.join(current_app.root_path, 'static', 'images', filename)
 
 @generate_bp.route('/generate/prompt', methods=['POST'])
+@csrf.exempt
 @limiter.limit(get_rate_limit_string())
 @login_required
 def generate_prompt_route():
+    print(f"=== GENERATE PROMPT ROUTE CALLED ===")
+    print(f"Request method: {request.method}")
+    print(f"Request content type: {request.content_type}")
+    print(f"Request is_json: {request.is_json}")
+    print(f"Request headers: {dict(request.headers)}")
+    
     try:
         # Check if request has JSON content
         if not request.is_json:
+            print(f"Request is not JSON - Content-Type: {request.content_type}")
             return jsonify({
                 'error': 'Invalid content type',
-                'details': 'Request must be JSON',
+                'details': f'Request must be JSON, got: {request.content_type}',
                 'type': 'invalid_content_type'
             }), 400
             
@@ -120,6 +128,7 @@ def generate_prompt_route():
         }), 500
 
 @generate_bp.route('/generate/image', methods=['POST'])
+@csrf.exempt
 @limiter.limit(get_rate_limit_string())
 @login_required
 def generate_image_route():
