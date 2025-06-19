@@ -4,7 +4,7 @@ from .image_generator import generate_image
 from .prompt_generator import generate_prompt
 from .clients import APIKeyError
 from models import db, Image, APISettings
-from extensions import limiter, get_rate_limit_string
+from extensions import limiter, get_rate_limit_string, csrf
 from flask_wtf.csrf import CSRFError
 import os
 from PIL import Image as PILImage
@@ -22,6 +22,7 @@ def get_absolute_path(filename):
     return os.path.join(current_app.root_path, 'static', 'images', filename)
 
 @generate_bp.route('/generate/prompt', methods=['POST'])
+@csrf.exempt
 @limiter.limit(get_rate_limit_string())
 @login_required
 def generate_prompt_route():
@@ -128,6 +129,7 @@ def generate_prompt_route():
         }), 500
 
 @generate_bp.route('/generate/image', methods=['POST'])
+@csrf.exempt
 @limiter.limit(get_rate_limit_string())
 @login_required
 def generate_image_route():
