@@ -3,7 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>{% block title %}{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}Sketch Maker AI - Transform Ideas into Stunning Visuals with AI{% endblock %}</title>
+    <meta name="description" content="{% block description %}Create professional AI-generated images, artwork, and marketing materials from text prompts. Advanced AI image generation platform for creators, marketers, and businesses.{% endblock %}">
+    <meta name="keywords" content="{% block keywords %}AI image generation, AI art, text to image, artificial intelligence, image creation, AI artwork, digital art, marketing materials, AI graphics, image generator{% endblock %}">
+    <meta name="author" content="Sketch Maker AI">
+    <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
+    <link rel="canonical" href="{% block canonical %}{{ request.url }}{% endblock %}">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.description() }}{% endblock %}">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.url }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='images/og-image.png', _external=True) }}{% endblock %}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Sketch Maker AI">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ self.og_title() }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ self.og_description() }}{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ self.og_image() }}{% endblock %}">
+    <meta name="twitter:site" content="@SketchMakerAI">
+    <meta name="twitter:creator" content="@SketchMakerAI">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="generator" content="Sketch Maker AI Platform">
+    <meta name="rating" content="general">
+    <meta name="distribution" content="global">
+    <meta name="language" content="en">
+    <meta name="geo.region" content="US">
+    <meta name="geo.placename" content="United States">
+    <meta name="application-name" content="Sketch Maker AI">
+    
     {% block head %}
     <!-- Favicon and App Icons -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo/favicon.ico') }}">
@@ -213,6 +249,61 @@
             }
         }
     </style>
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {% block structured_data %}
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Sketch Maker AI",
+        "description": "Create professional AI-generated images, artwork, and marketing materials from text prompts. Advanced AI image generation platform for creators, marketers, and businesses.",
+        "url": "{{ request.host_url }}",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "Offer",
+            "category": "SaaS",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "Sketch Maker AI",
+            "url": "{{ request.host_url }}",
+            "logo": "{{ url_for('static', filename='logo/favicon-32x32.png', _external=True) }}"
+        },
+        "featureList": [
+            "AI Image Generation",
+            "Text to Image Conversion",
+            "Marketing Material Creation",
+            "Artistic Style Transfer",
+            "High-Resolution Output",
+            "Multiple AI Models",
+            "Batch Processing",
+            "API Access"
+        ],
+        "screenshot": "{{ url_for('static', filename='images/og-image.png', _external=True) }}",
+        "softwareVersion": "{{ app_version.version if app_version else '1.0' }}",
+        "releaseNotes": "Advanced AI image generation platform with multiple model support",
+        "requirements": "Modern web browser with JavaScript enabled",
+        "permissions": "Internet access required",
+        "downloadUrl": "{{ request.host_url }}",
+        "installUrl": "{{ request.host_url }}",
+        "memoryRequirements": "4GB RAM recommended",
+        "storageRequirements": "No local storage required",
+        "processorRequirements": "Modern CPU with internet connection"
+    }
+    {% endblock %}
+    </script>
+    
+    <!-- Additional SEO Enhancements -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    
     {% endblock %}
     {% block extra_css %}{% endblock %}
 </head>
@@ -300,7 +391,7 @@
                         <li><a href="{{ url_for('core.index') }}" class="link link-hover">Home</a></li>
                         <li><a href="{{ url_for('core.dashboard') }}" class="link link-hover">Dashboard</a></li>
                         <li><a href="{{ url_for('core.pricing') }}" class="link link-hover">Pricing</a></li>
-                        <li><a href="{{ url_for('gallery.gallery') }}" class="link link-hover">Gallery</a></li>
+                        <li><a href="{{ url_for('gallery.view_gallery') }}" class="link link-hover">Gallery</a></li>
                         <li><a href="{{ url_for('core.faq') }}" class="link link-hover">FAQ</a></li>
                     </ul>
                 </div>

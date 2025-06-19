@@ -1,6 +1,35 @@
 {% extends "base.html" %}
 
-{% block title %}Refund Policy - Sketch Maker AI{% endblock %}
+{% block title %}Refund Policy - Sketch Maker AI | Fair Refund Terms{% endblock %}
+{% block description %}Transparent refund policy for Sketch Maker AI subscriptions and credits. 7-day refund window for new subscriptions, prorated refunds for service issues, and fair treatment guarantee.{% endblock %}
+{% block keywords %}refund policy, money back guarantee, subscription refunds, AI service refunds, fair refund terms, customer protection, billing disputes{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block structured_data %}
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Refund Policy - Sketch Maker AI",
+    "description": "Transparent refund policy for Sketch Maker AI subscriptions and credits. 7-day refund window for new subscriptions, prorated refunds for service issues, and fair treatment guarantee.",
+    "url": "{{ request.url }}",
+    "dateModified": "{{ current_year }}-12-19",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Sketch Maker AI",
+        "url": "{{ request.host_url }}"
+    },
+    "mainEntity": {
+        "@type": "Policy",
+        "name": "Refund Policy",
+        "description": "Fair and transparent refund terms for AI image generation services",
+        "coverage": [
+            "Subscription refunds within 7 days",
+            "Credit refunds for unused purchases",
+            "Technical issue compensation",
+            "Prorated refunds for service disruptions"
+        ]
+    }
+}
+{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8 max-w-4xl">

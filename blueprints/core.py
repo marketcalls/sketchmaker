@@ -108,3 +108,137 @@ def about():
     """About Us page"""
     return render_template('about.html', current_year=datetime.now().year)
 
+@core_bp.route('/sitemap.xml')
+@limiter.limit(get_rate_limit_string())
+def sitemap():
+    """Generate sitemap.xml for SEO"""
+    from flask import make_response
+    
+    sitemap_xml = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+    <url>
+        <loc>{}</loc>
+        <lastmod>{}</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+</urlset>""".format(
+        request.host_url,
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'pricing',
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'about',
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'faq',
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'privacy',
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'terms',
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'refund-policy',
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'auth/login',
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'auth/register',
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'privacy',
+        datetime.now().strftime('%Y-%m-%d'),
+        request.host_url + 'terms',
+        datetime.now().strftime('%Y-%m-%d')
+    )
+    
+    response = make_response(sitemap_xml)
+    response.headers['Content-Type'] = 'application/xml'
+    return response
+
+@core_bp.route('/robots.txt')
+@limiter.limit(get_rate_limit_string())
+def robots():
+    """Generate robots.txt for SEO"""
+    from flask import make_response
+    
+    robots_txt = """User-agent: *
+Allow: /
+Allow: /pricing
+Allow: /about
+Allow: /faq
+Allow: /privacy
+Allow: /terms
+Allow: /refund-policy
+Allow: /auth/login
+Allow: /auth/register
+
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /api/
+Disallow: /generate/
+Disallow: /gallery/private/
+Disallow: /training/
+
+Sitemap: {}sitemap.xml""".format(request.host_url)
+    
+    response = make_response(robots_txt)
+    response.headers['Content-Type'] = 'text/plain'
+    return response
+

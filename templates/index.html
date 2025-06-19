@@ -1,6 +1,45 @@
 {% extends "base.html" %}
 
-{% block title %}Sketch Maker AI - Transform Text Into Art{% endblock %}
+{% block title %}Sketch Maker AI - AI Image Generator | Create Stunning Visuals from Text{% endblock %}
+{% block description %}Generate professional AI images, artwork, and marketing materials from text prompts. Free AI image generator with advanced models for creators, marketers, and businesses. Start creating today!{% endblock %}
+{% block keywords %}AI image generator, text to image, AI art generator, artificial intelligence art, AI artwork, digital art creator, AI graphics, image generation, AI design, marketing visuals, free AI art{% endblock %}
+{% block og_type %}website{% endblock %}
+{% block structured_data %}
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Sketch Maker AI",
+    "description": "Generate professional AI images, artwork, and marketing materials from text prompts using advanced artificial intelligence.",
+    "url": "{{ request.host_url }}",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "{{ request.host_url }}dashboard?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+    },
+    "creator": {
+        "@type": "Organization",
+        "name": "Sketch Maker AI",
+        "@id": "{{ request.host_url }}#organization"
+    },
+    "mainEntity": {
+        "@type": "SoftwareApplication",
+        "name": "Sketch Maker AI",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Web Browser",
+        "url": "{{ request.host_url }}",
+        "screenshot": "{{ url_for('static', filename='images/og-image.png', _external=True) }}",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        }
+    }
+}
+{% endblock %}
 
 {% block extra_css %}
 <style>

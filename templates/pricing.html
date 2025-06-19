@@ -1,6 +1,94 @@
 {% extends "base.html" %}
 
-{% block title %}Pricing Plans - Sketch Maker AI{% endblock %}
+{% block title %}Pricing Plans - Sketch Maker AI | Flexible AI Image Generation Plans{% endblock %}
+{% block description %}Choose the perfect AI image generation plan for your needs. Free tier available with 3 credits/month. Premium and Professional plans with advanced features, unlimited models, and priority support.{% endblock %}
+{% block keywords %}pricing plans, AI image generator pricing, subscription plans, AI art pricing, text to image pricing, AI design tools cost, flexible pricing, enterprise AI tools{% endblock %}
+{% block og_type %}website{% endblock %}
+{% block structured_data %}
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Pricing Plans - Sketch Maker AI",
+    "description": "Choose the perfect AI image generation plan for your needs. Free tier available with 3 credits/month. Premium and Professional plans with advanced features, unlimited models, and priority support.",
+    "url": "{{ request.url }}",
+    "mainEntity": {
+        "@type": "PriceSpecification",
+        "@id": "{{ request.url }}#pricing",
+        "name": "Sketch Maker AI Pricing Plans",
+        "description": "Flexible pricing plans for AI image generation services",
+        "offers": [
+            {
+                "@type": "Offer",
+                "name": "Starter Plan",
+                "description": "Perfect for getting started with AI creativity",
+                "price": "0",
+                "priceCurrency": "USD",
+                "billingIncrement": "P1M",
+                "category": "Free Tier",
+                "availability": "https://schema.org/InStock",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Basic AI Image Generation",
+                    "description": "3 credits per month, basic AI models, standard resolution"
+                }
+            },
+            {
+                "@type": "Offer",
+                "name": "Premium Plan",
+                "description": "For creators ready to explore advanced features",
+                "price": "Contact for pricing",
+                "priceCurrency": "USD",
+                "billingIncrement": "P1M",
+                "category": "Premium Tier",
+                "availability": "https://schema.org/InStock",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Advanced AI Image Generation",
+                    "description": "100 credits per month, all AI models, high resolution up to 2048x2048"
+                }
+            },
+            {
+                "@type": "Offer",
+                "name": "Professional Plan",
+                "description": "For businesses and professional creators",
+                "price": "Contact for pricing",
+                "priceCurrency": "USD",
+                "billingIncrement": "P1M",
+                "category": "Enterprise Tier",
+                "availability": "https://schema.org/InStock",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Enterprise AI Image Generation",
+                    "description": "1000 credits per month, full API access, 4K+ resolution, dedicated support"
+                }
+            }
+        ]
+    },
+    "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "{{ url_for('core.index', _external=True) }}"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Pricing",
+                "item": "{{ request.url }}"
+            }
+        ]
+    },
+    "provider": {
+        "@type": "Organization",
+        "name": "Sketch Maker AI",
+        "url": "{{ request.host_url }}",
+        "logo": "{{ url_for('static', filename='logo/favicon-32x32.png', _external=True) }}"
+    }
+}
+{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300">

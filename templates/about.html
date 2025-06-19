@@ -1,6 +1,86 @@
 {% extends "base.html" %}
 
-{% block title %}About Us - Sketch Maker AI{% endblock %}
+{% block title %}About Us - Sketch Maker AI | AI Image Generation Company{% endblock %}
+{% block description %}Learn about Sketch Maker AI's mission to democratize creative expression through advanced AI image generation technology. Our team, values, and cutting-edge AI models for creators worldwide.{% endblock %}
+{% block keywords %}about sketch maker ai, AI image generation company, artificial intelligence startup, AI art company, creative technology, machine learning team, AI research{% endblock %}
+{% block og_type %}about{% endblock %}
+{% block structured_data %}
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Sketch Maker AI",
+    "description": "Transforming imagination into visual reality through the power of artificial intelligence. We democratize creative expression by making professional-quality AI image generation accessible to everyone.",
+    "url": "{{ request.host_url }}",
+    "logo": "{{ url_for('static', filename='logo/favicon-32x32.png', _external=True) }}",
+    "foundingDate": "{{ current_year }}",
+    "founders": [
+        {
+            "@type": "Person",
+            "name": "Sketch Maker AI Team"
+        }
+    ],
+    "employee": [
+        {
+            "@type": "Person",
+            "jobTitle": "AI Researchers",
+            "description": "PhD experts in machine learning and computer vision"
+        },
+        {
+            "@type": "Person",
+            "jobTitle": "Software Engineers",
+            "description": "Full-stack developers building scalable platforms"
+        },
+        {
+            "@type": "Person",
+            "jobTitle": "Designers & Artists",
+            "description": "Creative professionals ensuring quality and usability"
+        }
+    ],
+    "contactPoint": [
+        {
+            "@type": "ContactPoint",
+            "telephone": "+1-555-0123",
+            "contactType": "Customer Service",
+            "email": "hello@sketchmaker.ai",
+            "availableLanguage": "English"
+        },
+        {
+            "@type": "ContactPoint",
+            "email": "support@sketchmaker.ai",
+            "contactType": "Technical Support",
+            "availableLanguage": "English"
+        },
+        {
+            "@type": "ContactPoint",
+            "email": "business@sketchmaker.ai",
+            "contactType": "Sales",
+            "availableLanguage": "English"
+        }
+    ],
+    "sameAs": [
+        "https://twitter.com/SketchMakerAI",
+        "https://linkedin.com/company/sketchmaker-ai",
+        "https://github.com/sketchmaker-ai"
+    ],
+    "knowsAbout": [
+        "Artificial Intelligence",
+        "Machine Learning",
+        "Computer Vision",
+        "Image Generation",
+        "Deep Learning",
+        "Neural Networks",
+        "Creative Technology"
+    ],
+    "makesOffer": {
+        "@type": "Offer",
+        "itemOffered": {
+            "@type": "Service",
+            "name": "AI Image Generation Platform",
+            "description": "Professional AI-powered image generation, artwork creation, and marketing material development from text prompts"
+        }
+    }
+}
+{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8 max-w-4xl">
