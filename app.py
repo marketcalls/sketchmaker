@@ -135,37 +135,58 @@ def create_app():
                 # OpenAI models - Latest as of June 2025
                 openai_models = [
                     {
-                        "name": "gpt-4.1",
-                        "display_name": "GPT-4.1",
-                        "description": "Smartest model for complex tasks",
+                        "name": "gpt-5",
+                        "display_name": "GPT-5",
+                        "description": "Most advanced AI model with unprecedented reasoning capabilities",
                         "is_latest": True,
                         "sort_order": 1
+                    },
+                    {
+                        "name": "gpt-5-mini",
+                        "display_name": "GPT-5 Mini",
+                        "description": "Compact GPT-5 with excellent performance-to-cost ratio",
+                        "is_latest": True,
+                        "sort_order": 2
+                    },
+                    {
+                        "name": "gpt-5-nano",
+                        "display_name": "GPT-5 Nano",
+                        "description": "Ultra-fast GPT-5 variant for real-time applications",
+                        "is_latest": True,
+                        "sort_order": 3
+                    },
+                    {
+                        "name": "gpt-4.1",
+                        "display_name": "GPT-4.1",
+                        "description": "Smartest GPT-4 model for complex tasks",
+                        "is_latest": False,
+                        "sort_order": 4
                     },
                     {
                         "name": "gpt-4.1-mini",
                         "display_name": "GPT-4.1 Mini",
                         "description": "Affordable model balancing speed and intelligence",
-                        "is_latest": True,
-                        "sort_order": 2
+                        "is_latest": False,
+                        "sort_order": 5
                     },
                     {
                         "name": "gpt-4.1-nano",
                         "display_name": "GPT-4.1 Nano",
                         "description": "Fastest, most cost-effective model for low-latency tasks",
-                        "is_latest": True,
-                        "sort_order": 3
+                        "is_latest": False,
+                        "sort_order": 6
                     },
                     {
                         "name": "gpt-4o",
                         "display_name": "GPT-4o",
                         "description": "Previous generation model",
-                        "sort_order": 4
+                        "sort_order": 7
                     },
                     {
                         "name": "gpt-4o-mini",
                         "display_name": "GPT-4o Mini",
                         "description": "Previous generation mini model",
-                        "sort_order": 5
+                        "sort_order": 8
                     }
                 ]
                 for model_data in openai_models:

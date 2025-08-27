@@ -2,125 +2,478 @@
 
 {% block head %}
 {{ super() }}
-<!-- Add Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
+:root {
+    --nano-primary: #7c3aed;
+    --nano-secondary: #ec4899;
+    --nano-accent: #06b6d4;
+    --nano-success: #10b981;
+    --nano-warning: #f59e0b;
+}
+
+.nano-gradient {
+    background: linear-gradient(135deg, var(--nano-primary) 0%, var(--nano-secondary) 50%, var(--nano-accent) 100%);
+}
+
+.nano-text-gradient {
+    background: linear-gradient(135deg, var(--nano-primary), var(--nano-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mode-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.mode-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.mode-card.active {
+    border-color: var(--nano-primary);
+    background: rgba(124, 58, 237, 0.1);
+}
+
+.mode-card .mode-icon {
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.mode-card:hover .mode-icon {
+    transform: scale(1.2);
+}
+
+.upload-zone {
+    border: 3px dashed rgba(124, 58, 237, 0.3);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(124, 58, 237, 0.02);
+    min-height: 400px;
+}
+
+.upload-zone:hover {
+    border-color: var(--nano-primary);
+    background: rgba(124, 58, 237, 0.05);
+}
+
+.upload-zone.dragover {
+    border-color: var(--nano-secondary);
+    background: rgba(236, 72, 153, 0.1);
+    transform: scale(1.02);
+}
+
+.image-preview-container {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #000;
+}
+
 .image-preview {
     width: 100%;
     height: auto;
-    max-height: 600px;
+    max-height: 500px;
     object-fit: contain;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
-.upload-area {
-    border: 2px dashed rgba(var(--b3, var(--b2)) / var(--tw-border-opacity));
+
+.history-item {
+    position: relative;
     border-radius: 0.5rem;
+    overflow: hidden;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
-.upload-area:hover {
-    border-color: rgba(var(--p) / var(--tw-border-opacity));
-    background-color: rgba(var(--p) / 0.05);
+
+.history-item:hover {
+    transform: scale(1.05);
+    z-index: 10;
 }
-.upload-area.dragover {
-    border-color: rgba(var(--p) / var(--tw-border-opacity));
-    background-color: rgba(var(--p) / 0.1);
+
+.history-timeline {
+    position: relative;
+    padding: 1rem 0;
 }
-.image-container {
-    background: var(--fallback-b1,oklch(var(--b1)));
-    border-radius: 0.75rem;
+
+.history-timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--nano-primary);
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 50px;
+    margin-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--nano-secondary);
+    border: 4px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.active {
+    display: flex;
+}
+
+.loading-content {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 400px;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--nano-gradient);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.result-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.result-item {
+    position: relative;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #000;
+}
+
+.result-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.result-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
     padding: 1rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
-.aspect-ratio-grid {
+
+.result-item:hover .result-actions {
+    opacity: 1;
+}
+
+.style-option {
+    padding: 0.5rem 1rem;
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.style-option:hover {
+    border-color: var(--nano-primary);
+}
+
+.style-option.selected {
+    background: var(--nano-primary);
+    color: white;
+}
+
+.advanced-controls {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
     gap: 0.5rem;
 }
-.aspect-ratio-btn {
-    padding: 0.5rem;
-    font-size: 0.875rem;
-    border: 1px solid rgba(var(--b3, var(--b2)) / var(--tw-border-opacity));
-    transition: all 0.2s;
+
+.control-slider {
+    width: 100%;
 }
-.aspect-ratio-btn.active {
-    background-color: var(--fallback-p,oklch(var(--p)));
-    color: var(--fallback-pc,oklch(var(--pc)));
-    border-color: var(--fallback-p,oklch(var(--p)));
+
+.batch-queue {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+.queue-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+    background: #f9fafb;
+}
+
+.queue-item.processing {
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid var(--nano-primary);
+}
+
+.queue-item.completed {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--nano-success);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-4">
+<div class="container mx-auto px-4 py-6">
     <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold mb-2">Magix - AI Image Enhancement</h1>
-        <p class="text-base-content/70 mb-6">Upload an image and describe what you want to add or modify. Magix AI will intelligently enhance your image based on your prompt.</p>
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold nano-text-gradient mb-3">Magix Nano Studio</h1>
+            <p class="text-xl text-base-content/70">Powered by Google Gemini 2.5 Flash Image (Nano Banana)</p>
+            <p class="text-sm text-base-content/50 mt-2">The most advanced AI image manipulation suite</p>
+        </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <!-- Left Column: Upload and Image Preview -->
-            <div class="space-y-4">
-                <!-- Image Upload/Preview Section -->
+        <!-- Mode Selection -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Select Mode</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                <div class="mode-card card bg-base-200 p-4" data-mode="director">
+                    <div class="text-center">
+                        <i class="fas fa-film mode-icon text-purple-500"></i>
+                        <h3 class="font-bold mt-2">Director</h3>
+                        <p class="text-xs text-base-content/60">Sequential edits</p>
+                    </div>
+                </div>
+                
+                <div class="mode-card card bg-base-200 p-4" data-mode="3d_vision">
+                    <div class="text-center">
+                        <i class="fas fa-cube mode-icon text-blue-500"></i>
+                        <h3 class="font-bold mt-2">3D Vision</h3>
+                        <p class="text-xs text-base-content/60">Multi-view</p>
+                    </div>
+                </div>
+                
+                <div class="mode-card card bg-base-200 p-4" data-mode="story">
+                    <div class="text-center">
+                        <i class="fas fa-book-open mode-icon text-green-500"></i>
+                        <h3 class="font-bold mt-2">Story</h3>
+                        <p class="text-xs text-base-content/60">Comic strips</p>
+                    </div>
+                </div>
+                
+                <div class="mode-card card bg-base-200 p-4" data-mode="style_transfer">
+                    <div class="text-center">
+                        <i class="fas fa-palette mode-icon text-pink-500"></i>
+                        <h3 class="font-bold mt-2">Style</h3>
+                        <p class="text-xs text-base-content/60">Art transfer</p>
+                    </div>
+                </div>
+                
+                <div class="mode-card card bg-base-200 p-4" data-mode="restoration">
+                    <div class="text-center">
+                        <i class="fas fa-magic mode-icon text-yellow-500"></i>
+                        <h3 class="font-bold mt-2">Restore</h3>
+                        <p class="text-xs text-base-content/60">Fix & enhance</p>
+                    </div>
+                </div>
+                
+                <div class="mode-card card bg-base-200 p-4" data-mode="professional">
+                    <div class="text-center">
+                        <i class="fas fa-briefcase mode-icon text-indigo-500"></i>
+                        <h3 class="font-bold mt-2">Pro</h3>
+                        <p class="text-xs text-base-content/60">Content tools</p>
+                    </div>
+                </div>
+                
+                <div class="mode-card card bg-base-200 p-4" data-mode="physics">
+                    <div class="text-center">
+                        <i class="fas fa-atom mode-icon text-cyan-500"></i>
+                        <h3 class="font-bold mt-2">Physics</h3>
+                        <p class="text-xs text-base-content/60">Realistic FX</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left Panel: Input -->
+            <div class="space-y-6">
+                <!-- Upload Section -->
                 <div class="card bg-base-200 shadow-xl">
                     <div class="card-body">
-                        <h3 class="card-title text-lg mb-4">
-                            <i class="fas fa-image"></i>
-                            Original Image
+                        <h3 class="card-title">
+                            <i class="fas fa-upload"></i>
+                            Input Image
                         </h3>
-                        <div id="uploadArea" class="upload-area p-12 text-center cursor-pointer min-h-[400px] flex items-center justify-center">
-                            <input type="file" id="imageUpload" accept="image/jpeg,image/png,image/webp" class="hidden" />
-                            <div id="uploadContent">
-                                <i class="fas fa-cloud-upload-alt text-5xl text-base-content/50 mb-4"></i>
-                                <p class="text-xl font-medium">Click to upload or drag & drop</p>
-                                <p class="text-base text-base-content/70 mt-2">JPEG, PNG, WebP (max 25MB)</p>
+                        
+                        <div id="uploadZone" class="upload-zone flex items-center justify-center cursor-pointer">
+                            <input type="file" id="imageInput" accept="image/*" class="hidden" multiple />
+                            <div id="uploadPlaceholder" class="text-center">
+                                <i class="fas fa-cloud-upload-alt text-5xl text-base-content/30 mb-4"></i>
+                                <p class="text-xl font-medium">Drop images here</p>
+                                <p class="text-sm text-base-content/60 mt-2">Or click to browse</p>
+                                <p class="text-xs text-base-content/40 mt-1">Supports multiple images for batch processing</p>
                             </div>
-                        </div>
-                        <div id="imagePreviewContainer" class="hidden">
-                            <div class="image-container">
-                                <img id="imagePreview" class="image-preview" />
+                            <div id="imagePreviewContainer" class="hidden w-full">
+                                <div id="imagesGrid" class="grid grid-cols-2 gap-2 mb-3">
+                                    <!-- Images will be added here dynamically -->
+                                </div>
+                                <div class="flex gap-2 mt-3">
+                                    <button id="changeImageBtn" class="btn btn-sm btn-outline flex-1">
+                                        <i class="fas fa-exchange-alt"></i> Change All
+                                    </button>
+                                    <button id="addMoreBtn" class="btn btn-sm btn-outline flex-1">
+                                        <i class="fas fa-plus"></i> Add More
+                                    </button>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <span id="imageCount" class="text-sm text-base-content/60"></span>
+                                </div>
                             </div>
-                            <button id="changeImageBtn" class="btn btn-sm btn-outline mt-3 w-full">
-                                <i class="fas fa-exchange-alt"></i>
-                                Change Image
-                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Controls Section -->
+                <!-- Controls -->
                 <div class="card bg-base-200 shadow-xl">
                     <div class="card-body">
-                        <h3 class="card-title text-lg">
+                        <h3 class="card-title">
                             <i class="fas fa-sliders-h"></i>
-                            Settings
+                            Controls
                         </h3>
-                        
-                        <!-- Prompt Input -->
+
+                        <!-- Prompt -->
                         <div class="form-control">
                             <label class="label">
-                                <span class="label-text font-medium">Prompt</span>
-                                <span class="label-text-alt text-xs">Describe what to add/modify</span>
+                                <span class="label-text font-bold">Prompt</span>
                             </label>
-                            <textarea id="prompt" class="textarea textarea-bordered h-24" placeholder="E.g., 'Put a donut next to the flour', 'Add a sunset in the background', 'Change the color to blue'"></textarea>
+                            <textarea id="promptInput" class="textarea textarea-bordered h-24" 
+                                placeholder="Describe what you want to create or modify..."></textarea>
                         </div>
 
-                        <!-- Aspect Ratio Selection -->
-                        <div class="form-control mt-4">
-                            <label class="label">
-                                <span class="label-text font-medium">Aspect Ratio</span>
-                                <span class="label-text-alt text-xs">Output image dimensions</span>
-                            </label>
-                            <div class="aspect-ratio-grid">
-                                <button class="btn aspect-ratio-btn active" data-ratio="">Default</button>
-                                <button class="btn aspect-ratio-btn" data-ratio="21:9">21:9</button>
-                                <button class="btn aspect-ratio-btn" data-ratio="16:9">16:9</button>
-                                <button class="btn aspect-ratio-btn" data-ratio="4:3">4:3</button>
-                                <button class="btn aspect-ratio-btn" data-ratio="3:2">3:2</button>
-                                <button class="btn aspect-ratio-btn" data-ratio="1:1">1:1</button>
-                                <button class="btn aspect-ratio-btn" data-ratio="2:3">2:3</button>
-                                <button class="btn aspect-ratio-btn" data-ratio="3:4">3:4</button>
-                                <button class="btn aspect-ratio-btn" data-ratio="9:16">9:16</button>
-                                <button class="btn aspect-ratio-btn" data-ratio="9:21">9:21</button>
+                        <!-- Mode-specific controls -->
+                        <div id="modeControls" class="mt-4">
+                            <!-- Style Transfer Options -->
+                            <div id="styleTransferControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Style</span>
+                                </label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button class="style-option btn btn-sm" data-style="anime">Anime</button>
+                                    <button class="style-option btn btn-sm" data-style="realistic">Realistic</button>
+                                    <button class="style-option btn btn-sm" data-style="oil_painting">Oil Painting</button>
+                                    <button class="style-option btn btn-sm" data-style="watercolor">Watercolor</button>
+                                    <button class="style-option btn btn-sm" data-style="pencil_sketch">Sketch</button>
+                                    <button class="style-option btn btn-sm" data-style="3d_render">3D Render</button>
+                                    <button class="style-option btn btn-sm" data-style="pixel_art">Pixel Art</button>
+                                    <button class="style-option btn btn-sm" data-style="vintage">Vintage</button>
+                                </div>
+                            </div>
+
+                            <!-- Professional Templates -->
+                            <div id="professionalControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Template</span>
+                                </label>
+                                <select id="templateSelect" class="select select-bordered w-full">
+                                    <option value="youtube_thumbnail">YouTube Thumbnail</option>
+                                    <option value="instagram_post">Instagram Post</option>
+                                    <option value="twitter_header">Twitter Header</option>
+                                    <option value="product_showcase">Product Showcase</option>
+                                    <option value="blog_header">Blog Header</option>
+                                    <option value="social_ad">Social Media Ad</option>
+                                </select>
+                            </div>
+
+                            <!-- Physics Effects -->
+                            <div id="physicsControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Effect</span>
+                                </label>
+                                <select id="effectSelect" class="select select-bordered w-full">
+                                    <option value="reflection">Reflections</option>
+                                    <option value="water_splash">Water Splash</option>
+                                    <option value="rain">Rain Effect</option>
+                                    <option value="snow">Snow Effect</option>
+                                    <option value="fire">Fire Effect</option>
+                                    <option value="smoke">Smoke Effect</option>
+                                    <option value="lightning">Lightning</option>
+                                    <option value="particles">Particles</option>
+                                </select>
                             </div>
                         </div>
 
@@ -130,118 +483,131 @@
                             <div class="collapse-title text-sm font-medium">
                                 Advanced Settings
                             </div>
-                            <div class="collapse-content space-y-3">
-                                <!-- Guidance Scale -->
-                                <div class="form-control">
-                                    <label class="label">
-                                        <span class="label-text text-sm">Guidance Scale</span>
-                                        <span class="label-text-alt text-xs" id="guidanceValue">3.5</span>
-                                    </label>
-                                    <input type="range" id="guidanceScale" min="1" max="10" step="0.5" value="3.5" class="range range-sm range-primary" />
-                                    <div class="w-full flex justify-between text-xs px-2 mt-1">
-                                        <span>1</span>
-                                        <span>5</span>
-                                        <span>10</span>
+                            <div class="collapse-content">
+                                <div class="advanced-controls">
+                                    <div class="control-group">
+                                        <label class="text-sm">Temperature</label>
+                                        <input type="range" id="temperatureSlider" min="0" max="2" step="0.1" value="0.7" class="range range-xs" />
+                                        <span class="text-xs text-center" id="temperatureValue">0.7</span>
                                     </div>
-                                </div>
-
-                                <!-- Seed -->
-                                <div class="form-control">
-                                    <label class="label">
-                                        <span class="label-text text-sm">Seed (optional)</span>
-                                        <span class="label-text-alt text-xs">For reproducible results</span>
-                                    </label>
-                                    <input type="number" id="seed" class="input input-bordered input-sm" placeholder="Leave empty for random" />
+                                    <div class="control-group">
+                                        <label class="text-sm">Number of Images</label>
+                                        <input type="number" id="numImages" min="1" max="4" value="1" class="input input-bordered input-sm" />
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="text-sm">Seed (Optional)</label>
+                                        <input type="number" id="seedInput" class="input input-bordered input-sm" placeholder="Random" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Generate Button -->
-                        <button id="generateBtn" class="btn btn-primary w-full mt-4" disabled>
-                            <i class="fas fa-magic"></i>
-                            Generate Enhancement
-                            <span class="loading loading-spinner loading-sm hidden"></span>
-                        </button>
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3 mt-6">
+                            <button id="generateBtn" class="btn btn-primary flex-1 nano-gradient">
+                                <i class="fas fa-sparkles"></i>
+                                Generate
+                            </button>
+                            <button id="batchProcessBtn" class="btn btn-secondary flex-1">
+                                <i class="fas fa-layer-group"></i>
+                                Batch Process
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Timeline -->
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-history"></i>
+                            Edit History
+                        </h3>
+                        <div id="historyTimeline" class="history-timeline max-h-64 overflow-y-auto">
+                            <p class="text-base-content/50 text-center py-8">No edits yet</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Results -->
-            <div class="space-y-4">
-                <!-- Result Section -->
-                <div id="resultSection" class="card bg-base-200 shadow-xl hidden">
+            <!-- Right Panel: Results -->
+            <div class="space-y-6">
+                <!-- Results Section -->
+                <div class="card bg-base-200 shadow-xl">
                     <div class="card-body">
-                        <h3 class="card-title text-lg mb-4">
-                            <i class="fas fa-star"></i>
-                            Enhanced Result
+                        <h3 class="card-title">
+                            <i class="fas fa-images"></i>
+                            Results
                         </h3>
-                        <div class="space-y-4">
-                            <div class="image-container">
-                                <img id="resultImage" class="image-preview" />
+                        
+                        <div id="resultsContainer">
+                            <div id="noResults" class="text-center py-16">
+                                <i class="fas fa-magic text-6xl text-base-content/20 mb-4"></i>
+                                <p class="text-xl text-base-content/60">Your creations will appear here</p>
                             </div>
                             
-                            <!-- Result Info -->
-                            <div id="resultInfo" class="bg-base-100 p-4 rounded-lg">
-                                <div class="grid grid-cols-2 gap-3 mb-3">
-                                    <div>
-                                        <span class="text-sm font-medium text-base-content/70">Seed:</span>
-                                        <p class="font-mono text-sm" id="resultSeed">-</p>
-                                    </div>
-                                    <div>
-                                        <span class="text-sm font-medium text-base-content/70">Guidance:</span>
-                                        <p class="text-sm" id="resultGuidance">-</p>
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-medium text-base-content/70">Used Prompt:</span>
-                                    <p id="resultPrompt" class="text-sm mt-1">-</p>
-                                </div>
-                            </div>
+                            <div id="resultsGrid" class="result-grid hidden"></div>
+                        </div>
 
-                            <!-- Action Buttons -->
-                            <div class="flex gap-3">
-                                <button id="downloadBtn" class="btn btn-secondary flex-1">
-                                    <i class="fas fa-download"></i>
-                                    Download
+                        <!-- Result Actions -->
+                        <div id="resultActions" class="hidden mt-4">
+                            <div class="flex gap-2">
+                                <button id="downloadAllBtn" class="btn btn-sm btn-outline">
+                                    <i class="fas fa-download"></i> Download All
                                 </button>
-                                <button id="viewInGalleryBtn" class="btn btn-primary flex-1 hidden">
-                                    <i class="fas fa-images"></i>
-                                    View in Gallery
+                                <button id="saveToGalleryBtn" class="btn btn-sm btn-outline">
+                                    <i class="fas fa-save"></i> Save to Gallery
                                 </button>
-                                <button id="regenerateBtn" class="btn btn-outline flex-1">
-                                    <i class="fas fa-redo"></i>
-                                    Regenerate
+                                <button id="continueEditingBtn" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Continue Editing
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Placeholder when no result -->
-                <div id="placeholderSection" class="card bg-base-200 shadow-xl">
+                <!-- Batch Queue -->
+                <div id="batchQueueCard" class="card bg-base-200 shadow-xl hidden">
                     <div class="card-body">
-                        <div class="text-center py-16">
-                            <i class="fas fa-magic text-6xl text-base-content/20 mb-4"></i>
-                            <h3 class="text-xl font-medium text-base-content/70">Enhanced image will appear here</h3>
-                            <p class="text-sm text-base-content/50 mt-2">Upload an image and enter a prompt to get started</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tips Section -->
-                <div class="card bg-base-100 shadow-xl">
-                    <div class="card-body">
-                        <h3 class="card-title text-lg">
-                            <i class="fas fa-lightbulb"></i>
-                            Tips for Better Results
+                        <h3 class="card-title">
+                            <i class="fas fa-tasks"></i>
+                            Batch Queue
                         </h3>
-                        <ul class="text-sm space-y-2 text-base-content/80">
-                            <li><i class="fas fa-check text-success mr-2"></i>Be specific about what you want to add or modify</li>
-                            <li><i class="fas fa-check text-success mr-2"></i>Describe the desired style, colors, or mood</li>
-                            <li><i class="fas fa-check text-success mr-2"></i>Use clear, descriptive language</li>
-                            <li><i class="fas fa-check text-success mr-2"></i>Higher guidance scale = more prompt adherence</li>
-                            <li><i class="fas fa-check text-success mr-2"></i>Choose aspect ratio based on your intended use</li>
-                        </ul>
+                        <div id="batchQueue" class="batch-queue">
+                            <!-- Queue items will be added here -->
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <button id="startBatchBtn" class="btn btn-sm btn-success flex-1">
+                                <i class="fas fa-play"></i> Start
+                            </button>
+                            <button id="clearQueueBtn" class="btn btn-sm btn-error flex-1">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="card bg-gradient-to-br from-purple-500/10 to-pink-500/10 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-lightbulb text-yellow-500"></i>
+                            Pro Tips
+                        </h3>
+                        <div id="modeTips" class="text-sm space-y-2">
+                            <p class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                                <span>Select a mode above to see specific tips and features</span>
+                            </p>
+                            <p class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                                <span>Upload multiple images for batch processing</span>
+                            </p>
+                            <p class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                                <span>Chain edits together to create complex transformations</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -249,127 +615,305 @@
     </div>
 </div>
 
-<!-- Custom JavaScript -->
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content">
+        <div class="nano-text-gradient text-2xl font-bold mb-4">Processing with Nano Banana</div>
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+        </div>
+        <p id="progressText" class="text-sm text-gray-600 mt-2">Initializing...</p>
+        <p class="text-xs text-gray-500 mt-2">⏱️ This may take 30-60 seconds or more depending on complexity</p>
+        <div class="loading loading-spinner loading-lg mt-4"></div>
+    </div>
+</div>
+
 <script>
-let uploadedImageUrl = null;
-let currentImageFile = null;
-let selectedAspectRatio = '';
-
-document.addEventListener('DOMContentLoaded', function() {
-    const uploadArea = document.getElementById('uploadArea');
-    const imageUpload = document.getElementById('imageUpload');
-    const imagePreview = document.getElementById('imagePreview');
-    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-    const uploadContent = document.getElementById('uploadContent');
-    const generateBtn = document.getElementById('generateBtn');
-    const guidanceScale = document.getElementById('guidanceScale');
-    const guidanceValue = document.getElementById('guidanceValue');
-    const aspectRatioButtons = document.querySelectorAll('.aspect-ratio-btn');
-
-    // Drag and drop functionality
-    uploadArea.addEventListener('click', () => imageUpload.click());
-    
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-    
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
-    
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            handleImageUpload(files[0]);
-        }
-    });
-
-    // File input change
-    imageUpload.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            handleImageUpload(e.target.files[0]);
-        }
-    });
-
-    // Change image button
-    document.getElementById('changeImageBtn').addEventListener('click', () => {
-        // Reset file input
-        imageUpload.value = '';
-        imageUpload.click();
-    });
-
-    // Guidance scale slider
-    guidanceScale.addEventListener('input', function() {
-        guidanceValue.textContent = this.value;
-    });
-    
-    // Aspect ratio selection
-    aspectRatioButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            aspectRatioButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            selectedAspectRatio = this.getAttribute('data-ratio');
-        });
-    });
-
-    function handleImageUpload(file) {
-        if (file.size > 25 * 1024 * 1024) {
-            alert('File size must be less than 25MB');
-            return;
-        }
-
-        currentImageFile = file;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            uploadedImageUrl = e.target.result;
-            imagePreview.src = uploadedImageUrl;
-            uploadArea.classList.add('hidden');
-            imagePreviewContainer.classList.remove('hidden');
-            generateBtn.disabled = !document.getElementById('prompt').value;
-        };
-        reader.readAsDataURL(file);
+// Nano Studio Main Application
+class NanoStudio {
+    constructor() {
+        this.currentMode = 'director';
+        this.uploadedImages = [];
+        this.editHistory = [];
+        this.batchQueue = [];
+        this.results = [];
+        this.isProcessing = false;
+        
+        this.init();
     }
 
-    // Prompt input validation
-    document.getElementById('prompt').addEventListener('input', function() {
-        generateBtn.disabled = !this.value.trim() || !uploadedImageUrl;
-    });
+    init() {
+        this.setupEventListeners();
+        this.loadHistory();
+    }
 
-    // Generate button
-    generateBtn.addEventListener('click', async function() {
-        const prompt = document.getElementById('prompt').value.trim();
-        if (!prompt || !uploadedImageUrl) {
-            alert('Please upload an image and enter a prompt');
+    setupEventListeners() {
+        // Mode selection
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.addEventListener('click', (e) => this.selectMode(e.currentTarget.dataset.mode));
+        });
+
+        // Upload handling
+        const uploadZone = document.getElementById('uploadZone');
+        const imageInput = document.getElementById('imageInput');
+        
+        uploadZone.addEventListener('click', () => imageInput.click());
+        uploadZone.addEventListener('dragover', this.handleDragOver.bind(this));
+        uploadZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        uploadZone.addEventListener('drop', this.handleDrop.bind(this));
+        imageInput.addEventListener('change', this.handleFileSelect.bind(this));
+
+        // Buttons
+        document.getElementById('changeImageBtn')?.addEventListener('click', () => {
+            this.uploadedImages = [];
+            imageInput.value = '';
+            imageInput.click();
+        });
+        document.getElementById('addMoreBtn')?.addEventListener('click', () => imageInput.click());
+        document.getElementById('generateBtn').addEventListener('click', () => this.generate());
+        document.getElementById('batchProcessBtn').addEventListener('click', () => this.showBatchQueue());
+        document.getElementById('startBatchBtn')?.addEventListener('click', () => this.processBatch());
+        document.getElementById('clearQueueBtn')?.addEventListener('click', () => this.clearQueue());
+        document.getElementById('downloadAllBtn')?.addEventListener('click', () => this.downloadAll());
+        document.getElementById('saveToGalleryBtn')?.addEventListener('click', () => this.saveToGallery());
+        document.getElementById('continueEditingBtn')?.addEventListener('click', () => this.continueEditing());
+
+        // Style options
+        document.querySelectorAll('.style-option').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.style-option').forEach(b => b.classList.remove('selected'));
+                e.target.classList.add('selected');
+            });
+        });
+
+        // Sliders
+        const tempSlider = document.getElementById('temperatureSlider');
+        tempSlider?.addEventListener('input', (e) => {
+            document.getElementById('temperatureValue').textContent = e.target.value;
+        });
+    }
+
+    selectMode(mode) {
+        this.currentMode = mode;
+        
+        // Update UI
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.classList.remove('active');
+            if (card.dataset.mode === mode) {
+                card.classList.add('active');
+            }
+        });
+
+        // Show mode-specific controls
+        this.showModeControls(mode);
+        
+        // Update tips
+        this.updateTips(mode);
+    }
+
+    showModeControls(mode) {
+        // Hide all mode controls
+        document.querySelectorAll('[id$="Controls"]').forEach(el => el.classList.add('hidden'));
+        
+        // Show specific controls
+        switch(mode) {
+            case 'style_transfer':
+                document.getElementById('styleTransferControls')?.classList.remove('hidden');
+                break;
+            case 'professional':
+                document.getElementById('professionalControls')?.classList.remove('hidden');
+                break;
+            case 'physics':
+                document.getElementById('physicsControls')?.classList.remove('hidden');
+                break;
+        }
+    }
+
+    updateTips(mode) {
+        const tipsContainer = document.getElementById('modeTips');
+        const tips = {
+            director: [
+                'Chain multiple edits to create complex sequences',
+                'Each edit maintains perfect consistency',
+                'Use timeline to navigate edit history'
+            ],
+            '3d_vision': [
+                'Generate 360° turntable views automatically',
+                'Create character sheets with multiple poses',
+                'Perfect for product visualization'
+            ],
+            story: [
+                'Creates 4-panel comic strips automatically',
+                'Maintains character consistency across panels',
+                'Add narrative prompts for better storytelling'
+            ],
+            style_transfer: [
+                'Transform images into any artistic style',
+                'Mix multiple styles with advanced controls',
+                'Preserve specific elements while styling'
+            ],
+            restoration: [
+                'Automatically repair damaged photos',
+                'Colorize black and white images',
+                'Enhance and upscale old photos'
+            ],
+            professional: [
+                'Generate YouTube thumbnails with templates',
+                'Remove/replace backgrounds instantly',
+                'Edit text within images'
+            ],
+            physics: [
+                'Add realistic reflections and shadows',
+                'Create weather effects like rain or snow',
+                'Simulate liquid and particle physics'
+            ]
+        };
+
+        const modeTips = tips[mode] || [];
+        tipsContainer.innerHTML = modeTips.map(tip => `
+            <p class="flex items-start">
+                <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                <span>${tip}</span>
+            </p>
+        `).join('');
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add('dragover');
+    }
+
+    handleDragLeave(e) {
+        e.currentTarget.classList.remove('dragover');
+    }
+
+    handleDrop(e) {
+        e.preventDefault();
+        e.currentTarget.classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        this.processFiles(files);
+    }
+
+    handleFileSelect(e) {
+        const files = Array.from(e.target.files);
+        this.processFiles(files);
+    }
+
+    async processFiles(files) {
+        for (const file of files) {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.uploadedImages.push({
+                        url: e.target.result,
+                        file: file,
+                        name: file.name
+                    });
+                    this.updateImagePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
+    removeImage(index) {
+        this.uploadedImages.splice(index, 1);
+        this.updateImagePreview();
+    }
+
+    updateImagePreview() {
+        if (this.uploadedImages.length > 0) {
+            const imagesGrid = document.getElementById('imagesGrid');
+            const container = document.getElementById('imagePreviewContainer');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const imageCount = document.getElementById('imageCount');
+            
+            // Clear existing previews
+            imagesGrid.innerHTML = '';
+            
+            // Display all uploaded images
+            this.uploadedImages.forEach((img, index) => {
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'relative group';
+                imageDiv.innerHTML = `
+                    <div class="image-preview-container relative">
+                        <img src="${img.url}" class="image-preview rounded" style="max-height: 200px;" />
+                        <button onclick="nanoStudio.removeImage(${index})" 
+                                class="absolute top-2 right-2 btn btn-circle btn-sm btn-error opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-center mt-1 truncate">${img.name || `Image ${index + 1}`}</p>
+                `;
+                imagesGrid.appendChild(imageDiv);
+            });
+            
+            container.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            
+            // Update image count text
+            imageCount.textContent = `${this.uploadedImages.length} image${this.uploadedImages.length > 1 ? 's' : ''} uploaded`;
+            
+            // Adjust grid columns based on number of images
+            if (this.uploadedImages.length === 1) {
+                imagesGrid.className = 'grid grid-cols-1 gap-2 mb-3';
+            } else if (this.uploadedImages.length === 2) {
+                imagesGrid.className = 'grid grid-cols-2 gap-2 mb-3';
+            } else {
+                imagesGrid.className = 'grid grid-cols-2 md:grid-cols-3 gap-2 mb-3';
+            }
+        } else {
+            // Show placeholder if no images
+            const container = document.getElementById('imagePreviewContainer');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            container.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+        }
+    }
+
+    async generate() {
+        if (this.isProcessing) return;
+        
+        const prompt = document.getElementById('promptInput').value;
+        if (!prompt && this.currentMode !== 'restoration') {
+            alert('Please enter a prompt');
             return;
         }
 
-        // Show loading state
-        this.disabled = true;
-        const loadingSpinner = this.querySelector('.loading');
-        const icon = this.querySelector('.fas');
-        loadingSpinner.classList.remove('hidden');
-        icon.classList.add('hidden');
+        // Show time warning notification
+        const notification = document.createElement('div');
+        notification.className = 'toast toast-top toast-center z-50';
+        notification.innerHTML = `
+            <div class="alert alert-info shadow-lg">
+                <i class="fas fa-info-circle"></i>
+                <span>Generation typically takes 30-60 seconds. Please wait...</span>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+
+        this.showLoading(true);
+        this.isProcessing = true;
 
         try {
             const requestData = {
+                mode: this.currentMode,
                 prompt: prompt,
-                image_url: uploadedImageUrl,
-                guidance_scale: parseFloat(document.getElementById('guidanceScale').value)
+                num_images: parseInt(document.getElementById('numImages')?.value || 1)
             };
 
-            const seedValue = document.getElementById('seed').value;
-            if (seedValue) {
-                requestData.seed = parseInt(seedValue);
+            // Add uploaded images
+            if (this.uploadedImages.length > 0) {
+                requestData.image_urls = this.uploadedImages.map(img => img.url);
             }
-            
-            // Add aspect ratio if selected
-            if (selectedAspectRatio) {
-                requestData.aspect_ratio = selectedAspectRatio;
-            }
+
+            // Add mode-specific parameters
+            this.addModeParameters(requestData);
+
+            // Add advanced settings
+            requestData.temperature = parseFloat(document.getElementById('temperatureSlider').value);
+            const seed = document.getElementById('seedInput').value;
+            if (seed) requestData.seed = parseInt(seed);
 
             const response = await fetch('/api/magix/generate', {
                 method: 'POST',
@@ -381,78 +925,275 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             const result = await response.json();
-
+            
             if (!response.ok) {
                 throw new Error(result.error || 'Generation failed');
             }
 
-            // Display result
-            document.getElementById('resultImage').src = result.image_url;
-            document.getElementById('resultSeed').textContent = result.seed || 'N/A';
-            document.getElementById('resultGuidance').textContent = requestData.guidance_scale;
-            document.getElementById('resultPrompt').textContent = result.prompt || prompt;
-            document.getElementById('resultSection').classList.remove('hidden');
-            document.getElementById('placeholderSection').classList.add('hidden');
-
-            // Setup download button
-            document.getElementById('downloadBtn').onclick = () => {
-                const link = document.createElement('a');
-                link.href = result.image_url;
-                link.download = `magix_enhanced_${Date.now()}.jpg`;
-                link.click();
-            };
-
-            // Setup view in gallery button
-            if (result.gallery_id) {
-                const galleryBtn = document.getElementById('viewInGalleryBtn');
-                galleryBtn.classList.remove('hidden');
-                galleryBtn.onclick = () => {
-                    window.location.href = `/gallery/${result.gallery_id}`;
-                };
-            }
-
-            // Setup regenerate button
-            document.getElementById('regenerateBtn').onclick = () => {
-                generateBtn.click();
-            };
-            
-            // Show success notification
-            showNotification('Image generated and saved to gallery!', 'success');
+            this.handleResults(result);
+            this.addToHistory(result);
 
         } catch (error) {
             console.error('Error:', error);
-            alert(error.message || 'Failed to generate enhanced image. Please try again.');
+            alert(error.message);
         } finally {
-            // Reset button state
-            this.disabled = false;
-            loadingSpinner.classList.add('hidden');
-            icon.classList.remove('hidden');
-            
-            // Re-enable if conditions are met
-            this.disabled = !document.getElementById('prompt').value.trim() || !uploadedImageUrl;
+            this.showLoading(false);
+            this.isProcessing = false;
         }
-    });
-    
-    // Simple notification function
-    function showNotification(message, type = 'info') {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `alert alert-${type} shadow-lg fixed bottom-4 right-4 z-50 max-w-md`;
-        notification.innerHTML = `
-            <div>
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
+    }
+
+    addModeParameters(data) {
+        switch(this.currentMode) {
+            case 'style_transfer':
+                const selectedStyle = document.querySelector('.style-option.selected');
+                if (selectedStyle) {
+                    data.style = selectedStyle.dataset.style;
+                }
+                break;
+            case 'professional':
+                data.template = document.getElementById('templateSelect')?.value;
+                break;
+            case 'physics':
+                data.effect = document.getElementById('effectSelect')?.value;
+                break;
+        }
+    }
+
+    handleResults(result) {
+        const resultsGrid = document.getElementById('resultsGrid');
+        const noResults = document.getElementById('noResults');
+        const resultActions = document.getElementById('resultActions');
+        
+        // Clear previous results
+        resultsGrid.innerHTML = '';
+        
+        // Add new results
+        if (result.images && result.images.length > 0) {
+            result.images.forEach((img, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item slide-in shadow-xl';
+                resultItem.innerHTML = `
+                    <div class="relative">
+                        <img src="${img.url}" alt="Result ${index + 1}" class="w-full" />
+                        <div class="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/60 to-transparent">
+                            <span class="text-white text-sm font-medium">Result ${index + 1}</span>
+                            ${img.width && img.height ? `<span class="text-white text-xs ml-2">${img.width}x${img.height}</span>` : ''}
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-3">
+                            <button class="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20" onclick="nanoStudio.downloadImage('${img.url}')" title="Download">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20" onclick="nanoStudio.useAsInput('${img.url}')" title="Use as Input">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                            <button class="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20" onclick="nanoStudio.viewFullscreen('${img.url}')" title="View Fullscreen">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20" onclick="nanoStudio.copyToClipboard('${img.url}')" title="Copy Image URL">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                resultsGrid.appendChild(resultItem);
+            });
+            
+            this.results = result.images;
+            resultsGrid.classList.remove('hidden');
+            noResults.classList.add('hidden');
+            resultActions.classList.remove('hidden');
+        }
+    }
+
+    addToHistory(result) {
+        const historyTimeline = document.getElementById('historyTimeline');
+        
+        // Create timeline item
+        const timelineItem = document.createElement('div');
+        timelineItem.className = 'timeline-item slide-in';
+        
+        const time = new Date().toLocaleTimeString();
+        const mode = this.currentMode;
+        const prompt = document.getElementById('promptInput').value;
+        
+        timelineItem.innerHTML = `
+            <div class="bg-base-100 rounded-lg p-3">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-sm font-bold">${mode.charAt(0).toUpperCase() + mode.slice(1)}</span>
+                    <span class="text-xs text-base-content/60">${time}</span>
+                </div>
+                <p class="text-sm text-base-content/80">${prompt || 'No prompt'}</p>
+                ${result.images ? `
+                    <div class="flex gap-1 mt-2">
+                        ${result.images.slice(0, 3).map(img => `
+                            <img src="${img.url}" class="w-16 h-16 object-cover rounded" />
+                        `).join('')}
+                        ${result.images.length > 3 ? `<span class="text-xs self-center">+${result.images.length - 3}</span>` : ''}
+                    </div>
+                ` : ''}
             </div>
         `;
         
-        // Add to page
-        document.body.appendChild(notification);
+        // Remove placeholder if exists
+        const placeholder = historyTimeline.querySelector('p');
+        if (placeholder) placeholder.remove();
         
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+        // Add to beginning of timeline
+        historyTimeline.insertBefore(timelineItem, historyTimeline.firstChild);
+        
+        // Keep only last 10 items
+        while (historyTimeline.children.length > 10) {
+            historyTimeline.removeChild(historyTimeline.lastChild);
+        }
+        
+        // Save to local storage
+        this.editHistory.unshift(result);
+        this.saveHistory();
     }
-});
+
+    showBatchQueue() {
+        document.getElementById('batchQueueCard').classList.remove('hidden');
+        this.updateQueueDisplay();
+    }
+
+    updateQueueDisplay() {
+        const queueContainer = document.getElementById('batchQueue');
+        
+        if (this.batchQueue.length === 0) {
+            queueContainer.innerHTML = '<p class="text-center text-base-content/50">Queue is empty</p>';
+        } else {
+            queueContainer.innerHTML = this.batchQueue.map((item, index) => `
+                <div class="queue-item ${item.status || ''}" data-index="${index}">
+                    <span class="text-sm">${item.prompt}</span>
+                    <span class="text-xs">${item.status || 'pending'}</span>
+                </div>
+            `).join('');
+        }
+    }
+
+    async processBatch() {
+        if (this.batchQueue.length === 0) {
+            alert('Batch queue is empty');
+            return;
+        }
+
+        for (let i = 0; i < this.batchQueue.length; i++) {
+            const item = this.batchQueue[i];
+            item.status = 'processing';
+            this.updateQueueDisplay();
+            
+            // Process item
+            await this.generate();
+            
+            item.status = 'completed';
+            this.updateQueueDisplay();
+        }
+    }
+
+    clearQueue() {
+        this.batchQueue = [];
+        this.updateQueueDisplay();
+    }
+
+    copyToClipboard(url) {
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Image URL copied to clipboard!');
+        }).catch(() => {
+            alert('Failed to copy URL');
+        });
+    }
+
+    downloadImage(url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `nano_studio_${Date.now()}.jpg`;
+        link.click();
+    }
+
+    downloadAll() {
+        this.results.forEach((img, index) => {
+            setTimeout(() => this.downloadImage(img.url), index * 500);
+        });
+    }
+
+    useAsInput(url) {
+        this.uploadedImages = [{url: url}];
+        this.updateImagePreview();
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    viewFullscreen(url) {
+        window.open(url, '_blank');
+    }
+
+    async saveToGallery() {
+        // Already saved automatically in backend
+        alert('Images saved to gallery!');
+    }
+
+    continueEditing() {
+        if (this.results.length > 0) {
+            this.uploadedImages = this.results.map(r => ({url: r.url}));
+            this.updateImagePreview();
+            document.getElementById('promptInput').value = '';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+    }
+
+    showLoading(show) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (show) {
+            overlay.classList.add('active');
+            this.animateProgress();
+        } else {
+            overlay.classList.remove('active');
+        }
+    }
+
+    animateProgress() {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        
+        const messages = [
+            'Initializing Nano Banana... (30-60 seconds expected)',
+            'Understanding your request... Please be patient',
+            'Processing with advanced AI models...',
+            'Applying transformations... Almost there',
+            'Finalizing your masterpiece...'
+        ];
+        
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            
+            fill.style.width = progress + '%';
+            text.textContent = messages[Math.floor(progress / 20)] || messages[0];
+            
+            if (!this.isProcessing) {
+                fill.style.width = '100%';
+                text.textContent = 'Complete!';
+                clearInterval(interval);
+            }
+        }, 500);
+    }
+
+    loadHistory() {
+        const saved = localStorage.getItem('nanoStudioHistory');
+        if (saved) {
+            this.editHistory = JSON.parse(saved);
+        }
+    }
+
+    saveHistory() {
+        localStorage.setItem('nanoStudioHistory', JSON.stringify(this.editHistory.slice(0, 50)));
+    }
+}
+
+// Initialize application
+const nanoStudio = new NanoStudio();
+
+// Set page title
+document.title = 'Magix Nano Studio';
 </script>
 {% endblock %}

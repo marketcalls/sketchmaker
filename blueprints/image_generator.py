@@ -235,7 +235,8 @@ def generate_image(data):
         }
 
         # Add dimension info for models that use it
-        if "image_size" in arguments:
+        if "image_size" in arguments and isinstance(arguments["image_size"], dict):
+            # Only add width/height if image_size is a dictionary (not for Ideogram V3 which uses strings)
             response_data.update({
                 "width": arguments["image_size"]["width"],
                 "height": arguments["image_size"]["height"]

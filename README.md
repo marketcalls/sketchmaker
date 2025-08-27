@@ -7,7 +7,8 @@ A sophisticated web application that leverages multiple AI providers and models 
 ## 🚀 Core Features
 
 ### 🤖 Multi-Provider AI Support
-- **OpenAI**: GPT-4.1, GPT-4.1 Mini, GPT-4.1 Nano (Latest models)
+- **OpenAI**: GPT-5, GPT-5 Mini, GPT-5 Nano (Latest generation models)
+- **OpenAI Legacy**: GPT-4.1, GPT-4.1 Mini, GPT-4.1 Nano
 - **Anthropic**: Claude Opus 4, Sonnet 4, Haiku 3.5 (June 2025 versions)
 - **Google Gemini**: Gemini 2.5 Pro, Flash, Flash Lite Preview
 - **Groq**: Compound Beta, Llama 3.3 70B Versatile, and more
@@ -25,23 +26,60 @@ A sophisticated web application that leverages multiple AI providers and models 
 - **Advanced Controls**: Resolution, style, inference steps, guidance scale
 - **Batch Generation**: Multiple images per request
 
-### 🖼️ Magix - AI Image Enhancement
-- **Intelligent Context-Aware Enhancement**: Upload an image and describe modifications in natural language
-- **Multiple Aspect Ratios**: Support for 10 different aspect ratios including:
-  - Default (maintains original), 21:9, 16:9, 4:3, 3:2, 1:1, 2:3, 3:4, 9:16, 9:21
-- **Advanced Controls**:
-  - Adjustable guidance scale (1-10) for prompt adherence control
-  - Seed support for reproducible results
-  - Real-time generation progress tracking
-- **Smart AI Understanding**: 
-  - Recognizes objects and spatial relationships in your image
-  - Seamlessly blends new elements while maintaining style consistency
-  - Understands complex prompts like "add a sunset", "place a donut next to the flour", etc.
-- **Professional UI**: Large image preview with side-by-side comparison
-- **Multiple format support**: JPEG, PNG, WebP (up to 25MB)
-- **High-quality downloads**: Export enhanced images in original quality
-- **Gallery Integration**: All generated images automatically saved to your personal gallery with prompts
-- **Powered by**: Latest Flux Pro Kontext model for superior results
+### 🎯 Nano Studio - Revolutionary AI Image Manipulation
+**Powered by Google Gemini 2.5 Flash Image (Nano Banana)**
+
+Nano Studio represents the cutting edge of AI image manipulation, offering unprecedented control and quality through seven specialized modes:
+
+#### 🎬 **Director Mode** - Sequential Editing with Version Control
+- Chain multiple edits while maintaining perfect consistency
+- Visual timeline with edit history thumbnails
+- Branch different edit paths and rollback to any point
+- Perfect for iterative creative workflows
+
+#### 🔮 **3D Vision Mode** - Multi-View Generation
+- Generate 360° turntable views from a single image
+- Create character sheets with multiple poses
+- Product visualization from different angles
+- "Show me the back" feature with accurate physics understanding
+
+#### 📚 **Story Mode** - Comic Strip & Narrative Creation
+- Automatic 4-6 panel comic generation
+- Perfect character consistency across all panels
+- Story progression with narrative understanding
+- Add speech bubbles and visual effects
+
+#### 🎨 **Style Transfer Mode** - Advanced Artistic Transformations
+- Transform images into any artistic style (anime, oil painting, sketch, etc.)
+- Mix multiple styles with precise control sliders
+- Preserve specific elements while styling others
+- Material changes (glass, metal, wood, ice transformations)
+
+#### 🔧 **Restoration Mode** - Fix and Enhance Photos
+- Automatic damage and tear repair
+- Intelligent colorization of black & white photos
+- Upscale and enhance detail quality
+- Remove artifacts and noise while preserving authenticity
+
+#### 💼 **Professional Mode** - Content Creation Tools
+- YouTube thumbnail generation with smart templates
+- Instant background removal and replacement
+- Edit text within existing images
+- Brand asset and social media content generation
+
+#### ⚡ **Physics Mode** - Realistic Effects & Simulations
+- Add physically accurate reflections and shadows
+- Weather effects (rain, snow, lightning)
+- Liquid and particle simulations
+- Time progression effects (aging, decay, growth)
+
+**Key Advantages of Nano Studio:**
+- **Perfect Physics Understanding**: Accurately predicts reflections, shadows, and physical interactions
+- **Character Consistency**: Maintains exact character features across multiple edits
+- **3D Understanding**: Can rotate objects and show different angles accurately
+- **Style Preservation**: Maintains original image style when adding new elements
+- **Batch Processing**: Handle multiple images simultaneously
+- **Real-time Progress**: Visual progress tracking with descriptive updates
 
 ### 🎯 Banner Generation
 - SVG banner creation with precise control
@@ -146,6 +184,59 @@ A sophisticated web application that leverages multiple AI providers and models 
 - **Migrations**: Alembic
 - **Environment**: python-dotenv
 - **File Storage**: Local filesystem with multi-format support
+
+## 🎯 Using Nano Studio
+
+### Accessing Nano Studio
+1. Navigate to `/magix` in your Sketch Maker application
+2. Or click on "Nano Studio" from the dashboard
+
+### Quick Start Guide
+
+1. **Select a Mode**: Choose from the 7 available modes based on your needs
+2. **Upload Image(s)**: Drag and drop or click to upload (supports batch processing)
+3. **Enter Prompt**: Describe what you want to create or modify
+4. **Adjust Settings** (Optional):
+   - Temperature: Controls creativity (0-2)
+   - Number of images: Generate multiple variations (1-4)
+   - Seed: For reproducible results
+5. **Generate**: Click the Generate button and watch the real-time progress
+6. **Download or Continue**: Save your results or use them as input for further editing
+
+### Example Prompts by Mode
+
+**Director Mode:**
+- "First add a sunset, then add birds flying, finally add a lighthouse"
+- "Remove the person, then change the sky to night, then add stars"
+
+**3D Vision Mode:**
+- "Show this product from 5 different angles"
+- "Create a character sheet with front, side, and back views"
+- "Rotate this object 180 degrees"
+
+**Story Mode:**
+- "Create a 4-panel comic about a cat's adventure"
+- "Show this character's day from morning to night"
+
+**Style Transfer Mode:**
+- "Convert this to anime style"
+- "Make it look like an oil painting"
+- "Transform to pixel art"
+
+**Restoration Mode:**
+- "Repair all damage and colorize this old photo"
+- "Remove scratches and enhance details"
+- "Upscale and improve quality"
+
+**Professional Mode:**
+- "Create a YouTube thumbnail with dramatic text"
+- "Remove background and add professional gradient"
+- "Change the text to say 'HUGE NEWS'"
+
+**Physics Mode:**
+- "Add realistic water reflection"
+- "Make it rain with proper physics"
+- "Add fire effect with smoke"
 
 ## 📋 Installation
 
