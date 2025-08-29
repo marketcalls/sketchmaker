@@ -160,6 +160,16 @@ Nano Studio represents the cutting edge of AI image manipulation, offering unpre
 - Image metadata tracking
 - Creation history
 
+### 📱 Responsive Design & Mobile Experience
+- **Mobile-First Architecture**: Optimized for phones, tablets, and desktops
+- **Responsive Navigation**: Slide-out drawer menu for mobile devices
+- **Adaptive Tables**: Intelligent column hiding and dropdown actions on small screens
+- **Touch-Friendly Interface**: Larger tap targets and optimized spacing
+- **Responsive Forms**: Single-column layouts on mobile, multi-column on desktop
+- **Smart Typography**: Fluid text sizing across all breakpoints
+- **Optimized Modals**: Full-screen modals on mobile for better usability
+- **Progressive Enhancement**: Enhanced features for larger screens
+
 ![AI Generated Art](https://marketcalls.in/wp-content/uploads/2024/08/bannana.jpeg)
 
 ## 🛠️ Tech Stack
@@ -178,6 +188,7 @@ Nano Studio represents the cutting edge of AI image manipulation, offering unpre
 - **Canvas**: Fabric.js for image editing
 - **Animations**: GSAP
 - **Image Processing**: Pillow, CairoSVG
+- **Responsive Design**: Mobile-first approach with breakpoints at sm (640px), md (768px), lg (1024px)
 
 ### Infrastructure
 - **Rate Limiting**: Flask-Limiter

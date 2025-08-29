@@ -3,7 +3,7 @@
 {% block title %}Manage Subscriptions - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Manage User Subscriptions</h1>
         <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost">
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Subscription Statistics -->
-    <div class="stats shadow mb-6 w-full">
+    <div class="stats stats-vertical sm:stats-horizontal shadow mb-6 w-full">
         <div class="stat">
             <div class="stat-title">Total Users</div>
             <div class="stat-value">{{ user_subscriptions|length }}</div>
@@ -38,14 +38,13 @@
             <h2 class="card-title mb-4">User Subscriptions</h2>
             
             <div class="overflow-x-auto">
-                <table class="table table-zebra">
+                <table class="table table-zebra table-xs sm:table-sm md:table-md">
                     <thead>
                         <tr>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Current Plan</th>
-                            <th>Credits Remaining</th>
-                            <th>Credits Used</th>
+                            <th>User</th>
+                            <th class="hidden sm:table-cell">Email</th>
+                            <th>Plan</th>
+                            <th class="hidden md:table-cell">Credits</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -53,40 +52,59 @@
                         {% for item in user_subscriptions %}
                         <tr>
                             <td>
-                                <div class="flex items-center gap-2">
-                                    {{ item.user.username }}
+                                <div class="flex flex-col">
+                                    <div class="font-semibold text-sm">{{ item.user.username }}</div>
+                                    <div class="text-xs opacity-60 sm:hidden">{{ item.user.email }}</div>
                                     {% if item.user.role == 'superadmin' %}
-                                        <span class="badge badge-error badge-sm">Superadmin</span>
+                                        <span class="badge badge-error badge-xs mt-1">Superadmin</span>
                                     {% elif item.user.role == 'admin' %}
-                                        <span class="badge badge-warning badge-sm">Admin</span>
+                                        <span class="badge badge-warning badge-xs mt-1">Admin</span>
                                     {% endif %}
                                 </div>
                             </td>
-                            <td>{{ item.user.email }}</td>
+                            <td class="hidden sm:table-cell text-xs">{{ item.user.email }}</td>
                             <td>
-                                <span class="badge badge-primary">{{ item.plan_name }}</span>
+                                <div class="flex flex-col">
+                                    <span class="badge badge-primary badge-sm">{{ item.plan_name }}</span>
+                                    <div class="text-xs mt-1 md:hidden">
+                                        <span class="font-semibold">{{ item.credits_remaining }}</span> credits
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="hidden md:table-cell">
+                                <div class="text-sm">
+                                    <span class="font-bold text-primary">{{ item.credits_remaining }}</span>
+                                    <span class="text-xs opacity-60">/ {{ item.credits_used }} used</span>
+                                </div>
                             </td>
                             <td>
-                                <span class="font-bold text-primary">{{ item.credits_remaining }}</span>
-                            </td>
-                            <td>{{ item.credits_used }}</td>
-                            <td>
-                                <div class="flex gap-2">
-                                    <button class="btn btn-sm btn-primary" 
+                                <div class="dropdown dropdown-end lg:hidden">
+                                    <label tabindex="0" class="btn btn-ghost btn-xs">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+                                    </label>
+                                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                                        <li><a onclick="showAssignPlanModal({{ item.user.id }}, '{{ item.user.username }}')">Change Plan</a></li>
+                                        <li><a onclick="showModifyCreditsModal({{ item.user.id }}, '{{ item.user.username }}', {{ item.credits_remaining }})">Modify Credits</a></li>
+                                        <li><a href="{{ url_for('admin_subscription.view_usage', user_id=item.user.id) }}">View Usage</a></li>
+                                        <li><a href="{{ url_for('admin_subscription.edit_user_limits', user_id=item.user.id) }}">Edit Limits</a></li>
+                                    </ul>
+                                </div>
+                                <div class="hidden lg:flex gap-1 flex-wrap">
+                                    <button class="btn btn-xs sm:btn-sm btn-primary" 
                                             onclick="showAssignPlanModal({{ item.user.id }}, '{{ item.user.username }}')">
-                                        Change Plan
+                                        <span class="hidden xl:inline">Change</span> Plan
                                     </button>
-                                    <button class="btn btn-sm btn-secondary" 
+                                    <button class="btn btn-xs sm:btn-sm btn-secondary" 
                                             onclick="showModifyCreditsModal({{ item.user.id }}, '{{ item.user.username }}', {{ item.credits_remaining }})">
-                                        Modify Credits
+                                        <span class="hidden xl:inline">Modify</span> Credits
                                     </button>
                                     <a href="{{ url_for('admin_subscription.view_usage', user_id=item.user.id) }}" 
-                                       class="btn btn-sm btn-ghost">
-                                        View Usage
+                                       class="btn btn-xs sm:btn-sm btn-ghost">
+                                        <span class="hidden xl:inline">View</span> Usage
                                     </a>
                                     <a href="{{ url_for('admin_subscription.edit_user_limits', user_id=item.user.id) }}" 
-                                       class="btn btn-sm btn-primary">
-                                        Edit Limits
+                                       class="btn btn-xs sm:btn-sm btn-primary">
+                                        <span class="hidden xl:inline">Edit</span> Limits
                                     </a>
                                 </div>
                             </td>
@@ -99,7 +117,7 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="mt-6 flex gap-4">
+    <div class="mt-6 flex flex-wrap gap-2 sm:gap-4">
         <a href="{{ url_for('admin_subscription.manage_plans') }}" class="btn btn-primary">
             Manage Plans
         </a>

@@ -71,9 +71,9 @@ def is_stable():
 # Version history tracking
 VERSION_HISTORY = [
     {
-        'version': '1.0.0.0',
+        'version': '1.0.0.1',
         'codename': 'Genesis',
-        'release_date': '2025-06-18',
+        'release_date': '2025-08-29',
         'description': 'Initial release with comprehensive AI image generation capabilities',
         'features': [
             'Multi-provider AI image generation (OpenAI, Anthropic, Google, Groq)',

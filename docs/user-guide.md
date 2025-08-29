@@ -36,6 +36,13 @@ This comprehensive user guide will help you master all features of SketchMaker A
 - **Train LoRA**: Custom model training
 - **Settings**: Account preferences
 
+#### **Mobile Navigation**
+On mobile devices:
+- Tap the **hamburger menu** (☰) to open the navigation drawer
+- Swipe from left edge to open menu
+- Tap anywhere outside to close
+- All features accessible from the mobile menu
+
 #### **Credit Information**
 Your dashboard displays:
 - Current credit balance (real-time updates)
@@ -408,6 +415,44 @@ Sort by:
 - **Collection Links**: Share entire collections
 - **Embed Codes**: Website integration
 - **Social Media**: Direct platform sharing
+
+## 📱 Mobile Usage Guide
+
+### **Optimized Mobile Experience**
+
+SketchMaker AI is fully optimized for mobile devices with a responsive, touch-friendly interface.
+
+#### **Mobile-Specific Features**
+- **Slide-out Navigation**: Access all features from the drawer menu
+- **Touch Gestures**: Swipe to navigate, pinch to zoom images
+- **Responsive Forms**: Single-column layouts for easy input
+- **Adaptive Tables**: Horizontal scrolling with key information prioritized
+- **Full-Screen Modals**: Better visibility for dialogs and forms
+- **Optimized Buttons**: Larger tap targets for accurate selection
+
+#### **Mobile Navigation Tips**
+1. **Access Menu**: Tap the hamburger icon (☰) in the top-left
+2. **Close Menu**: Tap outside the drawer or swipe left
+3. **Profile Menu**: Tap your avatar for account options
+4. **Quick Actions**: Use dropdown menus for table actions
+
+#### **Mobile Image Generation**
+- **Portrait Mode**: Forms automatically stack vertically
+- **Dropdown Selects**: Easy model and style selection
+- **Touch-Friendly Sliders**: Adjust parameters with finger swipes
+- **Image Preview**: Tap to view full-screen, pinch to zoom
+
+#### **Mobile Gallery Management**
+- **Grid View**: Responsive columns based on screen size
+- **Swipe Actions**: Navigate between images
+- **Long Press**: Access quick actions menu
+- **Batch Selection**: Tap and hold to select multiple
+
+#### **Mobile Best Practices**
+- **Rotate for More Space**: Landscape mode for wider tables
+- **Use Search**: Quickly find features instead of scrolling
+- **Enable Notifications**: Get alerts for completed generations
+- **Save Favorites**: Quick access to frequently used settings
 
 ## ⚙️ Settings and Preferences
 

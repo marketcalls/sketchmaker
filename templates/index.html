@@ -130,17 +130,17 @@
     <div class="absolute top-1/3 -left-24 w-80 h-80 bg-secondary opacity-10 rounded-full blur-3xl pointer-events-none"></div>
     
     <!-- Hero Section -->
-    <section class="py-16 md:py-28 relative z-10">
-        <div class="container mx-auto px-4">
+    <section class="py-12 sm:py-16 md:py-28 relative z-10">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center gap-8 md:gap-16">
                 <div class="flex-1 text-center md:text-left relative">
                     <div class="absolute -top-10 -left-10 w-24 h-24 bg-primary opacity-5 rounded-full blur-xl"></div>
                     
-                    <h1 class="text-4xl md:text-6xl font-bold mb-6 gradient-text leading-tight">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 gradient-text leading-tight">
                         Transform Text Into <span class="relative inline-block">Art<span class="absolute -bottom-1 left-0 w-full h-1 bg-secondary rounded-full"></span></span>
                     </h1>
                     
-                    <p class="text-lg md:text-xl text-base-content/80 mb-8 max-w-2xl">
+                    <p class="text-base sm:text-lg md:text-xl text-base-content/80 mb-6 sm:mb-8 max-w-2xl">
                         Create stunning visuals with <span class="text-purple-500 font-bold">Nano Studio</span> powered by 
                         <span class="text-pink-500 font-medium">Google Gemini 2.5 Flash Image</span>. 
                         Experience revolutionary image editing with perfect physics understanding, 3D rotations, style transfers, and more. 
@@ -151,17 +151,17 @@
                     
                     <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                         {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-lg relative overflow-hidden group">
+                            <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary btn-md sm:btn-lg relative overflow-hidden group">
                                 <span class="relative z-10">Go to Dashboard</span>
                                 <span class="absolute inset-0 bg-white opacity-20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
                             </a>
                         {% else %}
-                            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg relative overflow-hidden group">
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-md sm:btn-lg relative overflow-hidden group">
                                 <span class="relative z-10">Start Creating</span>
                                 <span class="absolute inset-0 bg-white opacity-20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
                             </a>
                         {% endif %}
-                        <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-outline btn-lg group relative overflow-hidden">
+                        <a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-outline btn-md sm:btn-lg group relative overflow-hidden">
                             <span class="relative z-10 group-hover:text-primary-content">View Gallery</span>
                             <span class="absolute inset-0 bg-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                         </a>
@@ -252,11 +252,11 @@
     </div>
 
     <!-- Features Section -->
-    <section class="py-16 md:py-24 bg-base-200/50 relative z-10">
+    <section class="py-12 sm:py-16 md:py-24 bg-base-200/50 relative z-10">
         <div class="absolute top-0 right-0 w-full h-64 bg-gradient-to-b from-base-300/50 to-transparent pointer-events-none"></div>
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-bold mb-4 inline-block gradient-text">Key Features</h2>
+                <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 inline-block gradient-text">Key Features</h2>
                 <div class="w-24 h-1 bg-primary mx-auto rounded-full"></div>
                 <p class="mt-4 text-lg text-base-content/70 max-w-2xl mx-auto">Powerful tools to transform your creative vision into reality</p>
             </div>
