@@ -242,33 +242,6 @@
     width: 100%;
 }
 
-.batch-queue {
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 0.5rem;
-}
-
-.queue-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    margin-bottom: 0.5rem;
-    background: #f9fafb;
-}
-
-.queue-item.processing {
-    background: rgba(124, 58, 237, 0.1);
-    border: 1px solid var(--nano-primary);
-}
-
-.queue-item.completed {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid var(--nano-success);
-}
 
 @keyframes pulse {
     0%, 100% { opacity: 1; }
@@ -502,15 +475,11 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
-                        <div class="flex gap-3 mt-6">
-                            <button id="generateBtn" class="btn btn-primary flex-1 nano-gradient">
+                        <!-- Action Button -->
+                        <div class="mt-6">
+                            <button id="generateBtn" class="btn btn-primary w-full nano-gradient">
                                 <i class="fas fa-sparkles"></i>
-                                Generate
-                            </button>
-                            <button id="batchProcessBtn" class="btn btn-secondary flex-1">
-                                <i class="fas fa-layer-group"></i>
-                                Batch Process
+                                Generate Magic
                             </button>
                         </div>
                     </div>
@@ -566,26 +535,6 @@
                     </div>
                 </div>
 
-                <!-- Batch Queue -->
-                <div id="batchQueueCard" class="card bg-base-200 shadow-xl hidden">
-                    <div class="card-body">
-                        <h3 class="card-title">
-                            <i class="fas fa-tasks"></i>
-                            Batch Queue
-                        </h3>
-                        <div id="batchQueue" class="batch-queue">
-                            <!-- Queue items will be added here -->
-                        </div>
-                        <div class="flex gap-2 mt-3">
-                            <button id="startBatchBtn" class="btn btn-sm btn-success flex-1">
-                                <i class="fas fa-play"></i> Start
-                            </button>
-                            <button id="clearQueueBtn" class="btn btn-sm btn-error flex-1">
-                                <i class="fas fa-trash"></i> Clear
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Tips -->
                 <div class="card bg-gradient-to-br from-purple-500/10 to-pink-500/10 shadow-xl">
@@ -635,7 +584,6 @@ class NanoStudio {
         this.currentMode = 'director';
         this.uploadedImages = [];
         this.editHistory = [];
-        this.batchQueue = [];
         this.results = [];
         this.isProcessing = false;
         
@@ -684,9 +632,6 @@ class NanoStudio {
             imageInput.click();
         });
         document.getElementById('generateBtn').addEventListener('click', () => this.generate());
-        document.getElementById('batchProcessBtn').addEventListener('click', () => this.showBatchQueue());
-        document.getElementById('startBatchBtn')?.addEventListener('click', () => this.processBatch());
-        document.getElementById('clearQueueBtn')?.addEventListener('click', () => this.clearQueue());
         document.getElementById('downloadAllBtn')?.addEventListener('click', () => this.downloadAll());
         document.getElementById('saveToGalleryBtn')?.addEventListener('click', () => this.saveToGallery());
         document.getElementById('continueEditingBtn')?.addEventListener('click', () => this.continueEditing());
@@ -1186,49 +1131,6 @@ class NanoStudio {
         this.saveHistory();
     }
 
-    showBatchQueue() {
-        document.getElementById('batchQueueCard').classList.remove('hidden');
-        this.updateQueueDisplay();
-    }
-
-    updateQueueDisplay() {
-        const queueContainer = document.getElementById('batchQueue');
-        
-        if (this.batchQueue.length === 0) {
-            queueContainer.innerHTML = '<p class="text-center text-base-content/50">Queue is empty</p>';
-        } else {
-            queueContainer.innerHTML = this.batchQueue.map((item, index) => `
-                <div class="queue-item ${item.status || ''}" data-index="${index}">
-                    <span class="text-sm">${item.prompt}</span>
-                    <span class="text-xs">${item.status || 'pending'}</span>
-                </div>
-            `).join('');
-        }
-    }
-
-    async processBatch() {
-        if (this.batchQueue.length === 0) {
-            alert('Batch queue is empty');
-            return;
-        }
-
-        for (let i = 0; i < this.batchQueue.length; i++) {
-            const item = this.batchQueue[i];
-            item.status = 'processing';
-            this.updateQueueDisplay();
-            
-            // Process item
-            await this.generate();
-            
-            item.status = 'completed';
-            this.updateQueueDisplay();
-        }
-    }
-
-    clearQueue() {
-        this.batchQueue = [];
-        this.updateQueueDisplay();
-    }
 
     copyToClipboard(url) {
         navigator.clipboard.writeText(url).then(() => {
@@ -1251,10 +1153,40 @@ class NanoStudio {
         });
     }
 
-    useAsInput(url) {
-        this.uploadedImages = [{url: url}];
-        this.updateImagePreview();
-        window.scrollTo({top: 0, behavior: 'smooth'});
+    async useAsInput(url) {
+        // If it's a local URL, convert to base64
+        if (url.startsWith('/static/') || !url.startsWith('data:')) {
+            try {
+                // Fetch the image and convert to base64
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const reader = new FileReader();
+                
+                reader.onload = () => {
+                    this.uploadedImages = [{
+                        url: reader.result,
+                        name: 'Generated Image',
+                        wasCompressed: false
+                    }];
+                    this.updateImagePreview();
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                };
+                
+                reader.readAsDataURL(blob);
+            } catch (error) {
+                console.error('Error converting image to base64:', error);
+                alert('Failed to load image as input. Please try again.');
+            }
+        } else {
+            // Already a data URL, use directly
+            this.uploadedImages = [{
+                url: url,
+                name: 'Generated Image',
+                wasCompressed: false
+            }];
+            this.updateImagePreview();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
     }
 
     viewFullscreen(url) {
@@ -1266,9 +1198,41 @@ class NanoStudio {
         alert('Images saved to gallery!');
     }
 
-    continueEditing() {
+    async continueEditing() {
         if (this.results.length > 0) {
-            this.uploadedImages = this.results.map(r => ({url: r.url}));
+            // Convert all result images to base64 before using as input
+            this.uploadedImages = [];
+            
+            for (const result of this.results) {
+                if (result.url.startsWith('/static/') || !result.url.startsWith('data:')) {
+                    try {
+                        const response = await fetch(result.url);
+                        const blob = await response.blob();
+                        const reader = new FileReader();
+                        
+                        await new Promise((resolve) => {
+                            reader.onload = () => {
+                                this.uploadedImages.push({
+                                    url: reader.result,
+                                    name: 'Generated Image',
+                                    wasCompressed: false
+                                });
+                                resolve();
+                            };
+                            reader.readAsDataURL(blob);
+                        });
+                    } catch (error) {
+                        console.error('Error converting image:', error);
+                    }
+                } else {
+                    this.uploadedImages.push({
+                        url: result.url,
+                        name: 'Generated Image',
+                        wasCompressed: false
+                    });
+                }
+            }
+            
             this.updateImagePreview();
             document.getElementById('promptInput').value = '';
             window.scrollTo({top: 0, behavior: 'smooth'});

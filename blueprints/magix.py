@@ -278,63 +278,6 @@ def generate_magix():
         print(f"Error in generate_magix: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@magix_bp.route('/api/magix/batch', methods=['POST'])
-@limiter.limit(get_rate_limit_string())
-@login_required
-def batch_generate():
-    """Handle batch operations for multiple edits"""
-    try:
-        data = request.get_json()
-        operations = data.get('operations', [])
-        
-        if not operations:
-            return jsonify({'error': 'No operations provided'}), 400
-            
-        results = []
-        client = init_fal_client()
-        
-        for op in operations:
-            try:
-                # Process each operation
-                arguments = {
-                    "prompt": op['prompt'],
-                    "image_urls": op.get('image_urls', []),
-                    "num_images": 1
-                }
-                
-                result = client.subscribe(
-                    "fal-ai/nano-banana/edit",
-                    arguments=arguments,
-                    with_logs=False
-                )
-                
-                if result and 'images' in result:
-                    for img in result['images']:
-                        if img.get('url'):
-                            local_url, _, _, _ = save_result_image(img['url'])
-                            results.append({
-                                'operation': op['id'],
-                                'url': local_url,
-                                'success': True
-                            })
-                else:
-                    results.append({
-                        'operation': op['id'],
-                        'success': False,
-                        'error': 'No result'
-                    })
-                    
-            except Exception as e:
-                results.append({
-                    'operation': op['id'],
-                    'success': False,
-                    'error': str(e)
-                })
-        
-        return jsonify({'results': results})
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 @magix_bp.route('/api/magix/history/<int:user_id>')
 @login_required
