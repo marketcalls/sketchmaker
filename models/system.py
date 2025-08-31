@@ -9,6 +9,7 @@ class SystemSettings(db.Model):
     credit_cost_images = db.Column(db.Float, default=1.0)
     credit_cost_banners = db.Column(db.Float, default=0.5)
     credit_cost_magix = db.Column(db.Float, default=1.0)
+    credit_cost_virtual = db.Column(db.Float, default=1.0)
     credit_cost_lora_training = db.Column(db.Float, default=40.0)
     
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -29,6 +30,7 @@ class SystemSettings(db.Model):
             'images': self.credit_cost_images,
             'banners': self.credit_cost_banners,
             'magix': self.credit_cost_magix,
+            'virtual': self.credit_cost_virtual,
             'lora_training': self.credit_cost_lora_training
         }
         return feature_map.get(feature_type, 1.0)
@@ -39,6 +41,7 @@ class SystemSettings(db.Model):
             'images': self.credit_cost_images,
             'banners': self.credit_cost_banners,
             'magix': self.credit_cost_magix,
+            'virtual': self.credit_cost_virtual,
             'lora_training': self.credit_cost_lora_training
         }
     
@@ -50,6 +53,8 @@ class SystemSettings(db.Model):
             self.credit_cost_banners = float(credit_costs['banners'])
         if 'magix' in credit_costs:
             self.credit_cost_magix = float(credit_costs['magix'])
+        if 'virtual' in credit_costs:
+            self.credit_cost_virtual = float(credit_costs['virtual'])
         if 'lora_training' in credit_costs:
             self.credit_cost_lora_training = float(credit_costs['lora_training'])
         

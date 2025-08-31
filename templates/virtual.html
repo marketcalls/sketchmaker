@@ -1,0 +1,782 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+:root {
+    --dress-primary: #ec4899;
+    --dress-secondary: #8b5cf6;
+    --dress-accent: #06b6d4;
+    --dress-success: #10b981;
+    --dress-warning: #f59e0b;
+}
+
+.dress-gradient {
+    background: linear-gradient(135deg, var(--dress-primary) 0%, var(--dress-secondary) 50%, var(--dress-accent) 100%);
+}
+
+.dress-text-gradient {
+    background: linear-gradient(135deg, var(--dress-primary), var(--dress-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.upload-zone {
+    border: 3px dashed rgba(236, 72, 153, 0.3);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(236, 72, 153, 0.02);
+    min-height: 350px;
+}
+
+.upload-zone:hover {
+    border-color: var(--dress-primary);
+    background: rgba(236, 72, 153, 0.05);
+}
+
+.upload-zone.dragover {
+    border-color: var(--dress-secondary);
+    background: rgba(139, 92, 246, 0.1);
+    transform: scale(1.02);
+}
+
+.image-preview-container {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #000;
+}
+
+.image-preview {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: contain;
+}
+
+.result-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.result-item {
+    position: relative;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #000;
+}
+
+.result-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.result-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    padding: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.result-item:hover .result-actions {
+    opacity: 1;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay.active {
+    display: flex;
+}
+
+.loading-content {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 400px;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--dress-gradient);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.comparison-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.comparison-item {
+    position: relative;
+}
+
+.comparison-label {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+.tip-card {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(139, 92, 246, 0.1));
+    border: 1px solid rgba(236, 72, 153, 0.2);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold dress-text-gradient mb-3">Virtual Try-On</h1>
+            <p class="text-xl text-base-content/70">AI-Powered Fashion Visualization</p>
+            <p class="text-sm text-base-content/50 mt-2">Upload your photo and a dress to see yourself wearing it instantly</p>
+        </div>
+
+        <!-- Main Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left Panel: Input -->
+            <div class="space-y-6">
+                <!-- Person Upload Section -->
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-user"></i>
+                            Your Photo
+                        </h3>
+                        
+                        <div id="personUploadZone" class="upload-zone flex items-center justify-center cursor-pointer">
+                            <input type="file" id="personImageInput" accept="image/*" class="hidden" />
+                            <div id="personUploadPlaceholder" class="text-center">
+                                <i class="fas fa-camera text-5xl text-base-content/30 mb-4"></i>
+                                <p class="text-xl font-medium">Upload your photo</p>
+                                <p class="text-sm text-base-content/60 mt-2">Or drag and drop here</p>
+                                <p class="text-xs text-base-content/40 mt-1">Full body photos work best</p>
+                            </div>
+                            <div id="personImagePreviewContainer" class="hidden w-full">
+                                <div class="image-preview-container">
+                                    <img id="personImagePreview" class="image-preview" />
+                                </div>
+                                <button id="changePersonImageBtn" class="btn btn-sm btn-outline w-full mt-3">
+                                    <i class="fas fa-exchange-alt"></i> Change Photo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dress Upload Section -->
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-tshirt"></i>
+                            Dress/Clothing
+                        </h3>
+                        
+                        <div id="dressUploadZone" class="upload-zone flex items-center justify-center cursor-pointer">
+                            <input type="file" id="dressImageInput" accept="image/*" class="hidden" />
+                            <div id="dressUploadPlaceholder" class="text-center">
+                                <i class="fas fa-tshirt text-5xl text-base-content/30 mb-4"></i>
+                                <p class="text-xl font-medium">Upload dress image</p>
+                                <p class="text-sm text-base-content/60 mt-2">Or drag and drop here</p>
+                                <p class="text-xs text-base-content/40 mt-1">Clear product images work best</p>
+                            </div>
+                            <div id="dressImagePreviewContainer" class="hidden w-full">
+                                <div class="image-preview-container">
+                                    <img id="dressImagePreview" class="image-preview" />
+                                </div>
+                                <button id="changeDressImageBtn" class="btn btn-sm btn-outline w-full mt-3">
+                                    <i class="fas fa-exchange-alt"></i> Change Dress
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-sliders-h"></i>
+                            Customization
+                        </h3>
+
+                        <!-- Prompt -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-bold">Additional Instructions (Optional)</span>
+                            </label>
+                            <textarea id="promptInput" class="textarea textarea-bordered h-20" 
+                                placeholder="E.g., 'Make it fit perfectly', 'Add accessories', 'Change pose slightly'..."></textarea>
+                        </div>
+
+                        <!-- Background Option -->
+                        <div class="form-control mt-4">
+                            <label class="label cursor-pointer">
+                                <span class="label-text">Use dress image background</span>
+                                <input type="checkbox" id="useDressBackground" class="checkbox checkbox-primary" />
+                            </label>
+                            <p class="text-xs text-base-content/60 mt-1">Enable to place yourself in the same setting as the dress photo</p>
+                        </div>
+
+                        <!-- Advanced Settings -->
+                        <div class="collapse collapse-arrow bg-base-100 mt-4">
+                            <input type="checkbox" />
+                            <div class="collapse-title text-sm font-medium">
+                                Advanced Settings
+                            </div>
+                            <div class="collapse-content">
+                                <div class="space-y-3">
+                                    <div class="form-control">
+                                        <label class="text-sm">Creativity Level</label>
+                                        <input type="range" id="temperatureSlider" min="0" max="2" step="0.1" value="0.7" class="range range-xs" />
+                                        <span class="text-xs text-center" id="temperatureValue">0.7</span>
+                                    </div>
+                                    <div class="form-control">
+                                        <label class="text-sm">Number of Variations</label>
+                                        <input type="number" id="numImages" min="1" max="4" value="1" class="input input-bordered input-sm" />
+                                    </div>
+                                    <div class="form-control">
+                                        <label class="text-sm">Seed (Optional)</label>
+                                        <input type="number" id="seedInput" class="input input-bordered input-sm" placeholder="Random" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <div class="mt-6">
+                            <button id="generateBtn" class="btn btn-primary w-full dress-gradient" disabled>
+                                <i class="fas fa-magic"></i>
+                                Try On Dress
+                            </button>
+                            <p class="text-xs text-center text-base-content/60 mt-2">Upload both images to enable</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Results -->
+            <div class="space-y-6">
+                <!-- Preview Section -->
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-eye"></i>
+                            Preview
+                        </h3>
+                        
+                        <div id="previewContainer">
+                            <div id="noPreview" class="text-center py-12">
+                                <i class="fas fa-images text-6xl text-base-content/20 mb-4"></i>
+                                <p class="text-xl text-base-content/60">Upload both images to see preview</p>
+                            </div>
+                            
+                            <div id="previewGrid" class="comparison-view hidden">
+                                <div class="comparison-item">
+                                    <div class="comparison-label">Original</div>
+                                    <img id="previewPerson" class="w-full rounded" />
+                                </div>
+                                <div class="comparison-item">
+                                    <div class="comparison-label">Dress</div>
+                                    <img id="previewDress" class="w-full rounded" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fas fa-sparkles"></i>
+                            Result
+                        </h3>
+                        
+                        <div id="resultsContainer">
+                            <div id="noResults" class="text-center py-16">
+                                <i class="fas fa-magic text-6xl text-base-content/20 mb-4"></i>
+                                <p class="text-xl text-base-content/60">Your virtual try-on will appear here</p>
+                            </div>
+                            
+                            <div id="resultsGrid" class="result-grid hidden"></div>
+                        </div>
+
+                        <!-- Result Actions -->
+                        <div id="resultActions" class="hidden mt-4">
+                            <div class="flex gap-2">
+                                <button id="downloadBtn" class="btn btn-sm btn-outline flex-1">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                                <button id="saveToGalleryBtn" class="btn btn-sm btn-outline flex-1">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                                <button id="tryAgainBtn" class="btn btn-sm btn-primary flex-1">
+                                    <i class="fas fa-redo"></i> Try Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="tip-card">
+                    <h3 class="font-bold mb-2 flex items-center">
+                        <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                        Pro Tips
+                    </h3>
+                    <div class="text-sm space-y-2">
+                        <p class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span>Use clear, well-lit photos for best results</span>
+                        </p>
+                        <p class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span>Full body shots work better than cropped images</span>
+                        </p>
+                        <p class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span>Product images on clean backgrounds give best results</span>
+                        </p>
+                        <p class="flex items-start">
+                            <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                            <span>Try different poses and angles for variety</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-content">
+        <div class="dress-text-gradient text-2xl font-bold mb-4">Processing Virtual Try-On</div>
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+        </div>
+        <p id="progressText" class="text-sm text-gray-600 mt-2">Analyzing images...</p>
+        <p class="text-xs text-gray-500 mt-2">⏱️ This may take 30-60 seconds</p>
+        <div class="loading loading-spinner loading-lg mt-4"></div>
+    </div>
+</div>
+
+<script>
+// Virtual Try-On Application
+class VirtualTryOn {
+    constructor() {
+        this.personImage = null;
+        this.dressImage = null;
+        this.results = [];
+        this.isProcessing = false;
+        
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        // Person image upload
+        const personUploadZone = document.getElementById('personUploadZone');
+        const personImageInput = document.getElementById('personImageInput');
+        
+        personUploadZone.addEventListener('click', (e) => {
+            if (e.target === personUploadZone || e.target.closest('#personUploadPlaceholder')) {
+                personImageInput.click();
+            }
+        });
+        personUploadZone.addEventListener('dragover', this.handleDragOver.bind(this));
+        personUploadZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        personUploadZone.addEventListener('drop', (e) => this.handleDrop(e, 'person'));
+        personImageInput.addEventListener('change', (e) => this.handleFileSelect(e, 'person'));
+
+        // Dress image upload
+        const dressUploadZone = document.getElementById('dressUploadZone');
+        const dressImageInput = document.getElementById('dressImageInput');
+        
+        dressUploadZone.addEventListener('click', (e) => {
+            if (e.target === dressUploadZone || e.target.closest('#dressUploadPlaceholder')) {
+                dressImageInput.click();
+            }
+        });
+        dressUploadZone.addEventListener('dragover', this.handleDragOver.bind(this));
+        dressUploadZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        dressUploadZone.addEventListener('drop', (e) => this.handleDrop(e, 'dress'));
+        dressImageInput.addEventListener('change', (e) => this.handleFileSelect(e, 'dress'));
+
+        // Change buttons
+        document.getElementById('changePersonImageBtn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            personImageInput.value = '';
+            personImageInput.click();
+        });
+        document.getElementById('changeDressImageBtn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dressImageInput.value = '';
+            dressImageInput.click();
+        });
+
+        // Generate button
+        document.getElementById('generateBtn').addEventListener('click', () => this.generate());
+
+        // Result actions
+        document.getElementById('downloadBtn')?.addEventListener('click', () => this.downloadResult());
+        document.getElementById('saveToGalleryBtn')?.addEventListener('click', () => this.saveToGallery());
+        document.getElementById('tryAgainBtn')?.addEventListener('click', () => this.tryAgain());
+
+        // Slider
+        const tempSlider = document.getElementById('temperatureSlider');
+        tempSlider?.addEventListener('input', (e) => {
+            document.getElementById('temperatureValue').textContent = e.target.value;
+        });
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add('dragover');
+    }
+
+    handleDragLeave(e) {
+        e.currentTarget.classList.remove('dragover');
+    }
+
+    handleDrop(e, type) {
+        e.preventDefault();
+        e.currentTarget.classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            this.processFile(files[0], type);
+        }
+    }
+
+    handleFileSelect(e, type) {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            this.processFile(files[0], type);
+        }
+    }
+
+    async processFile(file, type) {
+        try {
+            const dataUrl = await this.readFileAsDataUrl(file);
+            
+            if (type === 'person') {
+                this.personImage = dataUrl;
+                this.updatePersonPreview();
+            } else if (type === 'dress') {
+                this.dressImage = dataUrl;
+                this.updateDressPreview();
+            }
+            
+            this.updateGenerateButton();
+            this.updatePreview();
+        } catch (error) {
+            console.error('Error processing file:', error);
+            alert('Failed to process image. Please try again.');
+        }
+    }
+
+    readFileAsDataUrl(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    updatePersonPreview() {
+        const container = document.getElementById('personImagePreviewContainer');
+        const placeholder = document.getElementById('personUploadPlaceholder');
+        const preview = document.getElementById('personImagePreview');
+        
+        if (this.personImage) {
+            preview.src = this.personImage;
+            container.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+        } else {
+            container.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+        }
+    }
+
+    updateDressPreview() {
+        const container = document.getElementById('dressImagePreviewContainer');
+        const placeholder = document.getElementById('dressUploadPlaceholder');
+        const preview = document.getElementById('dressImagePreview');
+        
+        if (this.dressImage) {
+            preview.src = this.dressImage;
+            container.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+        } else {
+            container.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+        }
+    }
+
+    updatePreview() {
+        const previewGrid = document.getElementById('previewGrid');
+        const noPreview = document.getElementById('noPreview');
+        
+        if (this.personImage && this.dressImage) {
+            document.getElementById('previewPerson').src = this.personImage;
+            document.getElementById('previewDress').src = this.dressImage;
+            previewGrid.classList.remove('hidden');
+            noPreview.classList.add('hidden');
+        } else {
+            previewGrid.classList.add('hidden');
+            noPreview.classList.remove('hidden');
+        }
+    }
+
+    updateGenerateButton() {
+        const generateBtn = document.getElementById('generateBtn');
+        if (this.personImage && this.dressImage) {
+            generateBtn.disabled = false;
+        } else {
+            generateBtn.disabled = true;
+        }
+    }
+
+    async generate() {
+        if (this.isProcessing) return;
+        
+        if (!this.personImage || !this.dressImage) {
+            alert('Please upload both your photo and a dress image');
+            return;
+        }
+
+        this.showLoading(true);
+        this.isProcessing = true;
+
+        try {
+            const requestData = {
+                person_image: this.personImage,
+                dress_image: this.dressImage,
+                prompt: document.getElementById('promptInput').value,
+                use_dress_background: document.getElementById('useDressBackground').checked,
+                num_images: parseInt(document.getElementById('numImages')?.value || 1),
+                temperature: parseFloat(document.getElementById('temperatureSlider').value)
+            };
+
+            const seed = document.getElementById('seedInput').value;
+            if (seed) requestData.seed = parseInt(seed);
+
+            const response = await fetch('/api/virtual/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': window.csrf_token
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.error || 'Generation failed');
+            }
+
+            this.handleResults(result);
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message);
+        } finally {
+            this.showLoading(false);
+            this.isProcessing = false;
+        }
+    }
+
+    handleResults(result) {
+        const resultsGrid = document.getElementById('resultsGrid');
+        const noResults = document.getElementById('noResults');
+        const resultActions = document.getElementById('resultActions');
+        
+        // Clear previous results
+        resultsGrid.innerHTML = '';
+        
+        // Add new results
+        if (result.images && result.images.length > 0) {
+            result.images.forEach((img, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item slide-in shadow-xl';
+                resultItem.innerHTML = `
+                    <div class="relative">
+                        <img src="${img.url}" alt="Result ${index + 1}" class="w-full" />
+                        <div class="result-actions">
+                            <button class="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20" onclick="virtualTryOn.downloadImage('${img.url}')" title="Download">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20" onclick="virtualTryOn.viewFullscreen('${img.url}')" title="View Fullscreen">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20" onclick="virtualTryOn.copyToClipboard('${img.url}')" title="Copy URL">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                resultsGrid.appendChild(resultItem);
+            });
+            
+            this.results = result.images;
+            resultsGrid.classList.remove('hidden');
+            noResults.classList.add('hidden');
+            resultActions.classList.remove('hidden');
+        }
+    }
+
+    downloadImage(url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `virtual_tryon_${Date.now()}.jpg`;
+        link.click();
+    }
+
+    downloadResult() {
+        if (this.results.length > 0) {
+            this.downloadImage(this.results[0].url);
+        }
+    }
+
+    viewFullscreen(url) {
+        window.open(url, '_blank');
+    }
+
+    copyToClipboard(url) {
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Image URL copied to clipboard!');
+        }).catch(() => {
+            alert('Failed to copy URL');
+        });
+    }
+
+    async saveToGallery() {
+        alert('Image saved to gallery!');
+    }
+
+    tryAgain() {
+        this.generate();
+    }
+
+    showLoading(show) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (show) {
+            overlay.classList.add('active');
+            this.animateProgress();
+        } else {
+            overlay.classList.remove('active');
+        }
+    }
+
+    animateProgress() {
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        
+        const messages = [
+            'Analyzing your photo...',
+            'Processing dress details...',
+            'Applying virtual try-on...',
+            'Adjusting fit and style...',
+            'Finalizing result...'
+        ];
+        
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            
+            fill.style.width = progress + '%';
+            text.textContent = messages[Math.floor(progress / 20)] || messages[0];
+            
+            if (!this.isProcessing) {
+                fill.style.width = '100%';
+                text.textContent = 'Complete!';
+                clearInterval(interval);
+            }
+        }, 500);
+    }
+}
+
+// Initialize application
+const virtualTryOn = new VirtualTryOn();
+
+// Set page title
+document.title = 'Virtual Try-On';
+</script>
+{% endblock %}

@@ -60,6 +60,7 @@ def create_app():
         from blueprints.banner import banner
         from blueprints.image_generator import image_generator_bp
         from blueprints.magix import magix_bp
+        from blueprints.virtual import virtual_bp
         from blueprints.image_utils import image_utils_bp
         from blueprints.admin.subscription_routes import admin_subscription_bp
         from blueprints.admin.api_routes import admin_api_bp
@@ -77,6 +78,7 @@ def create_app():
         app.register_blueprint(banner)
         app.register_blueprint(image_generator_bp)
         app.register_blueprint(magix_bp)
+        app.register_blueprint(virtual_bp)
         app.register_blueprint(image_utils_bp)
         
         # Error handlers
