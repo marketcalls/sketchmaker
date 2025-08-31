@@ -12,6 +12,7 @@ from PIL import Image as PILImage
 import json
 import base64
 from io import BytesIO
+from services.image_optimizer import ImageOptimizer
 
 magix_bp = Blueprint('magix', __name__)
 
@@ -100,10 +101,22 @@ def generate_magix():
         }
 
         # Add image URLs if provided (for editing modes)
+        # Optimize images before sending to FAL
         if 'image_urls' in data:
-            arguments['image_urls'] = data['image_urls']
+            optimized_urls = []
+            for img_url in data['image_urls']:
+                optimized_img, metadata = ImageOptimizer.optimize_image(img_url, service='magix')
+                optimized_urls.append(optimized_img)
+                if metadata.get('optimization_failed'):
+                    print(f"Warning: Image optimization failed, using original")
+                else:
+                    print(f"Image optimized: {metadata.get('compression_ratio', 100)}% of original size")
+            arguments['image_urls'] = optimized_urls
         elif 'image_url' in data:
-            arguments['image_urls'] = [data['image_url']]
+            optimized_img, metadata = ImageOptimizer.optimize_image(data['image_url'], service='magix')
+            arguments['image_urls'] = [optimized_img]
+            if not metadata.get('optimization_failed'):
+                print(f"Image optimized: {metadata.get('compression_ratio', 100)}% of original size")
 
         # Mode-specific configurations
         if mode == 'director':

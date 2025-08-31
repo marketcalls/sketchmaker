@@ -657,19 +657,32 @@ class NanoStudio {
         const uploadZone = document.getElementById('uploadZone');
         const imageInput = document.getElementById('imageInput');
         
-        uploadZone.addEventListener('click', () => imageInput.click());
+        uploadZone.addEventListener('click', (e) => {
+            // Prevent event from triggering on child elements
+            if (e.target === uploadZone || e.target.id === 'uploadPlaceholder' || e.target.closest('#uploadPlaceholder')) {
+                imageInput.click();
+            }
+        });
         uploadZone.addEventListener('dragover', this.handleDragOver.bind(this));
         uploadZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
         uploadZone.addEventListener('drop', this.handleDrop.bind(this));
         imageInput.addEventListener('change', this.handleFileSelect.bind(this));
 
-        // Buttons
-        document.getElementById('changeImageBtn')?.addEventListener('click', () => {
+        // Buttons - Fixed to properly handle input reset
+        document.getElementById('changeImageBtn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             this.uploadedImages = [];
-            imageInput.value = '';
+            this.updateImagePreview();
+            // Small delay to ensure DOM updates before clicking
+            setTimeout(() => {
+                imageInput.value = '';
+                imageInput.click();
+            }, 100);
+        });
+        document.getElementById('addMoreBtn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             imageInput.click();
         });
-        document.getElementById('addMoreBtn')?.addEventListener('click', () => imageInput.click());
         document.getElementById('generateBtn').addEventListener('click', () => this.generate());
         document.getElementById('batchProcessBtn').addEventListener('click', () => this.showBatchQueue());
         document.getElementById('startBatchBtn')?.addEventListener('click', () => this.processBatch());
@@ -796,24 +809,137 @@ class NanoStudio {
 
     handleFileSelect(e) {
         const files = Array.from(e.target.files);
-        this.processFiles(files);
+        if (files.length > 0) {
+            this.processFiles(files);
+        }
     }
 
     async processFiles(files) {
+        // Process all files and then update preview once
+        const promises = [];
+        
         for (const file of files) {
             if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.uploadedImages.push({
-                        url: e.target.result,
-                        file: file,
-                        name: file.name
-                    });
-                    this.updateImagePreview();
-                };
-                reader.readAsDataURL(file);
+                promises.push(this.processAndCompressImage(file));
             }
         }
+        
+        // Wait for all files to be processed
+        await Promise.all(promises);
+        // Update preview once after all files are loaded
+        this.updateImagePreview();
+    }
+
+    async processAndCompressImage(file) {
+        // Check if the file is large (iPhone images are typically > 2MB)
+        const MAX_SIZE_MB = 2;
+        const fileSizeMB = file.size / (1024 * 1024);
+        
+        console.log(`Processing image: ${file.name}, Size: ${fileSizeMB.toFixed(2)}MB`);
+        
+        if (fileSizeMB > MAX_SIZE_MB) {
+            // Compress large images
+            try {
+                const compressedDataUrl = await this.compressImage(file);
+                this.uploadedImages.push({
+                    url: compressedDataUrl,
+                    file: file,
+                    name: file.name,
+                    wasCompressed: true,
+                    originalSize: fileSizeMB,
+                    compressedSize: compressedDataUrl.length / (1024 * 1024)
+                });
+                console.log(`Image compressed: ${fileSizeMB.toFixed(2)}MB -> ${(compressedDataUrl.length / (1024 * 1024)).toFixed(2)}MB`);
+            } catch (error) {
+                console.error('Compression failed, using original:', error);
+                // Fallback to original if compression fails
+                return this.readFileAsDataUrl(file);
+            }
+        } else {
+            // Use original for smaller files
+            return this.readFileAsDataUrl(file);
+        }
+    }
+
+    readFileAsDataUrl(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.uploadedImages.push({
+                    url: e.target.result,
+                    file: file,
+                    name: file.name,
+                    wasCompressed: false
+                });
+                resolve();
+            };
+            reader.onerror = () => resolve();
+            reader.readAsDataURL(file);
+        });
+    }
+
+    compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const img = new Image();
+                
+                img.onload = () => {
+                    // Create canvas for compression
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Calculate new dimensions (max 1536x1536 for FAL)
+                    const MAX_WIDTH = 1536;
+                    const MAX_HEIGHT = 1536;
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    // Resize if needed
+                    if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                        const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+                        width = Math.round(width * ratio);
+                        height = Math.round(height * ratio);
+                    }
+                    
+                    // Set canvas dimensions
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Apply EXIF orientation if needed (for iPhone images)
+                    this.handleImageOrientation(img, canvas, ctx, width, height);
+                    
+                    // Convert to JPEG with quality compression
+                    // Start with 0.85 quality and reduce if still too large
+                    let quality = 0.85;
+                    let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    
+                    // Further compress if still too large
+                    while (dataUrl.length > 2 * 1024 * 1024 && quality > 0.5) {
+                        quality -= 0.05;
+                        dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    }
+                    
+                    resolve(dataUrl);
+                };
+                
+                img.onerror = () => reject(new Error('Failed to load image'));
+                img.src = e.target.result;
+            };
+            
+            reader.onerror = () => reject(new Error('Failed to read file'));
+            reader.readAsDataURL(file);
+        });
+    }
+
+    handleImageOrientation(img, canvas, ctx, width, height) {
+        // This handles common iPhone orientation issues
+        // In a production environment, you'd want to read EXIF data
+        // For now, we'll just draw normally and let the server handle orientation
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
     }
 
     removeImage(index) {
@@ -835,9 +961,18 @@ class NanoStudio {
             this.uploadedImages.forEach((img, index) => {
                 const imageDiv = document.createElement('div');
                 imageDiv.className = 'relative group';
+                
+                // Add compression indicator if image was compressed
+                const compressionBadge = img.wasCompressed ? 
+                    `<div class="absolute top-2 left-2 badge badge-success badge-sm">
+                        <i class="fas fa-compress mr-1"></i>
+                        ${img.originalSize.toFixed(1)}MB → ${img.compressedSize.toFixed(1)}MB
+                    </div>` : '';
+                
                 imageDiv.innerHTML = `
                     <div class="image-preview-container relative">
                         <img src="${img.url}" class="image-preview rounded" style="max-height: 200px;" />
+                        ${compressionBadge}
                         <button onclick="nanoStudio.removeImage(${index})" 
                                 class="absolute top-2 right-2 btn btn-circle btn-sm btn-error opacity-0 group-hover:opacity-100 transition-opacity">
                             <i class="fas fa-times"></i>
