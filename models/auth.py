@@ -168,21 +168,25 @@ class User(UserMixin, db.Model):
         return sub.can_use_feature(feature_type, amount)
     
     def use_feature(self, feature_type, amount=1, extra_data=None):
-        """Use credits for a feature and log the usage"""
+        """
+        DEPRECATED: Use subscription.reserve_credits() context manager instead.
+        This method is vulnerable to race conditions.
+        Kept for backward compatibility only.
+        """
         from .subscription import UsageHistory
-        
+
         sub = self.get_subscription()
         if not sub:
             return False
-        
+
         # Check if credits need to be reset
         if sub.should_reset_credits():
             sub.reset_monthly_credits()
-        
+
         # Get credit cost for this feature
         credit_cost = sub.get_credit_cost(feature_type)
         total_cost = credit_cost * amount
-        
+
         if sub.use_feature(feature_type, amount):
             # Log usage with actual credit cost
             usage = UsageHistory(
@@ -196,6 +200,28 @@ class User(UserMixin, db.Model):
             db.session.commit()
             return True
         return False
+
+    def log_usage(self, action, credits_used, extra_data=None):
+        """
+        Log usage to audit trail (UsageHistory).
+        Use this AFTER credits have been reserved via subscription.reserve_credits()
+        """
+        from .subscription import UsageHistory
+
+        sub = self.get_subscription()
+        if not sub:
+            return False
+
+        usage = UsageHistory(
+            user_id=self.id,
+            subscription_id=sub.id,
+            action=action,
+            credits_used=credits_used,
+            extra_data=extra_data
+        )
+        db.session.add(usage)
+        db.session.commit()
+        return True
     
     def get_feature_usage_count(self, feature_type):
         """Get count of feature usage this month"""

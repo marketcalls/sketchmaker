@@ -1,6 +1,8 @@
 from extensions import db
 from datetime import datetime, timedelta
 from enum import Enum
+from sqlalchemy import CheckConstraint
+from contextlib import contextmanager
 
 class SubscriptionPlan(Enum):
     FREE = "free"
@@ -112,22 +114,25 @@ class SubscriptionPlanModel(db.Model):
 
 class UserSubscription(db.Model):
     __tablename__ = 'user_subscriptions'
-    
+    __table_args__ = (
+        CheckConstraint('credits_remaining >= 0', name='check_credits_non_negative'),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     plan_id = db.Column(db.Integer, db.ForeignKey('subscription_plans.id'), nullable=False)
-    credits_remaining = db.Column(db.Integer, default=0)
-    credits_used_this_month = db.Column(db.Integer, default=0)
+    credits_remaining = db.Column(db.Integer, default=0, nullable=False)
+    credits_used_this_month = db.Column(db.Integer, default=0, nullable=False)
     subscription_start = db.Column(db.DateTime, default=datetime.utcnow)
     subscription_end = db.Column(db.DateTime)  # NULL for active subscriptions
     last_credit_reset = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # Simplified credit tracking only
     # Individual feature usage is tracked in UsageHistory for reporting
-    
+
     # Admin management fields
     assigned_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # Admin who assigned the plan
     notes = db.Column(db.Text)  # Admin notes
@@ -200,15 +205,93 @@ class UserSubscription(db.Model):
         cost_per_use = self.get_credit_cost(feature_type)
         total_cost = cost_per_use * amount
         return self.credits_remaining >= total_cost
-    
-    def use_feature(self, feature_type, amount=1):
-        """Use credits for a feature and log the usage"""
+
+    @contextmanager
+    def reserve_credits(self, feature_type, amount=1):
+        """
+        Context manager to atomically reserve credits before an operation.
+        Credits are deducted immediately with row-level locking.
+        If the operation fails, credits are automatically refunded.
+
+        Usage:
+            with user.get_subscription().reserve_credits('images', 1) as cost:
+                # Perform expensive operation here
+                result = call_external_api()
+                # If this block completes successfully, credits stay deducted
+                # If an exception occurs, credits are automatically refunded
+        """
+        from sqlalchemy.exc import IntegrityError
+
         cost_per_use = self.get_credit_cost(feature_type)
         total_cost = cost_per_use * amount
-        
+
+        # Start a nested transaction with pessimistic locking
+        # This prevents concurrent requests from reading the same credit balance
+        try:
+            # Lock this row for update (prevents other transactions from reading/modifying)
+            locked_subscription = db.session.query(UserSubscription).with_for_update().filter_by(
+                id=self.id
+            ).first()
+
+            if not locked_subscription:
+                raise ValueError("Subscription not found")
+
+            # Re-check credits under lock
+            if locked_subscription.credits_remaining < total_cost:
+                raise ValueError(f"Insufficient credits. Required: {total_cost}, Available: {locked_subscription.credits_remaining}")
+
+            # Deduct credits BEFORE the operation
+            locked_subscription.credits_remaining -= total_cost
+            locked_subscription.credits_used_this_month += total_cost
+
+            # Commit the credit deduction immediately
+            db.session.commit()
+
+            # Refresh local instance to reflect the changes
+            db.session.refresh(self)
+
+            try:
+                # Yield control to the calling code to perform the operation
+                yield total_cost
+
+                # If we get here, operation was successful
+                # Credits remain deducted
+
+            except Exception as e:
+                # Operation failed - refund the credits
+                refund_subscription = db.session.query(UserSubscription).with_for_update().filter_by(
+                    id=self.id
+                ).first()
+
+                if refund_subscription:
+                    refund_subscription.credits_remaining += total_cost
+                    refund_subscription.credits_used_this_month -= total_cost
+                    db.session.commit()
+                    db.session.refresh(self)
+
+                # Re-raise the exception
+                raise e
+
+        except IntegrityError as e:
+            db.session.rollback()
+            if 'check_credits_non_negative' in str(e):
+                raise ValueError("Insufficient credits - this operation would result in negative credits")
+            raise
+        except Exception as e:
+            db.session.rollback()
+            raise
+
+    def use_feature(self, feature_type, amount=1):
+        """
+        DEPRECATED: Use reserve_credits() context manager instead.
+        This method is kept for backward compatibility but is vulnerable to race conditions.
+        """
+        cost_per_use = self.get_credit_cost(feature_type)
+        total_cost = cost_per_use * amount
+
         if not self.can_use_feature(feature_type, amount):
             return False
-        
+
         # Deduct credits
         self.credits_remaining -= total_cost
         self.credits_used_this_month += total_cost
