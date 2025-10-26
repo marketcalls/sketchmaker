@@ -130,7 +130,12 @@ document.getElementById('model').addEventListener('change', function(e) {
     const ideogramV3ExpandPromptControl = document.getElementById('ideogramV3ExpandPromptControl');
     const ideogramV3NegativePromptControl = document.getElementById('ideogramV3NegativePromptControl');
     const ideogramV3RenderingSpeedControl = document.getElementById('ideogramV3RenderingSpeedControl');
-    
+
+    // Get Seedream V4 controls
+    const seedreamImageSizeControl = document.getElementById('seedreamImageSizeControl');
+    const seedreamCustomSizeControl = document.getElementById('seedreamCustomSizeControl');
+    const seedreamMaxImagesControl = document.getElementById('seedreamMaxImagesControl');
+
     // Reset all controls first
     imageSizeControl?.classList.remove('hidden');
     aspectRatioControl?.classList.add('hidden');
@@ -145,11 +150,21 @@ document.getElementById('model').addEventListener('change', function(e) {
     ideogramV3ExpandPromptControl?.classList.add('hidden');
     ideogramV3NegativePromptControl?.classList.add('hidden');
     ideogramV3RenderingSpeedControl?.classList.add('hidden');
+    seedreamImageSizeControl?.classList.add('hidden');
+    seedreamCustomSizeControl?.classList.add('hidden');
+    seedreamMaxImagesControl?.classList.add('hidden');
     if (characterCount) characterCount.classList.add('hidden');
     if (enhancedCharacterCount) enhancedCharacterCount.classList.add('hidden');
 
     // Apply model-specific controls
     switch(e.target.value) {
+        case 'fal-ai/bytedance/seedream/v4/text-to-image':
+            imageSizeControl?.classList.add('hidden');
+            seedreamImageSizeControl?.classList.remove('hidden');
+            seedreamMaxImagesControl?.classList.remove('hidden');
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+            break;
         case 'fal-ai/flux-pro/v1.1-ultra':
             imageSizeControl?.classList.add('hidden');
             aspectRatioControl?.classList.remove('hidden');
@@ -259,11 +274,11 @@ document.getElementById('addColorBtn')?.addEventListener('click', function() {
     const colorPickers = document.getElementById('colorPickers');
     const colorPickerWrapper = document.createElement('div');
     colorPickerWrapper.className = 'flex items-center gap-2';
-    
+
     const colorPicker = document.createElement('input');
     colorPicker.type = 'color';
     colorPicker.className = 'w-10 h-10 rounded cursor-pointer';
-    
+
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
     removeBtn.className = 'btn btn-sm btn-error';
@@ -271,8 +286,18 @@ document.getElementById('addColorBtn')?.addEventListener('click', function() {
     removeBtn.onclick = function() {
         colorPickerWrapper.remove();
     };
-    
+
     colorPickerWrapper.appendChild(colorPicker);
     colorPickerWrapper.appendChild(removeBtn);
     colorPickers.appendChild(colorPickerWrapper);
+});
+
+// Seedream V4 image size preset handler
+document.getElementById('seedreamImageSizePreset')?.addEventListener('change', function(e) {
+    const seedreamCustomSizeControl = document.getElementById('seedreamCustomSizeControl');
+    if (e.target.value === 'custom') {
+        seedreamCustomSizeControl?.classList.remove('hidden');
+    } else {
+        seedreamCustomSizeControl?.classList.add('hidden');
+    }
 });

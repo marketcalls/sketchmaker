@@ -3,7 +3,8 @@
     "allow": [
       "Bash(python:*)",
       "Bash(pip install:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Read(//c/Users/Admin1/Desktop/**)"
     ],
     "deny": [],
     "ask": []

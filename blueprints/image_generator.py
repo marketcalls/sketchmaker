@@ -61,6 +61,12 @@ def get_model_arguments(model, data):
             "output_format": "jpeg",
             "safety_tolerance": "2"
         }
+    elif model == "fal-ai/bytedance/seedream/v4/text-to-image":
+        model_args = {
+            "image_size": data.get("image_size", {"width": 1024, "height": 1024}),
+            "max_images": data.get("max_images", 1),
+            "num_images": data.get("num_images", 1)
+        }
     elif model == "fal-ai/ideogram/v2":
         model_args = {
             "aspect_ratio": data.get("aspect_ratio") or "1:1",

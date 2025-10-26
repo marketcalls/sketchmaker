@@ -4,6 +4,7 @@
             <span class="label-text">Model</span>
         </label>
         <select id="model" name="model" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="fal-ai/bytedance/seedream/v4/text-to-image" selected>Seedream V4 (Default)</option>
             <option value="fal-ai/flux-pro/v1.1">Flux Pro</option>
             <option value="fal-ai/flux-pro/v1.1-ultra">Flux Pro Ultra</option>
             <option value="fal-ai/flux-lora">Flux Lora</option>
@@ -58,6 +59,56 @@
         </label>
         <div id="colorPickers" class="flex flex-wrap gap-2">
             <!-- Color pickers will be added here dynamically -->
+        </div>
+    </div>
+
+    <!-- Seedream V4 Controls -->
+    <div class="form-control" id="seedreamImageSizeControl">
+        <label class="label">
+            <span class="label-text">Image Size Preset</span>
+        </label>
+        <select id="seedreamImageSizePreset" name="seedream_image_size_preset" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="default">Default</option>
+            <option value="custom">Custom</option>
+            <option value="square_hd">Square HD</option>
+            <option value="square">Square</option>
+            <option value="portrait_3_4">Portrait 3:4</option>
+            <option value="portrait_9_16">Portrait 9:16</option>
+            <option value="landscape_4_3">Landscape 4:3</option>
+            <option value="landscape_16_9">Landscape 16:9</option>
+            <option value="auto">Auto</option>
+            <option value="auto_2k">Auto 2K</option>
+            <option value="auto_4k">Auto 4K</option>
+        </select>
+    </div>
+
+    <div class="form-control hidden" id="seedreamCustomSizeControl">
+        <label class="label">
+            <span class="label-text">Custom Size</span>
+        </label>
+        <div class="flex gap-2 items-center">
+            <input type="number" id="seedreamWidth" name="seedream_width"
+                class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200"
+                placeholder="Width" value="1024" min="512" max="4096" step="64">
+            <span class="text-lg">×</span>
+            <input type="number" id="seedreamHeight" name="seedream_height"
+                class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200"
+                placeholder="Height" value="1024" min="512" max="4096" step="64">
+        </div>
+        <div class="text-xs opacity-70 mt-1">
+            Min: 512×512, Max: 4096×4096 (multiples of 64)
+        </div>
+    </div>
+
+    <div class="form-control" id="seedreamMaxImagesControl">
+        <label class="label">
+            <span class="label-text">Max Images</span>
+        </label>
+        <input type="number" id="seedreamMaxImages" name="seedream_max_images"
+            class="input input-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200"
+            value="1" min="1" max="4">
+        <div class="text-xs opacity-70 mt-1">
+            Number of images to generate (1-4)
         </div>
     </div>
 

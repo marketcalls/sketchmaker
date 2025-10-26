@@ -290,6 +290,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.image_size = dimensions;
             } else if (selectedModel === 'fal-ai/flux-pro/v1.1-ultra') {
                 formData.aspect_ratio = document.getElementById('aspectRatio').value;
+            } else if (selectedModel === 'fal-ai/bytedance/seedream/v4/text-to-image') {
+                // Add Seedream V4 specific parameters
+                const presetElement = document.getElementById('seedreamImageSizePreset');
+                const maxImagesElement = document.getElementById('seedreamMaxImages');
+                const widthElement = document.getElementById('seedreamWidth');
+                const heightElement = document.getElementById('seedreamHeight');
+
+                formData.seedream_image_size_preset = presetElement ? presetElement.value : 'default';
+                formData.seedream_max_images = maxImagesElement ? parseInt(maxImagesElement.value) : 1;
+
+                if (formData.seedream_image_size_preset === 'custom') {
+                    formData.seedream_width = widthElement ? parseInt(widthElement.value) : 1024;
+                    formData.seedream_height = heightElement ? parseInt(heightElement.value) : 1024;
+                }
+
+                console.log('Seedream V4 parameters:', {
+                    preset: formData.seedream_image_size_preset,
+                    max_images: formData.seedream_max_images,
+                    width: formData.seedream_width,
+                    height: formData.seedream_height
+                });
             } else if (selectedModel === 'fal-ai/ideogram/v2' || selectedModel === 'fal-ai/ideogram/v2a') {
                 // Add Ideogram V2/V2a specific parameters
                 const aspectRatioElement = document.getElementById('ideogramAspectRatio');
