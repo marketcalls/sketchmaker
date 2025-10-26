@@ -159,11 +159,21 @@ document.getElementById('model').addEventListener('change', function(e) {
     // Apply model-specific controls
     switch(e.target.value) {
         case 'fal-ai/bytedance/seedream/v4/text-to-image':
+            // Hide controls that don't apply to Seedream V4
             imageSizeControl?.classList.add('hidden');
-            seedreamImageSizeControl?.classList.remove('hidden');
-            seedreamMaxImagesControl?.classList.remove('hidden');
+            aspectRatioControl?.classList.add('hidden');
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Seedream V4 specific controls
+            seedreamImageSizeControl?.classList.remove('hidden');
+            seedreamMaxImagesControl?.classList.remove('hidden');
+
+            // Check if custom is already selected and show/hide accordingly
+            const seedreamPreset = document.getElementById('seedreamImageSizePreset');
+            if (seedreamPreset && seedreamPreset.value === 'custom') {
+                seedreamCustomSizeControl?.classList.remove('hidden');
+            }
             break;
         case 'fal-ai/flux-pro/v1.1-ultra':
             imageSizeControl?.classList.add('hidden');
@@ -216,8 +226,18 @@ document.getElementById('model').addEventListener('change', function(e) {
 // Initialize controls based on default model
 window.addEventListener('DOMContentLoaded', function() {
     const model = document.getElementById('model');
-    const event = new Event('change');
-    model.dispatchEvent(event);
+    if (model) {
+        const event = new Event('change');
+        model.dispatchEvent(event);
+    }
+
+    // Also initialize seedream preset handler
+    const seedreamPreset = document.getElementById('seedreamImageSizePreset');
+    if (seedreamPreset) {
+        // Trigger initial state
+        const presetEvent = new Event('change');
+        seedreamPreset.dispatchEvent(presetEvent);
+    }
 });
 
 // Art style tooltip functionality

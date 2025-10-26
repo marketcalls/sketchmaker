@@ -189,13 +189,13 @@ def generate_image_route():
             generation_params['aspect_ratio'] = data.get('aspect_ratio', '16:9')
         elif model == 'fal-ai/bytedance/seedream/v4/text-to-image':
             # Seedream V4 specific parameters
-            preset = data.get('seedream_image_size_preset', 'default')
+            preset = data.get('seedream_image_size_preset', 'landscape_16_9')
 
             # Handle image size based on preset
             if preset == 'custom':
                 generation_params['image_size'] = {
-                    'width': int(data.get('seedream_width', 1024)),
-                    'height': int(data.get('seedream_height', 1024))
+                    'width': int(data.get('seedream_width', 2048)),
+                    'height': int(data.get('seedream_height', 1152))
                 }
             elif preset == 'square_hd':
                 generation_params['image_size'] = {'width': 2048, 'height': 2048}
@@ -215,8 +215,8 @@ def generate_image_route():
                 generation_params['image_size'] = {'width': 2048, 'height': 2048}
             elif preset == 'auto_4k':
                 generation_params['image_size'] = {'width': 4096, 'height': 4096}
-            else:  # default
-                generation_params['image_size'] = {'width': 1024, 'height': 1024}
+            else:  # fallback to landscape 16:9
+                generation_params['image_size'] = {'width': 2048, 'height': 1152}
 
             # Max images parameter
             generation_params['max_images'] = int(data.get('seedream_max_images', 1))
