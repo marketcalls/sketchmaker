@@ -152,13 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (e.target.value === 'fal-ai/flux-lora') {
             if (loraInputs) loraInputs.classList.remove('hidden');
             if (imageSizeControl) imageSizeControl.classList.remove('hidden');
-        } else if (e.target.value === 'fal-ai/ideogram/v2' || e.target.value === 'fal-ai/ideogram/v2a') {
-            console.log('Showing Ideogram controls for model:', e.target.value);
-            if (ideogramAspectRatioControl) ideogramAspectRatioControl.classList.remove('hidden');
-            if (ideogramExpandPromptControl) ideogramExpandPromptControl.classList.remove('hidden');
-            if (ideogramStyleControl) ideogramStyleControl.classList.remove('hidden');
-            if (ideogramNegativePromptControl) ideogramNegativePromptControl.classList.remove('hidden');
-            if (imageSizeControl) imageSizeControl.classList.add('hidden'); // Hide image size as Ideogram uses aspect ratio
         } else if (e.target.value === 'fal-ai/flux-pro/v1.1-ultra') {
             if (imageSizeControl) imageSizeControl.classList.add('hidden'); // Ultra uses aspect ratio instead of dimensions
         } else {
@@ -328,30 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     num_images: formData.num_images,
                     output_format: formData.output_format,
                     safety_tolerance: formData.safety_tolerance
-                });
-            } else if (selectedModel === 'fal-ai/ideogram/v2' || selectedModel === 'fal-ai/ideogram/v2a') {
-                // Add Ideogram V2/V2a specific parameters
-                const aspectRatioElement = document.getElementById('ideogramAspectRatio');
-                const expandPromptElement = document.getElementById('ideogramExpandPrompt');
-                const styleElement = document.getElementById('ideogramStyle');
-                const negativePromptElement = document.getElementById('ideogramNegativePrompt');
-                
-                // Set default values if elements don't exist
-                formData.aspect_ratio = aspectRatioElement ? aspectRatioElement.value : '1:1';
-                formData.expand_prompt = expandPromptElement ? expandPromptElement.checked : true;
-                formData.style = styleElement ? styleElement.value : 'auto';
-                
-                if (negativePromptElement && negativePromptElement.value.trim()) {
-                    formData.negative_prompt = negativePromptElement.value;
-                } else {
-                    formData.negative_prompt = '';
-                }
-                
-                console.log(`Ideogram ${selectedModel} parameters:`, {
-                    aspect_ratio: formData.aspect_ratio,
-                    expand_prompt: formData.expand_prompt,
-                    style: formData.style,
-                    negative_prompt: formData.negative_prompt
                 });
             } else if (selectedModel === 'fal-ai/imagen4/preview') {
                 // Add Imagen4 specific parameters
