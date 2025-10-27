@@ -114,50 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     gsap.from('header', { duration: 1, y: -50, opacity: 0, ease: 'power3.out' });
     gsap.from('main', { duration: 1, y: 50, opacity: 0, ease: 'power3.out', delay: 0.3 });
 
-    // Toggle model-specific controls
-    modelSelect?.addEventListener('change', (e) => {
-        console.log('Model changed to:', e.target.value);
-        const recraftControls = document.getElementById('recraftStyleControl');
-        const recraftColorsControl = document.getElementById('recraftColorsControl');
-        const imageSizeControl = document.getElementById('imageSizeControl');
-        
-        // Ideogram V2 Controls
-        const ideogramAspectRatioControl = document.getElementById('ideogramAspectRatioControl');
-        const ideogramExpandPromptControl = document.getElementById('ideogramExpandPromptControl');
-        const ideogramStyleControl = document.getElementById('ideogramStyleControl');
-        const ideogramNegativePromptControl = document.getElementById('ideogramNegativePromptControl');
-        
-        // Debug logging for Ideogram controls
-        console.log('Ideogram controls present:', {
-            aspectRatioControl: !!ideogramAspectRatioControl,
-            expandPromptControl: !!ideogramExpandPromptControl,
-            styleControl: !!ideogramStyleControl,
-            negativePromptControl: !!ideogramNegativePromptControl
-        });
-        
-        // Hide all model-specific controls first
-        if (recraftControls) recraftControls.classList.add('hidden');
-        if (recraftColorsControl) recraftColorsControl.classList.add('hidden');
-        if (loraInputs) loraInputs.classList.add('hidden');
-        if (ideogramAspectRatioControl) ideogramAspectRatioControl.classList.add('hidden');
-        if (ideogramExpandPromptControl) ideogramExpandPromptControl.classList.add('hidden');
-        if (ideogramStyleControl) ideogramStyleControl.classList.add('hidden');
-        if (ideogramNegativePromptControl) ideogramNegativePromptControl.classList.add('hidden');
-        
-        // Show controls based on model
-        if (e.target.value === 'fal-ai/recraft-v3') {
-            if (recraftControls) recraftControls.classList.remove('hidden');
-            if (recraftColorsControl) recraftColorsControl.classList.remove('hidden');
-            if (imageSizeControl) imageSizeControl.classList.remove('hidden');
-        } else if (e.target.value === 'fal-ai/flux-lora') {
-            if (loraInputs) loraInputs.classList.remove('hidden');
-            if (imageSizeControl) imageSizeControl.classList.remove('hidden');
-        } else if (e.target.value === 'fal-ai/flux-pro/v1.1-ultra') {
-            if (imageSizeControl) imageSizeControl.classList.add('hidden'); // Ultra uses aspect ratio instead of dimensions
-        } else {
-            if (imageSizeControl) imageSizeControl.classList.remove('hidden');
-        }
-    });
+    // Model-specific control toggling is now handled in image-gen-controls.js
 
     // Enhance prompt button handler
     enhancePromptButton?.addEventListener('click', async () => {
@@ -476,12 +433,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initialize controls based on default model
-    window.addEventListener('DOMContentLoaded', function() {
-        const model = document.getElementById('model');
-        if (model) {
-            const event = new Event('change');
-            model.dispatchEvent(event);
-        }
-    });
+    // Model initialization is now handled in image-gen-controls.js
 });
