@@ -136,6 +136,9 @@ document.getElementById('model').addEventListener('change', function(e) {
     const seedreamCustomSizeControl = document.getElementById('seedreamCustomSizeControl');
     const seedreamMaxImagesControl = document.getElementById('seedreamMaxImagesControl');
 
+    // Get Flux Kontext Max controls
+    const fluxKontextAspectRatioControl = document.getElementById('fluxKontextAspectRatioControl');
+
     // Reset all controls first
     imageSizeControl?.classList.remove('hidden');
     aspectRatioControl?.classList.add('hidden');
@@ -153,6 +156,7 @@ document.getElementById('model').addEventListener('change', function(e) {
     seedreamImageSizeControl?.classList.add('hidden');
     seedreamCustomSizeControl?.classList.add('hidden');
     seedreamMaxImagesControl?.classList.add('hidden');
+    fluxKontextAspectRatioControl?.classList.add('hidden');
     if (characterCount) characterCount.classList.add('hidden');
     if (enhancedCharacterCount) enhancedCharacterCount.classList.add('hidden');
 
@@ -174,6 +178,16 @@ document.getElementById('model').addEventListener('change', function(e) {
             if (seedreamPreset && seedreamPreset.value === 'custom') {
                 seedreamCustomSizeControl?.classList.remove('hidden');
             }
+            break;
+        case 'fal-ai/flux-pro/kontext/max/text-to-image':
+            // Hide controls that don't apply to Flux Kontext Max
+            imageSizeControl?.classList.add('hidden');
+            aspectRatioControl?.classList.add('hidden');
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Flux Kontext Max specific controls
+            fluxKontextAspectRatioControl?.classList.remove('hidden');
             break;
         case 'fal-ai/flux-pro/v1.1-ultra':
             imageSizeControl?.classList.add('hidden');

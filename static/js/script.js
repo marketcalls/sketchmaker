@@ -311,6 +311,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     width: formData.seedream_width,
                     height: formData.seedream_height
                 });
+            } else if (selectedModel === 'fal-ai/flux-pro/kontext/max/text-to-image') {
+                // Add Flux Kontext Max specific parameters
+                const aspectRatioElement = document.getElementById('fluxKontextAspectRatio');
+                const guidanceScaleElement = document.getElementById('guidanceScale');
+
+                formData.aspect_ratio = aspectRatioElement ? aspectRatioElement.value : '1:1';
+                formData.guidance_scale = guidanceScaleElement ? parseFloat(guidanceScaleElement.value) : 3.5;
+                formData.num_images = 1;
+                formData.output_format = 'jpeg';
+                formData.safety_tolerance = '2';
+
+                console.log('Flux Kontext Max parameters:', {
+                    aspect_ratio: formData.aspect_ratio,
+                    guidance_scale: formData.guidance_scale,
+                    num_images: formData.num_images,
+                    output_format: formData.output_format,
+                    safety_tolerance: formData.safety_tolerance
+                });
             } else if (selectedModel === 'fal-ai/ideogram/v2' || selectedModel === 'fal-ai/ideogram/v2a') {
                 // Add Ideogram V2/V2a specific parameters
                 const aspectRatioElement = document.getElementById('ideogramAspectRatio');

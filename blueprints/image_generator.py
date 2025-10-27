@@ -67,6 +67,14 @@ def get_model_arguments(model, data):
             "max_images": data.get("max_images", 1),
             "num_images": data.get("num_images", 1)
         }
+    elif model == "fal-ai/flux-pro/kontext/max/text-to-image":
+        model_args = {
+            "aspect_ratio": data.get("aspect_ratio", "1:1"),
+            "guidance_scale": float(data.get("guidance_scale", 3.5)),
+            "num_images": int(data.get("num_images", 1)),
+            "output_format": data.get("output_format", "jpeg"),
+            "safety_tolerance": data.get("safety_tolerance", "2")
+        }
     elif model == "fal-ai/ideogram/v2":
         model_args = {
             "aspect_ratio": data.get("aspect_ratio") or "1:1",

@@ -221,6 +221,15 @@ def generate_image_route():
             # Max images parameter
             generation_params['max_images'] = int(data.get('seedream_max_images', 1))
             generation_params['num_images'] = int(data.get('seedream_max_images', 1))
+        elif model == 'fal-ai/flux-pro/kontext/max/text-to-image':
+            # Flux Kontext Max specific parameters
+            generation_params.update({
+                'aspect_ratio': data.get('aspect_ratio', '1:1'),
+                'guidance_scale': float(data.get('guidance_scale', 3.5)),
+                'num_images': int(data.get('num_images', 1)),
+                'output_format': data.get('output_format', 'jpeg'),
+                'safety_tolerance': data.get('safety_tolerance', '2')
+            })
         elif model == 'fal-ai/ideogram/v2':
             generation_params.update({
                 'aspect_ratio': data.get('aspect_ratio') or '1:1',

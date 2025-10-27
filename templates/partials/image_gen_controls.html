@@ -5,14 +5,12 @@
         </label>
         <select id="model" name="model" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
             <option value="fal-ai/bytedance/seedream/v4/text-to-image" selected>Seedream V4 (Default)</option>
+            <option value="fal-ai/flux-pro/kontext/max/text-to-image">Flux Kontext Max</option>
             <option value="fal-ai/flux-pro/v1.1">Flux Pro</option>
             <option value="fal-ai/flux-pro/v1.1-ultra">Flux Pro Ultra</option>
             <option value="fal-ai/flux-lora">Flux Lora</option>
-            <option value="fal-ai/flux/dev">Flux Dev</option>
             <option value="fal-ai/flux-realism">Flux Realism</option>
             <option value="fal-ai/recraft-v3">Recraft V3</option>
-            <option value="fal-ai/ideogram/v2">Ideogram V2</option>
-            <option value="fal-ai/ideogram/v2a">Ideogram V2a</option>
             <option value="fal-ai/ideogram/v3">Ideogram V3</option>
             <option value="fal-ai/imagen4/preview">Imagen 4 (Preview)</option>
         </select>
@@ -109,6 +107,24 @@
         <div class="text-xs opacity-70 mt-1">
             Number of images to generate (1-4)
         </div>
+    </div>
+
+    <!-- Flux Kontext Max Controls -->
+    <div class="form-control hidden" id="fluxKontextAspectRatioControl">
+        <label class="label">
+            <span class="label-text">Aspect Ratio</span>
+        </label>
+        <select id="fluxKontextAspectRatio" name="aspect_ratio" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="1:1" selected>1:1 (Square)</option>
+            <option value="21:9">21:9 (Ultra Wide)</option>
+            <option value="16:9">16:9 (Landscape)</option>
+            <option value="4:3">4:3 (Landscape)</option>
+            <option value="3:2">3:2 (Landscape)</option>
+            <option value="2:3">2:3 (Portrait)</option>
+            <option value="3:4">3:4 (Portrait)</option>
+            <option value="9:16">9:16 (Portrait)</option>
+            <option value="9:21">9:21 (Ultra Tall)</option>
+        </select>
     </div>
 
     <!-- Ideogram V2 Controls -->
