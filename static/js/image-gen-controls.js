@@ -1,5 +1,3 @@
-console.log('image-gen-controls.js loaded');
-
 // Fetch LoRA data when model is set to Flux Lora
 async function fetchLoraData() {
     try {
@@ -113,9 +111,7 @@ document.getElementById('toggleLoraInput')?.addEventListener('click', function()
 
 // Update controls when model changes
 const modelSelect = document.getElementById('model');
-console.log('Model select element:', modelSelect);
 modelSelect?.addEventListener('change', function(e) {
-    console.log('Model changed in event listener to:', e.target.value);
     const imageSizeControl = document.getElementById('imageSizeControl');
     const aspectRatioControl = document.getElementById('aspectRatioControl');
     const loraInputs = document.getElementById('loraInputs');
@@ -168,9 +164,6 @@ modelSelect?.addEventListener('change', function(e) {
     // Apply model-specific controls
     switch(e.target.value) {
         case 'fal-ai/bytedance/seedream/v4/text-to-image':
-            console.log('Seedream V4 selected, showing controls');
-            console.log('seedreamImageSizeControl:', seedreamImageSizeControl);
-            console.log('seedreamMaxImagesControl:', seedreamMaxImagesControl);
             // Hide controls that don't apply to Seedream V4
             imageSizeControl?.classList.add('hidden');
             aspectRatioControl?.classList.add('hidden');
@@ -180,8 +173,6 @@ modelSelect?.addEventListener('change', function(e) {
             // Show Seedream V4 specific controls
             seedreamImageSizeControl?.classList.remove('hidden');
             seedreamMaxImagesControl?.classList.remove('hidden');
-            console.log('After showing - seedreamImageSizeControl classes:', seedreamImageSizeControl?.className);
-            console.log('After showing - seedreamMaxImagesControl classes:', seedreamMaxImagesControl?.className);
 
             // Check if custom is already selected and show/hide accordingly
             const seedreamPreset = document.getElementById('seedreamImageSizePreset');
@@ -190,8 +181,6 @@ modelSelect?.addEventListener('change', function(e) {
             }
             break;
         case 'fal-ai/flux-pro/kontext/max/text-to-image':
-            console.log('Flux Kontext Max selected, showing controls');
-            console.log('fluxKontextAspectRatioControl:', fluxKontextAspectRatioControl);
             // Hide controls that don't apply to Flux Kontext Max
             imageSizeControl?.classList.add('hidden');
             aspectRatioControl?.classList.add('hidden');
@@ -200,7 +189,6 @@ modelSelect?.addEventListener('change', function(e) {
 
             // Show Flux Kontext Max specific controls
             fluxKontextAspectRatioControl?.classList.remove('hidden');
-            console.log('After showing - fluxKontextAspectRatioControl classes:', fluxKontextAspectRatioControl?.className);
             break;
         case 'fal-ai/flux-pro/v1.1-ultra':
             imageSizeControl?.classList.add('hidden');
@@ -246,19 +234,14 @@ modelSelect?.addEventListener('change', function(e) {
     // Update character counts if the functions exist
     if (typeof updateCharacterCount === 'function') updateCharacterCount();
     if (typeof updateEnhancedCharacterCount === 'function') updateEnhancedCharacterCount();
-    
-    console.log('Model changed to:', e.target.value);
 });
 
 // Initialize controls based on default model
 window.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded fired in image-gen-controls.js');
     const model = document.getElementById('model');
-    console.log('Model element in DOMContentLoaded:', model, 'Value:', model?.value);
     if (model) {
         const event = new Event('change');
         model.dispatchEvent(event);
-        console.log('Dispatched change event on model select');
     }
 
     // Also initialize seedream preset handler

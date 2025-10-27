@@ -227,8 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const dimensions = IMAGE_SIZES[imageSizeKey] || IMAGE_SIZES.square;
         const selectedModel = modelSelect.value;
 
-        console.log('Generating image with model:', selectedModel);
-
         try {
             const formData = {
                 prompt: enhancedPromptText.value,
@@ -260,13 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     formData.seedream_width = widthElement ? parseInt(widthElement.value) : 1024;
                     formData.seedream_height = heightElement ? parseInt(heightElement.value) : 1024;
                 }
-
-                console.log('Seedream V4 parameters:', {
-                    preset: formData.seedream_image_size_preset,
-                    max_images: formData.seedream_max_images,
-                    width: formData.seedream_width,
-                    height: formData.seedream_height
-                });
             } else if (selectedModel === 'fal-ai/flux-pro/kontext/max/text-to-image') {
                 // Add Flux Kontext Max specific parameters
                 const aspectRatioElement = document.getElementById('fluxKontextAspectRatio');
@@ -277,14 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.num_images = 1;
                 formData.output_format = 'jpeg';
                 formData.safety_tolerance = '2';
-
-                console.log('Flux Kontext Max parameters:', {
-                    aspect_ratio: formData.aspect_ratio,
-                    guidance_scale: formData.guidance_scale,
-                    num_images: formData.num_images,
-                    output_format: formData.output_format,
-                    safety_tolerance: formData.safety_tolerance
-                });
             } else if (selectedModel === 'fal-ai/imagen4/preview') {
                 // Add Imagen4 specific parameters
                 const aspectRatioElement = document.getElementById('imagen4AspectRatio');
@@ -295,11 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (negativePromptElement && negativePromptElement.value.trim()) {
                     formData.negative_prompt = negativePromptElement.value;
                 }
-                
-                console.log('Imagen4 parameters:', {
-                    aspect_ratio: formData.aspect_ratio,
-                    negative_prompt: formData.negative_prompt
-                });
             } else if (selectedModel === 'fal-ai/ideogram/v3') {
                 // Add Ideogram V3 specific parameters
                 const imageSizeElement = document.getElementById('ideogramV3ImageSize');
@@ -314,13 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (negativePromptElement && negativePromptElement.value.trim()) {
                     formData.negative_prompt = negativePromptElement.value;
                 }
-                
-                console.log('Ideogram V3 parameters:', {
-                    image_size: formData.image_size,
-                    expand_prompt: formData.expand_prompt,
-                    rendering_speed: formData.rendering_speed,
-                    negative_prompt: formData.negative_prompt
-                });
             } else {
                 formData.image_size = dimensions;
             }
@@ -341,8 +312,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (seed) {
                 formData.seed = parseInt(seed);
             }
-
-            console.log('Sending request with data:', formData);
 
             const response = await fetch('/generate/image', {
                 method: 'POST',
