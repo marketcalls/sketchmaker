@@ -103,3 +103,13 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Compiled CSS (build artifact)
+static/css/output.css

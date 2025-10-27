@@ -1,0 +1,264 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Modern scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--fallback-b2, oklch(var(--b2)));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--fallback-b3, oklch(var(--b3)));
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--fallback-bc, oklch(var(--bc) / 0.5));
+  }
+
+  /* Text styling */
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.025em;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  /* Code block styling */
+  code {
+    color: var(--fallback-bc, oklch(var(--bc))) !important;
+    background-color: var(--fallback-b1, oklch(var(--b1))) !important;
+    border: 1px solid var(--fallback-b3, oklch(var(--b3))) !important;
+  }
+}
+
+@layer components {
+  /* Better form styling */
+  .input, .select, .textarea {
+    background-color: var(--fallback-b2, oklch(var(--b2))) !important;
+    border-color: var(--fallback-b3, oklch(var(--b3))) !important;
+    color: var(--fallback-bc, oklch(var(--bc))) !important;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  .input:focus, .select:focus, .textarea:focus {
+    border-color: var(--fallback-p, oklch(var(--p))) !important;
+    box-shadow: 0 0 0 2px var(--fallback-p, oklch(var(--p) / 0.2)) !important;
+  }
+
+  /* Navigation menu fixes */
+  .navbar {
+    position: relative;
+    z-index: 50;
+  }
+
+  .navbar-center {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .navbar .menu-horizontal {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .navbar .menu-horizontal > li {
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar .menu-horizontal > li > a {
+    white-space: nowrap;
+  }
+
+  .label-text {
+    color: var(--fallback-bc, oklch(var(--bc))) !important;
+    font-weight: 500 !important;
+  }
+  .label-text-alt {
+    color: var(--fallback-bc, oklch(var(--bc) / 0.7)) !important;
+  }
+
+  /* Card styling */
+  .card {
+    backdrop-filter: blur(12px);
+    background-color: var(--fallback-b2, oklch(var(--b2) / 0.8)) !important;
+    border: 1px solid var(--fallback-b3, oklch(var(--b3) / 0.5));
+  }
+
+  /* Button styling */
+  .btn {
+    text-transform: none !important;
+    font-weight: 500 !important;
+  }
+
+  /* Dropdown fix - ensure proper hiding and positioning */
+  .dropdown:not(.dropdown-open) .dropdown-content {
+    display: none !important;
+  }
+
+  .dropdown .dropdown-content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    min-width: max-content;
+    max-width: 280px;
+    white-space: nowrap;
+  }
+
+  /* Click-based dropdowns (Both Admin and Profile menus) */
+  .dropdown:focus-within .dropdown-content,
+  .dropdown.dropdown-open .dropdown-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    display: block !important;
+  }
+
+  /* Keep dropdown open when hovering over content */
+  .dropdown .dropdown-content:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    display: block !important;
+  }
+
+  /* Ensure dropdown end alignment */
+  .dropdown.dropdown-end .dropdown-content {
+    right: 0;
+    left: auto;
+  }
+
+  /* Fix dropdown menu items */
+  .dropdown .dropdown-content .menu li a {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    padding: 0.75rem 1rem;
+    display: block;
+    width: 100%;
+    min-height: 2.5rem;
+    line-height: 1.4;
+  }
+
+  /* Ensure full text visibility in admin dropdown */
+  .dropdown .dropdown-content {
+    width: auto;
+    min-width: 200px;
+  }
+
+  /* Toast styling */
+  #toast-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: calc(100vw - 2rem);
+  }
+  .toast {
+    min-width: 250px;
+    max-width: 100%;
+    animation: slideIn 0.2s ease-out;
+  }
+  .toast.hide {
+    animation: slideOut 0.2s ease-in forwards;
+  }
+}
+
+@layer utilities {
+  /* Responsive menu adjustments */
+  @media (max-width: 1536px) {
+    .navbar-center .btn-ghost {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  @media (max-width: 1280px) {
+    .navbar-center {
+      display: none !important;
+    }
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    .card-body {
+      padding: 1rem;
+    }
+    .btn-group {
+      flex-wrap: wrap;
+    }
+    .modal-box {
+      margin: 1rem;
+      max-width: calc(100vw - 2rem);
+    }
+    /* Prevent horizontal scroll on mobile */
+    body {
+      overflow-x: hidden;
+    }
+    /* Make tables scrollable on mobile */
+    .table-container, .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+    }
+    .toast {
+      min-width: 300px;
+    }
+  }
+
+  /* Responsive dropdown positioning */
+  @media (max-width: 768px) {
+    .dropdown .dropdown-content {
+      position: fixed;
+      right: 1rem;
+      left: auto;
+      max-width: calc(100vw - 2rem);
+    }
+  }
+
+  /* Animations */
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+}

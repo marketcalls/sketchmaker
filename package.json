@@ -1,0 +1,17 @@
+{
+  "name": "sketchmaker",
+  "version": "1.0.0",
+  "description": "Sketch Maker AI - Image Generation Platform",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
+    "watch:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "dev": "npm run watch:css"
+  },
+  "keywords": ["tailwind", "daisyui", "flask"],
+  "author": "Sketch Maker AI",
+  "license": "MIT",
+  "devDependencies": {
+    "tailwindcss": "^3.4.1",
+    "daisyui": "^4.7.2"
+  }
+}

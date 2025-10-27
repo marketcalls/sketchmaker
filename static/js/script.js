@@ -110,9 +110,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const enhancedPromptContainer = document.getElementById('enhancedPromptContainer');
     const enhancedPromptText = document.getElementById('enhancedPromptText');
 
-    // Animation for page load
-    gsap.from('header', { duration: 1, y: -50, opacity: 0, ease: 'power3.out' });
-    gsap.from('main', { duration: 1, y: 50, opacity: 0, ease: 'power3.out', delay: 0.3 });
+    // Animation for page load - only animate if elements exist
+    const header = document.querySelector('header');
+    const main = document.querySelector('main');
+    if (header) {
+        gsap.from(header, { duration: 1, y: -50, opacity: 0, ease: 'power3.out' });
+    }
+    if (main) {
+        gsap.from(main, { duration: 1, y: 50, opacity: 0, ease: 'power3.out', delay: 0.3 });
+    }
 
     // Model-specific control toggling is now handled in image-gen-controls.js
 

@@ -4,7 +4,9 @@
       "Bash(python:*)",
       "Bash(pip install:*)",
       "Bash(del:*)",
-      "Read(//c/Users/Admin1/Desktop/**)"
+      "Read(//c/Users/Admin1/Desktop/**)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:css:*)"
     ],
     "deny": [],
     "ask": []
