@@ -63,7 +63,6 @@ export function initializeForm() {
 
     // Function to update visible controls based on selected model
     function updateFormControls(modelValue) {
-        console.log('Updating controls for model:', modelValue);
         
         // Reset all controls first
         imageSizeControl.classList.remove('hidden');
@@ -101,7 +100,6 @@ export function initializeForm() {
 
     // Update controls when model changes
     modelSelect.addEventListener('change', (e) => {
-        console.log('Model changed to:', e.target.value);
         updateFormControls(e.target.value);
     });
 
@@ -111,7 +109,6 @@ export function initializeForm() {
     // Handle image generation
     document.getElementById('generateImage').addEventListener('click', async () => {
         const selectedModel = modelSelect.value;
-        console.log('Preparing to generate image with model:', selectedModel);
 
         // Get the prompt from either enhanced or original input
         const prompt = document.getElementById('enhancedPromptText').value || document.getElementById('userInput').value;
@@ -161,8 +158,6 @@ export function initializeForm() {
                 }];
             }
         }
-
-        console.log('Sending request with data:', formData);
 
         try {
             const response = await fetch('/generate/image', {
