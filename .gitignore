@@ -112,4 +112,5 @@ yarn-error.log*
 package-lock.json
 
 # Compiled CSS (build artifact)
-static/css/output.css
+# Comment out the line below to commit compiled CSS for easier deployment
+# static/css/output.css

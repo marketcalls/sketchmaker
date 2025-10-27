@@ -6,7 +6,8 @@
       "Bash(del:*)",
       "Read(//c/Users/Admin1/Desktop/**)",
       "Bash(npm install:*)",
-      "Bash(npm run build:css:*)"
+      "Bash(npm run build:css:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
