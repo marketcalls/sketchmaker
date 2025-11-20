@@ -66,9 +66,9 @@ Virtual Try-On revolutionizes online shopping by allowing users to see themselve
 - **Virtual Wardrobes**: Build digital clothing collections
 
 ### 🎯 Nano Studio - Revolutionary AI Image Manipulation
-**Powered by Google Gemini 2.5 Flash Image (Nano Banana)**
+**Powered by Google's Nano Banana Pro (Nano Banana 2)**
 
-Nano Studio represents the cutting edge of AI image manipulation, offering unprecedented control and quality through seven specialized modes.
+Nano Studio features Google's state-of-the-art image generation and editing model, offering unprecedented control and quality through seven specialized modes with 1K/2K/4K resolution support.
 
 #### 🚀 Automatic Image Optimization
 Nano Studio includes intelligent image optimization that automatically processes images before AI manipulation:

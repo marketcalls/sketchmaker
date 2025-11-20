@@ -162,7 +162,7 @@ def generate_magix():
 
         print(f"Calling Nano Banana Pro API with mode: {mode}, arguments: {arguments}")
 
-        # Call the Google Gemini 2.5 Flash Image (Nano Banana Pro) API
+        # Call Google's Nano Banana Pro (Nano Banana 2) API - State-of-the-art image generation and editing
         try:
             result = client.subscribe(
                 "fal-ai/nano-banana-pro/edit",
