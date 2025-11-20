@@ -275,8 +275,8 @@
         <!-- Header -->
         <div class="text-center mb-8">
             <h1 class="text-5xl font-bold nano-text-gradient mb-3">Magix Nano Studio</h1>
-            <p class="text-xl text-base-content/70">Powered by Google Gemini 2.5 Flash Image (Nano Banana)</p>
-            <p class="text-sm text-base-content/50 mt-2">The most advanced AI image manipulation suite</p>
+            <p class="text-xl text-base-content/70">Powered by Google Gemini 2.5 Flash Image (Nano Banana Pro)</p>
+            <p class="text-sm text-base-content/50 mt-2">The most advanced AI image manipulation suite with 1K/2K/4K support</p>
         </div>
 
         <!-- Mode Selection -->
@@ -459,6 +459,36 @@
                             <div class="collapse-content">
                                 <div class="advanced-controls">
                                     <div class="control-group">
+                                        <label class="text-sm">Resolution</label>
+                                        <select id="resolutionSelect" class="select select-bordered select-sm">
+                                            <option value="1K" selected>1K (Standard)</option>
+                                            <option value="2K">2K (High Quality)</option>
+                                            <option value="4K">4K (Ultra HD)</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="text-sm">Aspect Ratio</label>
+                                        <select id="aspectRatioSelect" class="select select-bordered select-sm">
+                                            <option value="auto" selected>Auto (Default)</option>
+                                            <option value="21:9">21:9 (Ultra Wide)</option>
+                                            <option value="16:9">16:9 (Wide)</option>
+                                            <option value="3:2">3:2</option>
+                                            <option value="4:3">4:3 (Classic)</option>
+                                            <option value="5:4">5:4</option>
+                                            <option value="1:1">1:1 (Square)</option>
+                                            <option value="4:5">4:5</option>
+                                            <option value="3:4">3:4 (Portrait)</option>
+                                            <option value="2:3">2:3</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="text-sm">Output Format</label>
+                                        <select id="outputFormatSelect" class="select select-bordered select-sm">
+                                            <option value="png" selected>PNG (Lossless)</option>
+                                            <option value="jpeg">JPEG (Compressed)</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-group">
                                         <label class="text-sm">Temperature</label>
                                         <input type="range" id="temperatureSlider" min="0" max="2" step="0.1" value="0.7" class="range range-xs" />
                                         <span class="text-xs text-center" id="temperatureValue">0.7</span>
@@ -567,7 +597,7 @@
 <!-- Loading Overlay -->
 <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-content">
-        <div class="nano-text-gradient text-2xl font-bold mb-4">Processing with Nano Banana</div>
+        <div class="nano-text-gradient text-2xl font-bold mb-4">Processing with Nano Banana Pro</div>
         <div class="progress-bar">
             <div id="progressFill" class="progress-fill" style="width: 0%"></div>
         </div>
@@ -995,6 +1025,11 @@ class NanoStudio {
             const seed = document.getElementById('seedInput').value;
             if (seed) requestData.seed = parseInt(seed);
 
+            // Add Nano Banana Pro specific parameters
+            requestData.resolution = document.getElementById('resolutionSelect').value;
+            requestData.aspect_ratio = document.getElementById('aspectRatioSelect').value;
+            requestData.output_format = document.getElementById('outputFormatSelect').value;
+
             const response = await fetch('/api/magix/generate', {
                 method: 'POST',
                 headers: {
@@ -1254,7 +1289,7 @@ class NanoStudio {
         const text = document.getElementById('progressText');
         
         const messages = [
-            'Initializing Nano Banana... (30-60 seconds expected)',
+            'Initializing Nano Banana Pro... (30-60 seconds expected)',
             'Understanding your request... Please be patient',
             'Processing with advanced AI models...',
             'Applying transformations... Almost there',

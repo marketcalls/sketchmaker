@@ -94,10 +94,13 @@ def generate_magix():
                     progress_updates.append(log['message'])
                     print(f"Nano Studio Progress: {log['message']}")
 
-        # Prepare base arguments for Nano Banana
+        # Prepare base arguments for Nano Banana Pro
         arguments = {
             "prompt": prompt,
-            "num_images": data.get('num_images', 1)
+            "num_images": data.get('num_images', 1),
+            "aspect_ratio": data.get('aspect_ratio', 'auto'),
+            "output_format": data.get('output_format', 'png'),
+            "resolution": data.get('resolution', '1K')  # Supports: 1K, 2K, 4K
         }
 
         # Add image URLs if provided (for editing modes)
@@ -157,19 +160,19 @@ def generate_magix():
         if 'seed' in data and data['seed']:
             arguments['seed'] = int(data['seed'])
 
-        print(f"Calling Nano Banana API with mode: {mode}, arguments: {arguments}")
+        print(f"Calling Nano Banana Pro API with mode: {mode}, arguments: {arguments}")
 
-        # Call the Google Gemini 2.5 Flash Image (Nano Banana) API
+        # Call the Google Gemini 2.5 Flash Image (Nano Banana Pro) API
         try:
             result = client.subscribe(
-                "fal-ai/nano-banana/edit",
+                "fal-ai/nano-banana-pro/edit",
                 arguments=arguments,
                 with_logs=True,
                 on_queue_update=on_queue_update
             )
 
             if not result:
-                raise ValueError("Invalid response from Nano Banana API")
+                raise ValueError("Invalid response from Nano Banana Pro API")
 
             # Process results based on mode
             results_data = {
@@ -271,7 +274,7 @@ def generate_magix():
             return jsonify(results_data)
 
         except Exception as e:
-            print(f"Error calling Nano Banana API: {str(e)}")
+            print(f"Error calling Nano Banana Pro API: {str(e)}")
             return jsonify({'error': f'Generation failed: {str(e)}'}), 500
 
     except Exception as e:
