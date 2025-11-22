@@ -5,6 +5,7 @@
         </label>
         <select id="model" name="model" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
             <option value="fal-ai/bytedance/seedream/v4/text-to-image" selected>Seedream V4 (Default)</option>
+            <option value="fal-ai/nano-banana-pro">Nano Banana Pro</option>
             <option value="fal-ai/flux-pro/kontext/max/text-to-image">Flux Kontext Max</option>
             <option value="fal-ai/flux-pro/v1.1">Flux Pro</option>
             <option value="fal-ai/flux-pro/v1.1-ultra">Flux Pro Ultra</option>
@@ -188,6 +189,47 @@
             <option value="BALANCED">Balanced</option>
             <option value="FAST">Fast</option>
             <option value="QUALITY">Quality</option>
+        </select>
+    </div>
+
+    <!-- Nano Banana Pro Controls -->
+    <div class="form-control hidden" id="nanoBananaAspectRatioControl">
+        <label class="label">
+            <span class="label-text">Aspect Ratio</span>
+        </label>
+        <select id="nanoBananaAspectRatio" name="aspect_ratio" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="1:1" selected>1:1 (Square)</option>
+            <option value="21:9">21:9 (Ultra Wide)</option>
+            <option value="16:9">16:9 (Landscape)</option>
+            <option value="3:2">3:2 (Landscape)</option>
+            <option value="4:3">4:3 (Landscape)</option>
+            <option value="5:4">5:4 (Landscape)</option>
+            <option value="4:5">4:5 (Portrait)</option>
+            <option value="3:4">3:4 (Portrait)</option>
+            <option value="2:3">2:3 (Portrait)</option>
+            <option value="9:16">9:16 (Portrait)</option>
+        </select>
+    </div>
+
+    <div class="form-control hidden" id="nanoBananaResolutionControl">
+        <label class="label">
+            <span class="label-text">Resolution</span>
+        </label>
+        <select id="nanoBananaResolution" name="resolution" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="1K" selected>1K</option>
+            <option value="2K">2K</option>
+            <option value="4K">4K</option>
+        </select>
+    </div>
+
+    <div class="form-control hidden" id="nanoBananaOutputFormatControl">
+        <label class="label">
+            <span class="label-text">Output Format</span>
+        </label>
+        <select id="nanoBananaOutputFormat" name="output_format" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="png" selected>PNG</option>
+            <option value="jpeg">JPEG</option>
+            <option value="webp">WebP</option>
         </select>
     </div>
 

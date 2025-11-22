@@ -7,7 +7,9 @@
       "Read(//c/Users/Admin1/Desktop/**)",
       "Bash(npm install:*)",
       "Bash(npm run build:css:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(.\\venv\\Scripts\\python.exe:*)",
+      "Bash(venv/Scripts/python.exe:*)"
     ],
     "deny": [],
     "ask": []

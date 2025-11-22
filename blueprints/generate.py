@@ -230,6 +230,14 @@ def generate_image_route():
                 'output_format': data.get('output_format', 'jpeg'),
                 'safety_tolerance': data.get('safety_tolerance', '2')
             })
+        elif model == 'fal-ai/nano-banana-pro':
+            # Nano Banana Pro specific parameters
+            generation_params.update({
+                'aspect_ratio': data.get('aspect_ratio', '1:1'),
+                'resolution': data.get('resolution', '1K'),
+                'output_format': data.get('output_format', 'png'),
+                'num_images': int(data.get('num_images', 1))
+            })
         elif model == 'fal-ai/ideogram/v2':
             generation_params.update({
                 'aspect_ratio': data.get('aspect_ratio') or '1:1',

@@ -268,6 +268,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.num_images = 1;
                 formData.output_format = 'jpeg';
                 formData.safety_tolerance = '2';
+            } else if (selectedModel === 'fal-ai/nano-banana-pro') {
+                // Add Nano Banana Pro specific parameters
+                const aspectRatioElement = document.getElementById('nanoBananaAspectRatio');
+                const resolutionElement = document.getElementById('nanoBananaResolution');
+                const outputFormatElement = document.getElementById('nanoBananaOutputFormat');
+
+                formData.aspect_ratio = aspectRatioElement ? aspectRatioElement.value : '1:1';
+                formData.resolution = resolutionElement ? resolutionElement.value : '1K';
+                formData.output_format = outputFormatElement ? outputFormatElement.value : 'png';
+                formData.num_images = 1;
             } else if (selectedModel === 'fal-ai/imagen4/preview') {
                 // Add Imagen4 specific parameters
                 const aspectRatioElement = document.getElementById('imagen4AspectRatio');

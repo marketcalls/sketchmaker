@@ -140,6 +140,11 @@ modelSelect?.addEventListener('change', function(e) {
     // Get Flux Kontext Max controls
     const fluxKontextAspectRatioControl = document.getElementById('fluxKontextAspectRatioControl');
 
+    // Get Nano Banana Pro controls
+    const nanoBananaAspectRatioControl = document.getElementById('nanoBananaAspectRatioControl');
+    const nanoBananaResolutionControl = document.getElementById('nanoBananaResolutionControl');
+    const nanoBananaOutputFormatControl = document.getElementById('nanoBananaOutputFormatControl');
+
     // Reset all controls first
     imageSizeControl?.classList.remove('hidden');
     aspectRatioControl?.classList.add('hidden');
@@ -158,11 +163,26 @@ modelSelect?.addEventListener('change', function(e) {
     seedreamCustomSizeControl?.classList.add('hidden');
     seedreamMaxImagesControl?.classList.add('hidden');
     fluxKontextAspectRatioControl?.classList.add('hidden');
+    nanoBananaAspectRatioControl?.classList.add('hidden');
+    nanoBananaResolutionControl?.classList.add('hidden');
+    nanoBananaOutputFormatControl?.classList.add('hidden');
     if (characterCount) characterCount.classList.add('hidden');
     if (enhancedCharacterCount) enhancedCharacterCount.classList.add('hidden');
 
     // Apply model-specific controls
     switch(e.target.value) {
+        case 'fal-ai/nano-banana-pro':
+            // Hide controls that don't apply to Nano Banana Pro
+            imageSizeControl?.classList.add('hidden');
+            aspectRatioControl?.classList.add('hidden');
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Nano Banana Pro specific controls
+            nanoBananaAspectRatioControl?.classList.remove('hidden');
+            nanoBananaResolutionControl?.classList.remove('hidden');
+            nanoBananaOutputFormatControl?.classList.remove('hidden');
+            break;
         case 'fal-ai/bytedance/seedream/v4/text-to-image':
             // Hide controls that don't apply to Seedream V4
             imageSizeControl?.classList.add('hidden');

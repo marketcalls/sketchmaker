@@ -399,9 +399,8 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # Assign free plan to new user (except for first user who becomes superadmin)
-        if not is_first_user:
-            assign_free_plan(new_user)
+        # Assign free plan to all new users (including superadmin)
+        assign_free_plan(new_user)
 
         # Send welcome email
         email_success, email_message = send_welcome_email(new_user, requires_approval)
