@@ -116,6 +116,19 @@ def get_model_arguments(model, data):
             model_args["negative_prompt"] = data.get("negative_prompt")
         # Add image_urls parameter (empty array as per API spec)
         model_args["image_urls"] = []
+    elif model == "fal-ai/flux-2-flex":
+        # Flux 2 Flex specific parameters with hardcoded values
+        model_args = {
+            "image_size": data.get("image_size", "landscape_4_3"),
+            "guidance_scale": data.get("guidance_scale", 3.5),
+            "output_format": data.get("output_format", "jpeg"),
+            # Hardcoded values
+            "enable_prompt_expansion": True,
+            "safety_tolerance": "2",
+            "enable_safety_checker": True,
+            "num_inference_steps": 28,
+            "sync_mode": False
+        }
     else:
         # All other models require image_size
         if not isinstance(data.get("image_size"), dict) or 'width' not in data["image_size"] or 'height' not in data["image_size"]:
@@ -163,7 +176,7 @@ def generate_image(data):
         if not data.get("prompt"):
             raise ValueError("Prompt cannot be empty")
         
-        model = data.get("model", "fal-ai/flux-pro/v1.1")
+        model = data.get("model", "fal-ai/flux-2-flex")
         print("\n=== Image Generation Start ===")
         print(f"Requested Model: {model}")
         print(f"Input data: {data}")

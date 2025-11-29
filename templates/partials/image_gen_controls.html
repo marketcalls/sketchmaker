@@ -7,7 +7,7 @@
             <option value="fal-ai/bytedance/seedream/v4/text-to-image" selected>Seedream V4 (Default)</option>
             <option value="fal-ai/nano-banana-pro">Nano Banana Pro</option>
             <option value="fal-ai/flux-pro/kontext/max/text-to-image">Flux Kontext Max</option>
-            <option value="fal-ai/flux-pro/v1.1">Flux Pro</option>
+            <option value="fal-ai/flux-2-flex">Flux 2 Flex</option>
             <option value="fal-ai/flux-pro/v1.1-ultra">Flux Pro Ultra</option>
             <option value="fal-ai/flux-lora">Flux Lora</option>
             <option value="fal-ai/flux-realism">Flux Realism</option>
@@ -189,6 +189,21 @@
             <option value="BALANCED">Balanced</option>
             <option value="FAST">Fast</option>
             <option value="QUALITY">Quality</option>
+        </select>
+    </div>
+
+    <!-- Flux 2 Flex Controls -->
+    <div class="form-control hidden" id="flux2FlexImageSizeControl">
+        <label class="label">
+            <span class="label-text">Image Size</span>
+        </label>
+        <select id="flux2FlexImageSize" name="image_size" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="square_hd">Square HD</option>
+            <option value="square">Square</option>
+            <option value="portrait_3_4">Portrait 3:4</option>
+            <option value="portrait_9_16">Portrait 9:16</option>
+            <option value="landscape_4_3" selected>Landscape 4:3</option>
+            <option value="landscape_16_9">Landscape 16:9</option>
         </select>
     </div>
 

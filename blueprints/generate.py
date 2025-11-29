@@ -157,7 +157,7 @@ def generate_image_route():
         # Get all parameters from request
         prompt = data['prompt']
         art_style = data.get('artStyle')
-        model = data.get('model', 'fal-ai/flux-pro/v1.1')
+        model = data.get('model', 'fal-ai/flux-2-flex')
 
         # Add art style to prompt if provided and not using Recraft V3
         if art_style and model != 'fal-ai/recraft-v3':
@@ -269,6 +269,19 @@ def generate_image_route():
             })
             if data.get('negative_prompt'):
                 generation_params['negative_prompt'] = data.get('negative_prompt')
+        elif model == 'fal-ai/flux-2-flex':
+            # Flux 2 Flex specific parameters with hardcoded values
+            generation_params.update({
+                'image_size': data.get('image_size', 'landscape_4_3'),
+                'guidance_scale': data.get('guidance_scale', 3.5),
+                'output_format': data.get('output_format', 'jpeg'),
+                # Hardcoded values
+                'enable_prompt_expansion': True,
+                'safety_tolerance': '2',
+                'enable_safety_checker': True,
+                'num_inference_steps': 28,
+                'sync_mode': False
+            })
         else:
             generation_params['image_size'] = data.get('image_size', {
                 'width': 1024,

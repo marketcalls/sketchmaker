@@ -145,6 +145,9 @@ modelSelect?.addEventListener('change', function(e) {
     const nanoBananaResolutionControl = document.getElementById('nanoBananaResolutionControl');
     const nanoBananaOutputFormatControl = document.getElementById('nanoBananaOutputFormatControl');
 
+    // Get Flux 2 Flex controls
+    const flux2FlexImageSizeControl = document.getElementById('flux2FlexImageSizeControl');
+
     // Reset all controls first
     imageSizeControl?.classList.remove('hidden');
     aspectRatioControl?.classList.add('hidden');
@@ -166,6 +169,7 @@ modelSelect?.addEventListener('change', function(e) {
     nanoBananaAspectRatioControl?.classList.add('hidden');
     nanoBananaResolutionControl?.classList.add('hidden');
     nanoBananaOutputFormatControl?.classList.add('hidden');
+    flux2FlexImageSizeControl?.classList.add('hidden');
     if (characterCount) characterCount.classList.add('hidden');
     if (enhancedCharacterCount) enhancedCharacterCount.classList.add('hidden');
 
@@ -220,7 +224,16 @@ modelSelect?.addEventListener('change', function(e) {
             loraInputs?.classList.remove('hidden');
             updateLoraDropdown(); // Fetch and update LoRA options
             break;
-        case 'fal-ai/flux-pro/v1.1':
+        case 'fal-ai/flux-2-flex':
+            // Hide controls that don't apply to Flux 2 Flex
+            imageSizeControl?.classList.add('hidden');
+            aspectRatioControl?.classList.add('hidden');
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Flux 2 Flex specific controls
+            flux2FlexImageSizeControl?.classList.remove('hidden');
+            break;
         case 'fal-ai/flux/dev':
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');

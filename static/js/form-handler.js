@@ -72,7 +72,7 @@ export function initializeForm() {
         loraInputs.classList.add('hidden');
 
         switch(modelValue) {
-            case 'fal-ai/flux-pro/v1.1':
+            case 'fal-ai/flux-2-flex':
             case 'fal-ai/flux/dev':
                 // Show only image size controls
                 numInferenceStepsControls.classList.add('hidden');
@@ -140,6 +140,10 @@ export function initializeForm() {
             formData.aspect_ratio = document.getElementById('aspectRatio').value;
             formData.output_format = 'jpeg';
             formData.safety_tolerance = '2';
+        } else if (selectedModel === 'fal-ai/flux-2-flex') {
+            // For Flux 2 Flex, use string-based image size
+            const flux2FlexImageSize = document.getElementById('flux2FlexImageSize');
+            formData.image_size = flux2FlexImageSize ? flux2FlexImageSize.value : 'landscape_4_3';
         } else {
             // For other models, use image size
             const imageSizeKey = document.getElementById('imageSize').value;
