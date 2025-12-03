@@ -157,7 +157,7 @@ def generate_image_route():
         # Get all parameters from request
         prompt = data['prompt']
         art_style = data.get('artStyle')
-        model = data.get('model', 'fal-ai/flux-2-flex')
+        model = data.get('model', 'fal-ai/z-image/turbo/lora')
 
         # Add art style to prompt if provided and not using Recraft V3
         if art_style and model != 'fal-ai/recraft-v3':
@@ -281,6 +281,15 @@ def generate_image_route():
                 'enable_safety_checker': True,
                 'num_inference_steps': 28,
                 'sync_mode': False
+            })
+        elif model == 'fal-ai/z-image/turbo/lora':
+            # Z-Image specific parameters
+            generation_params.update({
+                'image_size': data.get('image_size', 'landscape_4_3'),
+                'num_inference_steps': data.get('num_inference_steps', 8),
+                'output_format': data.get('output_format', 'png'),
+                'acceleration': data.get('acceleration', 'none'),
+                'loras': data.get('loras', [])
             })
         else:
             generation_params['image_size'] = data.get('image_size', {

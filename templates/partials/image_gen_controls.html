@@ -4,7 +4,8 @@
             <span class="label-text">Model</span>
         </label>
         <select id="model" name="model" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
-            <option value="fal-ai/bytedance/seedream/v4/text-to-image" selected>Seedream V4 (Default)</option>
+            <option value="fal-ai/z-image/turbo/lora" selected>Z-Image (Default)</option>
+            <option value="fal-ai/bytedance/seedream/v4/text-to-image">Seedream V4</option>
             <option value="fal-ai/nano-banana-pro">Nano Banana Pro</option>
             <option value="fal-ai/flux-pro/kontext/max/text-to-image">Flux Kontext Max</option>
             <option value="fal-ai/flux-2-flex">Flux 2 Flex</option>
@@ -189,6 +190,21 @@
             <option value="BALANCED">Balanced</option>
             <option value="FAST">Fast</option>
             <option value="QUALITY">Quality</option>
+        </select>
+    </div>
+
+    <!-- Z-Image Controls -->
+    <div class="form-control" id="zImageSizeControl">
+        <label class="label">
+            <span class="label-text">Image Size</span>
+        </label>
+        <select id="zImageSize" name="image_size" class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200">
+            <option value="square_hd">Square HD</option>
+            <option value="square">Square</option>
+            <option value="portrait_3_4">Portrait 3:4</option>
+            <option value="portrait_9_16">Portrait 9:16</option>
+            <option value="landscape_4_3" selected>Landscape 4:3</option>
+            <option value="landscape_16_9">Landscape 16:9</option>
         </select>
     </div>
 

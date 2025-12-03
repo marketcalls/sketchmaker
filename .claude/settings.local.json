@@ -9,7 +9,8 @@
       "Bash(npm run build:css:*)",
       "Bash(git add:*)",
       "Bash(.\\venv\\Scripts\\python.exe:*)",
-      "Bash(venv/Scripts/python.exe:*)"
+      "Bash(venv/Scripts/python.exe:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

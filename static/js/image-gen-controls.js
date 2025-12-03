@@ -148,6 +148,9 @@ modelSelect?.addEventListener('change', function(e) {
     // Get Flux 2 Flex controls
     const flux2FlexImageSizeControl = document.getElementById('flux2FlexImageSizeControl');
 
+    // Get Z-Image controls
+    const zImageSizeControl = document.getElementById('zImageSizeControl');
+
     // Reset all controls first
     imageSizeControl?.classList.remove('hidden');
     aspectRatioControl?.classList.add('hidden');
@@ -170,11 +173,22 @@ modelSelect?.addEventListener('change', function(e) {
     nanoBananaResolutionControl?.classList.add('hidden');
     nanoBananaOutputFormatControl?.classList.add('hidden');
     flux2FlexImageSizeControl?.classList.add('hidden');
+    zImageSizeControl?.classList.add('hidden');
     if (characterCount) characterCount.classList.add('hidden');
     if (enhancedCharacterCount) enhancedCharacterCount.classList.add('hidden');
 
     // Apply model-specific controls
     switch(e.target.value) {
+        case 'fal-ai/z-image/turbo/lora':
+            // Hide controls that don't apply to Z-Image
+            imageSizeControl?.classList.add('hidden');
+            aspectRatioControl?.classList.add('hidden');
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Z-Image specific controls
+            zImageSizeControl?.classList.remove('hidden');
+            break;
         case 'fal-ai/nano-banana-pro':
             // Hide controls that don't apply to Nano Banana Pro
             imageSizeControl?.classList.add('hidden');

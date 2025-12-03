@@ -129,6 +129,15 @@ def get_model_arguments(model, data):
             "num_inference_steps": 28,
             "sync_mode": False
         }
+    elif model == "fal-ai/z-image/turbo/lora":
+        # Z-Image specific parameters
+        model_args = {
+            "image_size": data.get("image_size", "landscape_4_3"),
+            "num_inference_steps": data.get("num_inference_steps", 8),
+            "output_format": data.get("output_format", "png"),
+            "acceleration": data.get("acceleration", "none"),
+            "loras": data.get("loras", [])
+        }
     else:
         # All other models require image_size
         if not isinstance(data.get("image_size"), dict) or 'width' not in data["image_size"] or 'height' not in data["image_size"]:
@@ -176,7 +185,7 @@ def generate_image(data):
         if not data.get("prompt"):
             raise ValueError("Prompt cannot be empty")
         
-        model = data.get("model", "fal-ai/flux-2-flex")
+        model = data.get("model", "fal-ai/z-image/turbo/lora")
         print("\n=== Image Generation Start ===")
         print(f"Requested Model: {model}")
         print(f"Input data: {data}")
