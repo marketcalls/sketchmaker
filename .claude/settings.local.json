@@ -15,7 +15,8 @@
       "WebFetch(domain:docs.litellm.ai)",
       "WebFetch(domain:models.litellm.ai)",
       "WebFetch(domain:console.groq.com)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []

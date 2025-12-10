@@ -71,12 +71,16 @@ class LiteLLMClient:
         if env_key:
             os.environ[env_key] = api_key
 
-    # Models that use reasoning tokens (need higher max_tokens)
-    REASONING_MODELS = [
+    # Models that use reasoning tokens and need reasoning_effort parameter
+    # OpenAI reasoning models
+    OPENAI_REASONING_MODELS = [
         'gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5.1',
-        'o1', 'o1-mini', 'o1-preview', 'o3', 'o3-mini', 'o3-pro', 'o4-mini',
-        'gpt-oss-120b', 'gpt-oss-20b'
+        'o1', 'o1-mini', 'o1-preview', 'o3', 'o3-mini', 'o3-pro', 'o4-mini'
     ]
+    # Groq reasoning models (gpt-oss uses different reasoning_effort values)
+    GROQ_REASONING_MODELS = ['gpt-oss-120b', 'gpt-oss-20b']
+    # Combined for detection
+    REASONING_MODELS = OPENAI_REASONING_MODELS + GROQ_REASONING_MODELS
 
     def generate_completion(self, system_content, user_content, model,
                           temperature=0.7, max_tokens=500):
