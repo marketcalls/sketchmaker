@@ -85,7 +85,25 @@ cerebras_models = [
     }
 ]
 
-print("Adding Cerebras models:")
+# First, remove old/unwanted Cerebras models
+valid_model_names = [m['name'] for m in cerebras_models]
+c.execute("SELECT id, name FROM ai_model WHERE provider_id = ?", (cerebras_id,))
+existing_models = c.fetchall()
+
+print("Cleaning up old Cerebras models:")
+print("-" * 50)
+removed = 0
+for model_id, model_name in existing_models:
+    if model_name not in valid_model_names:
+        c.execute("DELETE FROM ai_model WHERE id = ?", (model_id,))
+        print(f"  [removed] {model_name}")
+        removed += 1
+
+if removed == 0:
+    print("  (no old models to remove)")
+conn.commit()
+
+print(f"\nAdding Cerebras models:")
 print("-" * 50)
 
 added = 0
