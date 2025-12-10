@@ -28,7 +28,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
         <div>
-            <h3 class="font-bold">Centralized API Management</h3>
+            <h3 class="font-bold">Centralized API Management (Powered by LiteLLM)</h3>
             <div class="text-sm">All API keys are managed centrally by administrators. Users consume these services through their subscription credits.</div>
         </div>
     </div>
@@ -40,7 +40,7 @@
             <div class="stat-value text-primary">{{ available_providers|length }}</div>
             <div class="stat-desc">{{ providers|length }} total providers</div>
         </div>
-        
+
         <div class="stat">
             <div class="stat-title">System Status</div>
             <div class="stat-value {% if api_settings.has_required_keys() %}text-success{% else %}text-error{% endif %} text-sm">
@@ -54,7 +54,7 @@
                 {% endif %}
             </div>
         </div>
-        
+
         <div class="stat">
             <div class="stat-title">Last Updated</div>
             <div class="stat-value text-sm">
@@ -78,7 +78,7 @@
             <div class="card-body">
                 <h2 class="card-title">AI Provider API Keys</h2>
                 <p class="text-sm text-base-content/70 mb-4">Configure API keys for prompt enhancement and AI processing</p>
-                
+
                 <form id="providerKeysForm">
                     <div class="space-y-4">
                         <!-- OpenAI -->
@@ -94,8 +94,8 @@
                                 </span>
                             </label>
                             <div class="input-group">
-                                <input type="password" name="openai_api_key" 
-                                       placeholder="sk-..." 
+                                <input type="password" name="openai_api_key"
+                                       placeholder="sk-..."
                                        class="input input-bordered flex-1"
                                        value="{% if api_settings.get_openai_key() %}••••••••••••••••{% endif %}">
                                 <button type="button" class="btn btn-outline" onclick="testProvider('OpenAI')">Test</button>
@@ -115,8 +115,8 @@
                                 </span>
                             </label>
                             <div class="input-group">
-                                <input type="password" name="anthropic_api_key" 
-                                       placeholder="sk-ant-..." 
+                                <input type="password" name="anthropic_api_key"
+                                       placeholder="sk-ant-..."
                                        class="input input-bordered flex-1"
                                        value="{% if api_settings.get_anthropic_key() %}••••••••••••••••{% endif %}">
                                 <button type="button" class="btn btn-outline" onclick="testProvider('Anthropic')">Test</button>
@@ -136,8 +136,8 @@
                                 </span>
                             </label>
                             <div class="input-group">
-                                <input type="password" name="gemini_api_key" 
-                                       placeholder="AI..." 
+                                <input type="password" name="gemini_api_key"
+                                       placeholder="AI..."
                                        class="input input-bordered flex-1"
                                        value="{% if api_settings.get_gemini_key() %}••••••••••••••••{% endif %}">
                                 <button type="button" class="btn btn-outline" onclick="testProvider('Google Gemini')">Test</button>
@@ -157,8 +157,8 @@
                                 </span>
                             </label>
                             <div class="input-group">
-                                <input type="password" name="groq_api_key" 
-                                       placeholder="gsk_..." 
+                                <input type="password" name="groq_api_key"
+                                       placeholder="gsk_..."
                                        class="input input-bordered flex-1"
                                        value="{% if api_settings.get_groq_key() %}••••••••••••••••{% endif %}">
                                 <button type="button" class="btn btn-outline" onclick="testProvider('Groq')">Test</button>
@@ -169,12 +169,93 @@
             </div>
         </div>
 
+        <!-- New LiteLLM Providers -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Additional AI Providers</h2>
+                <p class="text-sm text-base-content/70 mb-4">Extended providers via LiteLLM integration</p>
+
+                <form id="litellmKeysForm">
+                    <div class="space-y-4">
+                        <!-- xAI (Grok) -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center gap-2">
+                                    xAI (Grok) API Key
+                                    {% if api_settings.get_xai_key() %}
+                                        <span class="badge badge-success badge-sm">Configured</span>
+                                    {% else %}
+                                        <span class="badge badge-warning badge-sm">Optional</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <input type="password" name="xai_api_key"
+                                       placeholder="xai-..."
+                                       class="input input-bordered flex-1"
+                                       value="{% if api_settings.get_xai_key() %}••••••••••••••••{% endif %}">
+                                <button type="button" class="btn btn-outline" onclick="testProvider('xAI')">Test</button>
+                            </div>
+                        </div>
+
+                        <!-- Cerebras -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center gap-2">
+                                    Cerebras API Key
+                                    {% if api_settings.get_cerebras_key() %}
+                                        <span class="badge badge-success badge-sm">Configured</span>
+                                    {% else %}
+                                        <span class="badge badge-warning badge-sm">Optional</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <input type="password" name="cerebras_api_key"
+                                       placeholder="csk-..."
+                                       class="input input-bordered flex-1"
+                                       value="{% if api_settings.get_cerebras_key() %}••••••••••••••••{% endif %}">
+                                <button type="button" class="btn btn-outline" onclick="testProvider('Cerebras')">Test</button>
+                            </div>
+                        </div>
+
+                        <!-- OpenRouter -->
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text flex items-center gap-2">
+                                    OpenRouter API Key
+                                    {% if api_settings.get_openrouter_key() %}
+                                        <span class="badge badge-success badge-sm">Configured</span>
+                                    {% else %}
+                                        <span class="badge badge-warning badge-sm">Optional</span>
+                                    {% endif %}
+                                </span>
+                            </label>
+                            <div class="input-group">
+                                <input type="password" name="openrouter_api_key"
+                                       placeholder="sk-or-..."
+                                       class="input input-bordered flex-1"
+                                       value="{% if api_settings.get_openrouter_key() %}••••••••••••••••{% endif %}">
+                                <button type="button" class="btn btn-outline" onclick="testProvider('OpenRouter')">Test</button>
+                            </div>
+                            <label class="label">
+                                <span class="label-text-alt">Access 500+ models via OpenRouter</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Generation & Defaults Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <!-- Image Generation Keys -->
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
                 <h2 class="card-title">Image Generation API</h2>
                 <p class="text-sm text-base-content/70 mb-4">Configure API keys for image generation services</p>
-                
+
                 <form id="imageKeysForm">
                     <div class="space-y-4">
                         <!-- FAL -->
@@ -190,8 +271,8 @@
                                 </span>
                             </label>
                             <div class="input-group">
-                                <input type="password" name="fal_key" 
-                                       placeholder="fal_..." 
+                                <input type="password" name="fal_key"
+                                       placeholder="fal_..."
                                        class="input input-bordered flex-1"
                                        value="{% if api_settings.get_fal_key() %}••••••••••••••••{% endif %}">
                                 <button type="button" class="btn btn-outline" onclick="testProvider('FAL')">Test</button>
@@ -202,20 +283,25 @@
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
 
-                <!-- Default Settings -->
-                <div class="divider">Default Settings</div>
-                
+        <!-- Default Settings -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Default Settings</h2>
+                <p class="text-sm text-base-content/70 mb-4">Configure default provider and model</p>
+
                 <form id="defaultsForm">
                     <div class="space-y-4">
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Default AI Provider</span>
                             </label>
-                            <select name="default_provider_id" class="select select-bordered">
+                            <select name="default_provider_id" id="providerSelect" class="select select-bordered" onchange="filterModelsByProvider()">
                                 <option value="">Select provider...</option>
                                 {% for provider in available_providers %}
-                                <option value="{{ provider.id }}" 
+                                <option value="{{ provider.id }}"
                                         {% if api_settings.default_provider_id == provider.id %}selected{% endif %}>
                                     {{ provider.name }}
                                 </option>
@@ -227,12 +313,13 @@
                             <label class="label">
                                 <span class="label-text">Default Model</span>
                             </label>
-                            <select name="default_model_id" class="select select-bordered">
+                            <select name="default_model_id" id="modelSelect" class="select select-bordered">
                                 <option value="">Select model...</option>
                                 {% for model in models %}
-                                <option value="{{ model.id }}" 
+                                <option value="{{ model.id }}"
+                                        data-provider-id="{{ model.provider_id }}"
                                         {% if api_settings.default_model_id == model.id %}selected{% endif %}>
-                                    {{ model.name }}
+                                    {{ model.display_name }}
                                 </option>
                                 {% endfor %}
                             </select>
@@ -251,7 +338,7 @@
             </svg>
             Save All Settings
         </button>
-        
+
         <button class="btn btn-secondary" onclick="location.reload()">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -271,13 +358,56 @@
 </div>
 
 <script>
+// Filter models based on selected provider
+function filterModelsByProvider() {
+    const providerSelect = document.getElementById('providerSelect');
+    const modelSelect = document.getElementById('modelSelect');
+    const selectedProviderId = providerSelect.value;
+    const currentModelId = modelSelect.value;
+
+    // Get all model options
+    const options = modelSelect.querySelectorAll('option[data-provider-id]');
+
+    // Show/hide options based on provider
+    let firstVisibleOption = null;
+    let currentModelStillVisible = false;
+
+    options.forEach(option => {
+        if (!selectedProviderId || option.dataset.providerId === selectedProviderId) {
+            option.style.display = '';
+            option.disabled = false;
+            if (!firstVisibleOption) {
+                firstVisibleOption = option;
+            }
+            if (option.value === currentModelId) {
+                currentModelStillVisible = true;
+            }
+        } else {
+            option.style.display = 'none';
+            option.disabled = true;
+        }
+    });
+
+    // If current selection is no longer visible, select first visible option
+    if (!currentModelStillVisible && firstVisibleOption) {
+        modelSelect.value = firstVisibleOption.value;
+    } else if (!currentModelStillVisible) {
+        modelSelect.value = '';
+    }
+}
+
+// Initialize filter on page load
+document.addEventListener('DOMContentLoaded', function() {
+    filterModelsByProvider();
+});
+
 async function testProvider(provider) {
     const button = event.target;
     const originalText = button.textContent;
-    
+
     button.disabled = true;
     button.textContent = 'Testing...';
-    
+
     try {
         const response = await fetch('/admin/api/test', {
             method: 'POST',
@@ -287,9 +417,9 @@ async function testProvider(provider) {
             },
             body: JSON.stringify({ provider })
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             showToast(result.message, 'success');
         } else {
@@ -304,20 +434,22 @@ async function testProvider(provider) {
 }
 
 async function saveAllSettings() {
-    const forms = ['providerKeysForm', 'imageKeysForm', 'defaultsForm'];
+    const forms = ['providerKeysForm', 'litellmKeysForm', 'imageKeysForm', 'defaultsForm'];
     const formData = new FormData();
-    
+
     // Collect data from all forms
     forms.forEach(formId => {
         const form = document.getElementById(formId);
-        const data = new FormData(form);
-        for (let [key, value] of data.entries()) {
-            if (value && !value.includes('••••')) { // Don't send masked values
-                formData.append(key, value);
+        if (form) {
+            const data = new FormData(form);
+            for (let [key, value] of data.entries()) {
+                if (value && !value.includes('••••')) { // Don't send masked values
+                    formData.append(key, value);
+                }
             }
         }
     });
-    
+
     try {
         const response = await fetch('/admin/api/update', {
             method: 'POST',
@@ -326,9 +458,9 @@ async function saveAllSettings() {
             },
             body: formData
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             showToast(result.message, 'success');
             setTimeout(() => location.reload(), 1500);
@@ -344,12 +476,12 @@ async function clearAllKeys() {
     if (!confirm('Are you sure you want to clear ALL API keys? This will disable all AI features.')) {
         return;
     }
-    
-    const providers = ['openai', 'anthropic', 'gemini', 'groq', 'fal'];
-    
+
+    const providers = ['openai', 'anthropic', 'gemini', 'groq', 'xai', 'cerebras', 'openrouter', 'fal'];
+
     for (const provider of providers) {
         try {
-            await fetch(`/admin/api/clear/${provider}`, { 
+            await fetch(`/admin/api/clear/${provider}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': window.csrf_token
@@ -359,7 +491,7 @@ async function clearAllKeys() {
             console.error(`Failed to clear ${provider}:`, error);
         }
     }
-    
+
     showToast('All API keys cleared', 'warning');
     setTimeout(() => location.reload(), 1500);
 }
@@ -367,14 +499,14 @@ async function clearAllKeys() {
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-top toast-end`;
-    
+
     const alert = document.createElement('div');
     alert.className = `alert alert-${type}`;
     alert.innerHTML = `<span>${message}</span>`;
-    
+
     toast.appendChild(alert);
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.remove();
     }, 3000);

@@ -35,6 +35,7 @@ google-auth-httplib2==0.2.0
 google-generativeai==0.8.3
 googleapis-common-protos==1.66.0
 groq==0.12.0
+litellm>=1.80.9
 grpcio==1.67.1
 grpcio-status==1.67.1
 h11==0.16.0

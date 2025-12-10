@@ -12,7 +12,9 @@
       "Bash(venv/Scripts/python.exe:*)",
       "Bash(find:*)",
       "WebSearch",
-      "WebFetch(domain:docs.litellm.ai)"
+      "WebFetch(domain:docs.litellm.ai)",
+      "WebFetch(domain:models.litellm.ai)",
+      "WebFetch(domain:console.groq.com)"
     ],
     "deny": [],
     "ask": []

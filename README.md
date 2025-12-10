@@ -16,12 +16,16 @@ A sophisticated web application that leverages multiple AI providers and models 
 - Custom styling instructions
 - Multiple variation generation
 
-### 🤖 Multi-Provider AI Support
-- **OpenAI**: GPT-5, GPT-5 Mini, GPT-5 Nano (Latest generation models)
-- **OpenAI Legacy**: GPT-4.1, GPT-4.1 Mini, GPT-4.1 Nano
-- **Anthropic**: Claude Opus 4, Sonnet 4, Haiku 3.5 (June 2025 versions)
-- **Google Gemini**: Gemini 2.5 Pro, Flash, Flash Lite Preview
-- **Groq**: Compound Beta, Llama 3.3 70B Versatile, and more
+### 🤖 Multi-Provider AI Support (Powered by LiteLLM)
+Unified AI gateway supporting 100+ LLM providers through [LiteLLM](https://github.com/BerriAI/litellm):
+
+- **OpenAI**: GPT-5.1, GPT-5, GPT-5 Mini, O4 Mini, O3, GPT-OSS (Open Source)
+- **Anthropic**: Claude Opus 4.5, Sonnet 4.5, Haiku 4.5 (December 2025 versions)
+- **Google Gemini**: Gemini 3 Pro, Gemini 3 Flash, Gemini 3 Deep Think, Gemini 2.5
+- **Groq**: Compound Beta, GPT-OSS, Kimi K2 (Moonshot), Qwen 3 32B, Llama 3.3
+- **xAI (Grok)**: Grok 3, Grok 2 with web search support
+- **Cerebras**: Qwen3 Coder 480B, Llama 4 Maverick (2,500+ tokens/sec)
+- **OpenRouter**: Access 500+ models through a single API key
 
 ![AI Generated Social Media Expert](https://marketcalls.in/wp-content/uploads/2024/08/The-Social-Media-Expert.png)
 
@@ -273,7 +277,8 @@ Nano Studio includes intelligent image optimization that automatically processes
 - **Authentication**: Flask-Login, OAuth 2.0
 - **Task Scheduling**: APScheduler
 - **Encryption**: Cryptography (Fernet)
-- **API Clients**: OpenAI, Anthropic, Google Generative AI, Groq, FAL
+- **AI Gateway**: LiteLLM (unified interface for 100+ LLM providers)
+- **API Clients**: OpenAI, Anthropic, Google Gemini, Groq, xAI, Cerebras, OpenRouter, FAL
 
 ### Frontend
 - **CSS Framework**: Tailwind CSS with DaisyUI components
@@ -392,7 +397,6 @@ cp .env.example .env  # If example exists
 
 5. **Initialize the database**:
 ```bash
-
 # Set up subscription system
 python setup_subscriptions.py
 
@@ -403,7 +407,22 @@ python setup_subscriptions.py
 # - Set up the APScheduler for automatic credit resets
 ```
 
-6. **Run the application**:
+6. **Run database migrations** (for existing installations):
+```bash
+cd migrations
+uv run migrate_all.py
+cd ..
+
+# Or using Flask-Migrate directly:
+flask db upgrade
+```
+
+This adds support for new LiteLLM providers:
+- xAI (Grok)
+- Cerebras
+- OpenRouter
+
+7. **Run the application**:
 ```bash
 python app.py
 ```
@@ -416,7 +435,7 @@ The application will be available at `http://127.0.0.1:5000`
 The first user to register automatically becomes the superadmin with full system access.
 
 ### 🔑 API Configuration (Admin Only)
-Administrators configure API keys centrally for all users:
+Administrators configure API keys centrally for all users via LiteLLM:
 
 1. Login as admin
 2. Navigate to **Admin → API Key Management**
@@ -427,6 +446,9 @@ Administrators configure API keys centrally for all users:
      - Anthropic API Key
      - Google Gemini API Key
      - Groq API Key
+     - xAI (Grok) API Key
+     - Cerebras API Key
+     - OpenRouter API Key
 4. Select default provider and model
 5. Test each API connection
 
@@ -584,11 +606,15 @@ Created and maintained by [marketcalls](https://github.com/marketcalls)
 ### Icons and Images
 - Favicon and logo: [Sketch book icons created by RA_IC0N21 - Flaticon](https://www.flaticon.com/packs/design-thinking-14670943)
 
-### AI Services
-- OpenAI for GPT models
-- Anthropic for Claude models
-- Google for Gemini models
-- Groq for Llama models
+### AI Services & Infrastructure
+- **[LiteLLM](https://github.com/BerriAI/litellm)** - Unified AI gateway for 100+ LLM providers (MIT License)
+- OpenAI for GPT-5, O3, and GPT-OSS models
+- Anthropic for Claude 4.5 models
+- Google for Gemini 3 models
+- Groq for ultra-fast inference
+- xAI for Grok models
+- Cerebras for record-breaking inference speeds
+- OpenRouter for multi-model access
 - FAL for image generation
 
 ## 📞 Support

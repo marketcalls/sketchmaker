@@ -125,202 +125,376 @@ def create_app():
             return db.session.get(User, int(user_id))
 
         def init_api_providers():
-            """Initialize default API providers and models"""
+            """Initialize default API providers and models using LiteLLM"""
             # Only initialize if no providers exist
             if APIProvider.query.first() is None:
-                # Create providers
+                # Create all providers (including new ones for LiteLLM)
                 openai = APIProvider(name="OpenAI")
                 anthropic = APIProvider(name="Anthropic")
                 gemini = APIProvider(name="Google Gemini")
                 groq = APIProvider(name="Groq")
-                db.session.add_all([openai, anthropic, gemini, groq])
+                xai = APIProvider(name="xAI")  # Grok
+                cerebras = APIProvider(name="Cerebras")
+                openrouter = APIProvider(name="OpenRouter")
+                db.session.add_all([openai, anthropic, gemini, groq, xai, cerebras, openrouter])
                 db.session.commit()
 
-                # OpenAI models - Latest as of June 2025
+                # OpenAI models - Latest as of December 2025
+                # LiteLLM prefix: openai/
                 openai_models = [
+                    {
+                        "name": "gpt-5.1",
+                        "display_name": "GPT-5.1",
+                        "description": "Latest GPT-5.1 with improved reasoning and conversation",
+                        "is_latest": True,
+                        "sort_order": 1
+                    },
                     {
                         "name": "gpt-5",
                         "display_name": "GPT-5",
-                        "description": "Most advanced AI model with unprecedented reasoning capabilities",
+                        "description": "Unified AI model combining reasoning and fast responses",
                         "is_latest": True,
-                        "sort_order": 1
+                        "sort_order": 2
                     },
                     {
                         "name": "gpt-5-mini",
                         "display_name": "GPT-5 Mini",
                         "description": "Compact GPT-5 with excellent performance-to-cost ratio",
                         "is_latest": True,
-                        "sort_order": 2
-                    },
-                    {
-                        "name": "gpt-5-nano",
-                        "display_name": "GPT-5 Nano",
-                        "description": "Ultra-fast GPT-5 variant for real-time applications",
-                        "is_latest": True,
                         "sort_order": 3
                     },
                     {
-                        "name": "gpt-4.1",
-                        "display_name": "GPT-4.1",
-                        "description": "Smartest GPT-4 model for complex tasks",
-                        "is_latest": False,
+                        "name": "o4-mini",
+                        "display_name": "O4 Mini",
+                        "description": "Fast, cost-efficient reasoning model for math and coding",
+                        "is_latest": True,
                         "sort_order": 4
                     },
                     {
-                        "name": "gpt-4.1-mini",
-                        "display_name": "GPT-4.1 Mini",
-                        "description": "Affordable model balancing speed and intelligence",
-                        "is_latest": False,
+                        "name": "o3",
+                        "display_name": "O3",
+                        "description": "Advanced reasoning model",
+                        "is_latest": True,
                         "sort_order": 5
                     },
                     {
-                        "name": "gpt-4.1-nano",
-                        "display_name": "GPT-4.1 Nano",
-                        "description": "Fastest, most cost-effective model for low-latency tasks",
-                        "is_latest": False,
+                        "name": "o3-mini",
+                        "display_name": "O3 Mini",
+                        "description": "Smaller reasoning model for faster responses",
                         "sort_order": 6
                     },
                     {
                         "name": "gpt-4o",
                         "display_name": "GPT-4o",
-                        "description": "Previous generation model",
+                        "description": "Multimodal model for text and vision",
                         "sort_order": 7
                     },
                     {
                         "name": "gpt-4o-mini",
                         "display_name": "GPT-4o Mini",
-                        "description": "Previous generation mini model",
+                        "description": "Fast and affordable multimodal model",
                         "sort_order": 8
+                    },
+                    {
+                        "name": "gpt-oss-120b",
+                        "display_name": "GPT-OSS 120B",
+                        "description": "Open-weight 120B reasoning model",
+                        "sort_order": 9
+                    },
+                    {
+                        "name": "gpt-oss-20b",
+                        "display_name": "GPT-OSS 20B",
+                        "description": "Open-weight 20B model with 3.6B active parameters",
+                        "sort_order": 10
                     }
                 ]
                 for model_data in openai_models:
                     model = AIModel(provider_id=openai.id, **model_data)
                     db.session.add(model)
 
-                # Anthropic models - Latest as of June 2025
+                # Anthropic models - Latest as of December 2025
+                # LiteLLM prefix: anthropic/
                 anthropic_models = [
+                    {
+                        "name": "claude-opus-4-5-20251101",
+                        "display_name": "Claude Opus 4.5",
+                        "description": "Most intelligent model for coding, agents, and enterprise workflows",
+                        "is_latest": True,
+                        "sort_order": 1
+                    },
+                    {
+                        "name": "claude-sonnet-4-5-20250929",
+                        "display_name": "Claude Sonnet 4.5",
+                        "description": "Best coding model, excellent for complex agents",
+                        "is_latest": True,
+                        "sort_order": 2
+                    },
+                    {
+                        "name": "claude-haiku-4-5-20251015",
+                        "display_name": "Claude Haiku 4.5",
+                        "description": "Fast and affordable, similar to Sonnet 4 at 1/3 cost",
+                        "is_latest": True,
+                        "sort_order": 3
+                    },
                     {
                         "name": "claude-opus-4-20250514",
                         "display_name": "Claude Opus 4",
-                        "description": "Powerful, large model for complex challenges",
-                        "is_latest": True,
-                        "sort_order": 1
+                        "description": "Powerful model for complex challenges",
+                        "sort_order": 4
                     },
                     {
                         "name": "claude-sonnet-4-20250514",
                         "display_name": "Claude Sonnet 4",
                         "description": "Smart, efficient model for everyday use",
-                        "is_latest": True,
-                        "sort_order": 2
+                        "sort_order": 5
                     },
                     {
                         "name": "claude-3-5-haiku-20241022",
                         "display_name": "Claude 3.5 Haiku",
                         "description": "Fastest model for daily tasks",
-                        "is_latest": True,
-                        "sort_order": 3
-                    },
-                    {
-                        "name": "claude-3-7-sonnet-20250219",
-                        "display_name": "Claude 3.7 Sonnet",
-                        "description": "Enhanced Sonnet model",
-                        "sort_order": 4
-                    },
-                    {
-                        "name": "claude-3-5-sonnet-20241022",
-                        "display_name": "Claude 3.5 Sonnet",
-                        "description": "Previous Sonnet version",
-                        "sort_order": 5
+                        "sort_order": 6
                     }
                 ]
                 for model_data in anthropic_models:
                     model = AIModel(provider_id=anthropic.id, **model_data)
                     db.session.add(model)
 
-                # Google Gemini models - Latest as of June 2025
+                # Google Gemini models - Latest as of December 2025
+                # LiteLLM prefix: gemini/
                 gemini_models = [
                     {
-                        "name": "gemini-2.5-pro",
-                        "display_name": "Gemini 2.5 Pro",
-                        "description": "Latest and most capable Gemini model",
+                        "name": "gemini-3-pro",
+                        "display_name": "Gemini 3 Pro",
+                        "description": "Most intelligent Gemini with 1M context, tops LMArena",
                         "is_latest": True,
                         "sort_order": 1
                     },
                     {
-                        "name": "gemini-2.5-flash",
-                        "display_name": "Gemini 2.5 Flash",
-                        "description": "Fast and efficient for most tasks",
+                        "name": "gemini-3-flash",
+                        "display_name": "Gemini 3 Flash",
+                        "description": "Fast Gemini 3 for everyday tasks",
                         "is_latest": True,
                         "sort_order": 2
                     },
                     {
-                        "name": "gemini-2.5-flash-lite-preview-06-17",
-                        "display_name": "Gemini 2.5 Flash Lite Preview",
-                        "description": "Ultra-light preview model",
+                        "name": "gemini-3-deep-think",
+                        "display_name": "Gemini 3 Deep Think",
+                        "description": "Advanced reasoning model with 45.1% on ARC-AGI-2",
                         "is_latest": True,
                         "sort_order": 3
                     },
                     {
-                        "name": "gemini-2.5-pro-preview-05-06",
-                        "display_name": "Gemini 2.5 Pro Preview",
-                        "description": "Preview version of Pro model",
+                        "name": "gemini-2.5-pro",
+                        "display_name": "Gemini 2.5 Pro",
+                        "description": "Stable 2.5 Pro with adaptive thinking",
                         "sort_order": 4
                     },
                     {
-                        "name": "gemini-2.5-flash-preview-04-17",
-                        "display_name": "Gemini 2.5 Flash Preview",
-                        "description": "Preview version of Flash model",
+                        "name": "gemini-2.5-flash",
+                        "display_name": "Gemini 2.5 Flash",
+                        "description": "Fast model for large scale processing",
                         "sort_order": 5
+                    },
+                    {
+                        "name": "gemini-2.5-flash-lite",
+                        "display_name": "Gemini 2.5 Flash Lite",
+                        "description": "Low-cost, high-performance model",
+                        "sort_order": 6
+                    },
+                    {
+                        "name": "gemini-2.0-flash",
+                        "display_name": "Gemini 2.0 Flash",
+                        "description": "Previous generation flash model",
+                        "sort_order": 7
                     }
                 ]
                 for model_data in gemini_models:
                     model = AIModel(provider_id=gemini.id, **model_data)
                     db.session.add(model)
 
-                # Groq models - Latest as of June 2025
+                # Groq models - Latest as of December 2025
+                # LiteLLM prefix: groq/
                 groq_models = [
                     {
                         "name": "compound-beta",
                         "display_name": "Compound Beta",
-                        "description": "Latest compound model from Groq",
+                        "description": "Agentic AI with GPT-OSS 120B, web search & code execution",
                         "is_latest": True,
                         "sort_order": 1
                     },
                     {
                         "name": "compound-beta-mini",
                         "display_name": "Compound Beta Mini",
-                        "description": "Smaller compound model",
+                        "description": "Smaller compound AI system",
                         "is_latest": True,
                         "sort_order": 2
                     },
                     {
-                        "name": "llama-3.3-70b-versatile",
-                        "display_name": "Llama 3.3 70B Versatile",
-                        "description": "Latest Llama model, versatile for various tasks",
+                        "name": "gpt-oss-120b",
+                        "display_name": "GPT-OSS 120B (Groq)",
+                        "description": "OpenAI open-weight model on Groq hardware",
                         "is_latest": True,
                         "sort_order": 3
+                    },
+                    {
+                        "name": "gpt-oss-20b",
+                        "display_name": "GPT-OSS 20B (Groq)",
+                        "description": "Smaller open-weight reasoning model",
+                        "is_latest": True,
+                        "sort_order": 4
+                    },
+                    {
+                        "name": "moonshotai/kimi-k2-instruct-0905",
+                        "display_name": "Kimi K2 (Moonshot)",
+                        "description": "1T parameter MoE with 256K context",
+                        "is_latest": True,
+                        "sort_order": 5
+                    },
+                    {
+                        "name": "qwen/qwen3-32b",
+                        "display_name": "Qwen 3 32B",
+                        "description": "Alibaba Qwen 3 with exceptional text generation",
+                        "is_latest": True,
+                        "sort_order": 6
+                    },
+                    {
+                        "name": "llama-3.3-70b-versatile",
+                        "display_name": "Llama 3.3 70B Versatile",
+                        "description": "Meta Llama for versatile tasks",
+                        "sort_order": 7
                     },
                     {
                         "name": "llama-3.1-8b-instant",
                         "display_name": "Llama 3.1 8B Instant",
                         "description": "Fast 8B model for instant responses",
-                        "sort_order": 4
-                    },
-                    {
-                        "name": "llama3-8b-8192",
-                        "display_name": "Llama 3 8B",
-                        "description": "8B model with 8192 context",
-                        "sort_order": 5
-                    },
-                    {
-                        "name": "llama3-70b-8192",
-                        "display_name": "Llama 3 70B",
-                        "description": "70B model with 8192 context",
-                        "sort_order": 6
+                        "sort_order": 8
                     }
                 ]
                 for model_data in groq_models:
                     model = AIModel(provider_id=groq.id, **model_data)
+                    db.session.add(model)
+
+                # xAI (Grok) models - Latest as of December 2025
+                # LiteLLM prefix: xai/
+                xai_models = [
+                    {
+                        "name": "grok-3",
+                        "display_name": "Grok 3",
+                        "description": "Latest Grok model with web search support",
+                        "is_latest": True,
+                        "sort_order": 1
+                    },
+                    {
+                        "name": "grok-2-latest",
+                        "display_name": "Grok 2 Latest",
+                        "description": "Grok 2 with latest improvements",
+                        "is_latest": True,
+                        "sort_order": 2
+                    },
+                    {
+                        "name": "grok-2",
+                        "display_name": "Grok 2",
+                        "description": "Standard Grok 2 model",
+                        "sort_order": 3
+                    }
+                ]
+                for model_data in xai_models:
+                    model = AIModel(provider_id=xai.id, **model_data)
+                    db.session.add(model)
+
+                # Cerebras models - Latest as of December 2025
+                # LiteLLM prefix: cerebras/
+                cerebras_models = [
+                    {
+                        "name": "qwen3-coder-480b",
+                        "display_name": "Qwen3 Coder 480B",
+                        "description": "Top coding model at 2,000 tokens/sec",
+                        "is_latest": True,
+                        "sort_order": 1
+                    },
+                    {
+                        "name": "qwen3-235b-a22b",
+                        "display_name": "Qwen3 235B A22B",
+                        "description": "MoE with 22B active params, 262K context",
+                        "is_latest": True,
+                        "sort_order": 2
+                    },
+                    {
+                        "name": "qwen3-32b",
+                        "display_name": "Qwen3 32B",
+                        "description": "Real-time reasoning at 60x faster than competitors",
+                        "is_latest": True,
+                        "sort_order": 3
+                    },
+                    {
+                        "name": "llama-4-maverick",
+                        "display_name": "Llama 4 Maverick",
+                        "description": "400B Llama 4 at 2,500+ tokens/sec world record",
+                        "is_latest": True,
+                        "sort_order": 4
+                    },
+                    {
+                        "name": "llama-3.3-70b",
+                        "display_name": "Llama 3.3 70B",
+                        "description": "Multilingual Llama with fast inference",
+                        "sort_order": 5
+                    },
+                    {
+                        "name": "deepseek-r1-distill-llama-70b",
+                        "display_name": "DeepSeek R1 Distill 70B",
+                        "description": "DeepSeek reasoning model on Cerebras",
+                        "sort_order": 6
+                    }
+                ]
+                for model_data in cerebras_models:
+                    model = AIModel(provider_id=cerebras.id, **model_data)
+                    db.session.add(model)
+
+                # OpenRouter models - Latest as of December 2025
+                # LiteLLM prefix: openrouter/
+                openrouter_models = [
+                    {
+                        "name": "openai/gpt-5",
+                        "display_name": "GPT-5 (OpenRouter)",
+                        "description": "OpenAI GPT-5 via OpenRouter",
+                        "is_latest": True,
+                        "sort_order": 1
+                    },
+                    {
+                        "name": "anthropic/claude-opus-4.5",
+                        "display_name": "Claude Opus 4.5 (OpenRouter)",
+                        "description": "Anthropic Claude Opus 4.5 via OpenRouter",
+                        "is_latest": True,
+                        "sort_order": 2
+                    },
+                    {
+                        "name": "google/gemini-3-pro",
+                        "display_name": "Gemini 3 Pro (OpenRouter)",
+                        "description": "Google Gemini 3 Pro via OpenRouter",
+                        "is_latest": True,
+                        "sort_order": 3
+                    },
+                    {
+                        "name": "meta-llama/llama-4-maverick",
+                        "display_name": "Llama 4 Maverick (OpenRouter)",
+                        "description": "Meta Llama 4 via OpenRouter",
+                        "sort_order": 4
+                    },
+                    {
+                        "name": "qwen/qwen3-235b",
+                        "display_name": "Qwen3 235B (OpenRouter)",
+                        "description": "Alibaba Qwen3 via OpenRouter",
+                        "sort_order": 5
+                    },
+                    {
+                        "name": "mistralai/mistral-large",
+                        "display_name": "Mistral Large (OpenRouter)",
+                        "description": "Mistral AI large model via OpenRouter",
+                        "sort_order": 6
+                    }
+                ]
+                for model_data in openrouter_models:
+                    model = AIModel(provider_id=openrouter.id, **model_data)
                     db.session.add(model)
 
                 db.session.commit()

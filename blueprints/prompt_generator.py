@@ -81,7 +81,10 @@ Provide only the enhanced prompt as output, without any additional explanation o
         temperature=0.7,
         max_tokens=300 if model == "fal-ai/recraft-v3" else 500
     )
-    
+
+    # Debug logging
+    print(f"[DEBUG] Generated prompt (length={len(prompt) if prompt else 0}): {prompt[:200] if prompt else 'EMPTY'}...")
+
     # For Recraft V3, ensure the prompt is within length limits
     if model == "fal-ai/recraft-v3" and len(prompt) > 1000:
         # If too long, get a shorter version
