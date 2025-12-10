@@ -12,7 +12,7 @@ from datetime import datetime
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
 VERSION_PATCH = 0
-VERSION_BUILD = 0
+VERSION_BUILD = 1
 
 # Full version string
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH}.{VERSION_BUILD}"
@@ -27,9 +27,9 @@ PRODUCT_CODENAME = "Genesis"
 PRODUCT_DESCRIPTION = "Advanced AI-Powered Image Generation Platform"
 
 # Copyright and legal
-COPYRIGHT_YEAR = "2024-2025"
+COPYRIGHT_YEAR = "2026"
 COPYRIGHT_HOLDER = "SketchMaker AI"
-LICENSE = "Proprietary"
+LICENSE = "AGPL v3"
 
 def get_version():
     """Get the current version string"""
