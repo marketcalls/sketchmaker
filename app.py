@@ -316,58 +316,44 @@ def create_app():
                 # LiteLLM prefix: groq/
                 groq_models = [
                     {
-                        "name": "compound-beta",
-                        "display_name": "Compound Beta",
-                        "description": "Agentic AI with GPT-OSS 120B, web search & code execution",
+                        "name": "openai/gpt-oss-120b",
+                        "display_name": "GPT-OSS 120B",
+                        "description": "OpenAI open-weight 120B reasoning model on Groq",
                         "is_latest": True,
                         "sort_order": 1
                     },
                     {
-                        "name": "compound-beta-mini",
-                        "display_name": "Compound Beta Mini",
-                        "description": "Smaller compound AI system",
+                        "name": "openai/gpt-oss-20b",
+                        "display_name": "GPT-OSS 20B",
+                        "description": "OpenAI open-weight 20B model on Groq",
                         "is_latest": True,
                         "sort_order": 2
-                    },
-                    {
-                        "name": "gpt-oss-120b",
-                        "display_name": "GPT-OSS 120B (Groq)",
-                        "description": "OpenAI open-weight model on Groq hardware",
-                        "is_latest": True,
-                        "sort_order": 3
-                    },
-                    {
-                        "name": "gpt-oss-20b",
-                        "display_name": "GPT-OSS 20B (Groq)",
-                        "description": "Smaller open-weight reasoning model",
-                        "is_latest": True,
-                        "sort_order": 4
-                    },
-                    {
-                        "name": "moonshotai/kimi-k2-instruct-0905",
-                        "display_name": "Kimi K2 (Moonshot)",
-                        "description": "1T parameter MoE with 256K context",
-                        "is_latest": True,
-                        "sort_order": 5
                     },
                     {
                         "name": "qwen/qwen3-32b",
                         "display_name": "Qwen 3 32B",
                         "description": "Alibaba Qwen 3 with exceptional text generation",
                         "is_latest": True,
-                        "sort_order": 6
+                        "sort_order": 3
+                    },
+                    {
+                        "name": "moonshotai/kimi-k2-instruct-0905",
+                        "display_name": "Kimi K2 (Moonshot)",
+                        "description": "1T parameter MoE with 256K context",
+                        "is_latest": True,
+                        "sort_order": 4
                     },
                     {
                         "name": "llama-3.3-70b-versatile",
                         "display_name": "Llama 3.3 70B Versatile",
                         "description": "Meta Llama for versatile tasks",
-                        "sort_order": 7
+                        "sort_order": 5
                     },
                     {
                         "name": "llama-3.1-8b-instant",
                         "display_name": "Llama 3.1 8B Instant",
                         "description": "Fast 8B model for instant responses",
-                        "sort_order": 8
+                        "sort_order": 6
                     }
                 ]
                 for model_data in groq_models:

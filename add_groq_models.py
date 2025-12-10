@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Add new Groq models to existing database and set default
-Run: uv run add_groq_models.py
+Add/update Groq models in existing database and set default.
+Removes old models and adds current ones.
+Run: python add_groq_models.py
 """
 
 import sqlite3
@@ -11,6 +12,7 @@ import os
 DB_PATHS = [
     os.path.join(os.path.dirname(__file__), 'instance', 'sketchmaker.db'),
     os.path.join(os.path.dirname(__file__), 'sketchmaker.db'),
+    '/var/python/sketchmaker/sketchmaker/instance/sketchmaker.db',
 ]
 
 DB_PATH = None
@@ -39,45 +41,75 @@ if not row:
 groq_id = row[0]
 print(f"Groq provider ID: {groq_id}")
 
-# New models to add
-new_models = [
-    {
-        "name": "qwen/qwen3-32b",
-        "display_name": "Qwen 3 32B",
-        "description": "Alibaba Qwen 3 with exceptional text generation",
-        "is_latest": True,
-        "sort_order": 10
-    },
-    {
-        "name": "moonshotai/kimi-k2-instruct-0905",
-        "display_name": "Kimi K2 Instruct (Moonshot)",
-        "description": "1T parameter MoE with 256K context",
-        "is_latest": True,
-        "sort_order": 11
-    },
+# Current Groq models - Latest as of December 2025
+groq_models = [
     {
         "name": "openai/gpt-oss-120b",
         "display_name": "GPT-OSS 120B",
         "description": "OpenAI open-weight 120B reasoning model on Groq",
         "is_latest": True,
-        "sort_order": 1  # First in sort order to be default
+        "sort_order": 1
     },
     {
         "name": "openai/gpt-oss-20b",
         "display_name": "GPT-OSS 20B",
         "description": "OpenAI open-weight 20B model on Groq",
         "is_latest": True,
-        "sort_order": 13
+        "sort_order": 2
     },
+    {
+        "name": "qwen/qwen3-32b",
+        "display_name": "Qwen 3 32B",
+        "description": "Alibaba Qwen 3 with exceptional text generation",
+        "is_latest": True,
+        "sort_order": 3
+    },
+    {
+        "name": "moonshotai/kimi-k2-instruct-0905",
+        "display_name": "Kimi K2 (Moonshot)",
+        "description": "1T parameter MoE with 256K context",
+        "is_latest": True,
+        "sort_order": 4
+    },
+    {
+        "name": "llama-3.3-70b-versatile",
+        "display_name": "Llama 3.3 70B Versatile",
+        "description": "Meta Llama for versatile tasks",
+        "sort_order": 5
+    },
+    {
+        "name": "llama-3.1-8b-instant",
+        "display_name": "Llama 3.1 8B Instant",
+        "description": "Fast 8B model for instant responses",
+        "sort_order": 6
+    }
 ]
 
-print("\nAdding Groq models:")
+# First, remove old/unwanted Groq models
+valid_model_names = [m['name'] for m in groq_models]
+cursor.execute("SELECT id, name FROM ai_model WHERE provider_id = ?", (groq_id,))
+existing_models = cursor.fetchall()
+
+print("\nCleaning up old Groq models:")
+print("-" * 50)
+removed = 0
+for model_id, model_name in existing_models:
+    if model_name not in valid_model_names:
+        cursor.execute("DELETE FROM ai_model WHERE id = ?", (model_id,))
+        print(f"  [removed] {model_name}")
+        removed += 1
+
+if removed == 0:
+    print("  (no old models to remove)")
+conn.commit()
+
+print(f"\nAdding Groq models:")
 print("-" * 50)
 
 added = 0
 skipped = 0
 
-for model in new_models:
+for model in groq_models:
     # Check if model already exists
     cursor.execute(
         "SELECT id FROM ai_model WHERE name = ? AND provider_id = ?",
@@ -92,7 +124,8 @@ for model in new_models:
     cursor.execute("""
         INSERT INTO ai_model (name, display_name, description, provider_id, is_latest, is_active, sort_order)
         VALUES (?, ?, ?, ?, ?, 1, ?)
-    """, (model['name'], model['display_name'], model['description'], groq_id, model['is_latest'], model['sort_order']))
+    """, (model['name'], model['display_name'], model['description'], groq_id,
+          1 if model.get('is_latest') else 0, model.get('sort_order', 0)))
     print(f"  [added] {model['name']}")
     added += 1
 
@@ -131,6 +164,6 @@ conn.commit()
 conn.close()
 
 print("\n" + "=" * 50)
-print(f"Done! Added: {added}, Skipped: {skipped}")
+print(f"Done! Removed: {removed}, Added: {added}, Skipped: {skipped}")
 print("Default: Groq / openai/gpt-oss-120b")
 print("\nRestart the app to see the changes.")
