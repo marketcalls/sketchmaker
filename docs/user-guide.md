@@ -30,8 +30,9 @@ This comprehensive user guide will help you master all features of SketchMaker A
 
 #### **Main Navigation**
 - **Dashboard**: Overview of your activity
-- **Banner**: Create banners and promotional images
+- **Explainer**: Create infographics, diagrams, and visual explanations
 - **Magix**: Advanced image editing tools
+- **Virtual**: AI-powered virtual try-on
 - **Gallery**: View and manage your creations
 - **Train LoRA**: Custom model training
 - **Settings**: Account preferences
@@ -50,7 +51,7 @@ Your dashboard displays:
 - Current credit costs per feature (dynamic)
 - Next reset date (personalized to your subscription)
 - Subscription status
-- Feature usage breakdown (AI Images, Banners, Magix, LoRA)
+- Feature usage breakdown (AI Images, Explainers, Magix, Virtual, LoRA)
 
 ## 🎨 Image Generation
 
@@ -139,48 +140,119 @@ Negative Prompt:
 - **Characteristics**: Photographic quality, detailed
 - **Example**: "A realistic product shot of a smartphone on white background"
 
-## 🎯 Banner Creation
+## 🎯 Explainer Tool - Visual Content Creation
 
-### **Banner Generator Workflow**
+### **Overview**
 
-#### **Step 1: Select Format**
-Choose from popular formats:
-- **Social Media**: Instagram, Facebook, Twitter
-- **Web**: Blog headers, website banners
-- **Print**: Posters, flyers, business cards
-- **Custom**: Specify exact dimensions
+The Explainer Tool transforms complex ideas into professional visual content using AI. Create infographics, diagrams, flowcharts, and educational visuals with support for 2000+ word detailed prompts.
 
-#### **Step 2: Design Elements**
-- **Background**: Choose style or upload image
-- **Text Overlay**: Add titles and descriptions
-- **Color Scheme**: Brand colors or presets
-- **Layout**: Template selection
+### **Getting Started**
 
-#### **Step 3: Customization**
-- **Typography**: Font selection and sizing
-- **Positioning**: Text and element placement
-- **Effects**: Shadows, gradients, filters
-- **Branding**: Logo integration
+#### **Step 1: Select Content Type**
+Choose from 8 content types:
+- **Concept Explainer**: Educational breakdowns of complex topics
+- **Infographic**: Data visualization, statistics, timelines
+- **Flowchart/Diagram**: Process flows, decision trees, architectures
+- **Kids Explainer**: Child-friendly illustrations with simple language
+- **Technical Diagram**: System architectures, workflows, code concepts
+- **Comparison Chart**: Side-by-side comparisons, pros/cons
+- **Step-by-Step Guide**: Numbered tutorials, how-to guides
+- **Startup Pitchdeck**: Investor presentations, startup visuals
 
-#### **Export Options**
-- **Web Formats**: PNG, JPEG, WebP
-- **Vector Formats**: SVG for scalability
-- **Print Ready**: High DPI versions
-- **Multiple Sizes**: Generate variations
+#### **Step 2: Describe Your Content**
+Write a detailed description (supports 2000+ words):
+- Include main topics and key points
+- Specify data, statistics, or information to display
+- Describe the structure and layout you want
+- Mention any specific colors, icons, or visual elements
 
-### **Banner Best Practices**
+**Example Prompt:**
+```
+Create a visual explainer about how photosynthesis works.
+Include the main stages (light reaction and Calvin cycle),
+show the inputs (sunlight, water, CO2) and outputs (glucose, oxygen).
+Use a plant cell diagram in the center with arrows showing
+the flow of energy and materials.
+```
 
-#### **Composition Tips**
-- **Rule of Thirds**: Position key elements strategically
-- **White Space**: Don't overcrowd the design
-- **Hierarchy**: Most important text should be largest
-- **Contrast**: Ensure text is readable
+#### **Step 3: Configure Style & Settings**
 
-#### **Text Guidelines**
-- **Headline**: 6-8 words maximum
-- **Subtext**: Additional details, smaller font
-- **Call to Action**: Clear, action-oriented
-- **Font Pairing**: Maximum 2 font families
+**Visual Styles:**
+| Style | Description |
+|-------|-------------|
+| Professional | Clean, corporate, minimal design |
+| Vibrant | Colorful, engaging, modern |
+| Educational | Clear hierarchy, learning-focused |
+| Playful | Fun, illustrated, cartoon-style |
+| Technical | Detailed, precise, schematic |
+| Minimalist | Simple, focused, whitespace |
+
+**Aspect Ratios:**
+- Square (1:1) - Social media, thumbnails
+- Landscape 16:9 - Presentations, YouTube
+- Landscape 4:3 - Blog posts, articles
+- Portrait 9:16 - Stories, mobile content
+- Ultra-wide 21:9 - Banners, headers
+
+**Resolution:**
+- 1K - Standard (default, fastest)
+- 2K - High Quality
+- 4K - Ultra HD (best quality)
+
+**Output Format:**
+- PNG - Best quality, supports transparency
+- JPEG - Smaller file size
+- WebP - Modern format, good compression
+
+### **AI Prompt Enhancement**
+
+Enable the "AI Prompt Enhancement" toggle to let AI improve your description:
+
+1. **Enter your basic idea** in the prompt field
+2. **Enable the toggle** - button changes to "Enhance Prompt"
+3. **Click Enhance Prompt** - AI generates a detailed 1500-2000 word description
+4. **Review and edit** the enhanced prompt in the editable text area
+5. **Click Re-Enhance** if you want a different version
+6. **Click Generate Image** when satisfied
+
+The enhanced prompt includes:
+- Overall concept and message
+- Visual layout and composition details
+- Typography and text element specifications
+- Color palette with specific colors
+- Icons, illustrations, and graphics details
+- Detailed content section breakdowns
+
+### **Best Practices**
+
+#### **Writing Effective Prompts**
+- **Be Specific**: Include exact data, numbers, and text
+- **Describe Layout**: Top, center, bottom, left, right positioning
+- **Mention Colors**: Specify color schemes or brand colors
+- **Include Style Cues**: "modern", "hand-drawn", "corporate"
+- **Specify Audience**: "for children", "for executives", "for students"
+
+#### **Content Type Tips**
+
+**For Infographics:**
+- Include specific statistics and numbers
+- Mention timeline or flow direction
+- Specify chart types (bar, pie, line)
+
+**For Flowcharts:**
+- Define start and end points
+- List decision points and outcomes
+- Specify connection styles (arrows, lines)
+
+**For Kids Content:**
+- Use simple language in prompts
+- Mention "cartoon-style" or "friendly characters"
+- Request bright, cheerful colors
+
+**For Technical Diagrams:**
+- List all components and connections
+- Specify layer structure (frontend, backend, database)
+- Include protocol or data flow labels
 
 ## 🎨 Magix - AI Image Enhancement
 
@@ -504,8 +576,9 @@ View current subscription:
 #### **Dynamic Credit System**
 Understanding credit costs (configurable by administrators):
 - **AI Images**: Default 1 credit per generation
-- **Banners**: Default 0.5 credits per creation
+- **Explainers**: Default 1 credit per visual
 - **Magix Edits**: Default 1 credit per edit
+- **Virtual Try-On**: Default 1 credit per try-on
 - **LoRA Training**: Default 40 credits per training session
 
 **Real-time Updates**: Credit costs may be adjusted by administrators and will update automatically across all interfaces.
@@ -514,7 +587,7 @@ Understanding credit costs (configurable by administrators):
 Track your usage:
 - **Credits Used**: Current month consumption with dynamic cost calculations
 - **Credits Remaining**: Real-time balance updates
-- **Feature Usage**: Breakdown by image type (AI Images, Banners, Magix, LoRA)
+- **Feature Usage**: Breakdown by feature type (AI Images, Explainers, Magix, Virtual, LoRA)
 - **Images Generated**: Total count
 - **Storage Used**: Gallery space
 - **Next Reset**: When credits refresh based on your subscription date

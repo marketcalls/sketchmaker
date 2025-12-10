@@ -61,8 +61,8 @@ Welcome to **SketchMaker AI**! This guide will help you get up and running quick
 
 3. **Use Different Sizes**
    - Social media posts
-   - Blog banners
-   - Logo creation
+   - Presentation graphics
+   - Infographics and explainers
 
 ## 🔧 For Administrators
 
@@ -150,11 +150,12 @@ Size: Instagram Post Square (1080x1080)
 Style: Modern
 ```
 
-**Blog Banner**
+**Explainer Visual**
 ```
-Prompt: "Technology concept with circuit boards and code"
-Size: Blog Banner (1280x640)
-Style: Tech/Modern
+Prompt: "How machine learning works - showing data input, model training, and predictions"
+Size: Landscape 16:9
+Style: Educational
+Use: Explainer Tool for infographic-style output
 ```
 
 **Logo Creation**

@@ -241,8 +241,9 @@ For individual users:
 #### **Credit Cost Management**
 Configure credit costs per feature in real-time:
 - **AI Images**: Adjust credit cost per image generation (default: 1.0)
-- **Banners**: Configure credit cost per banner creation (default: 0.5)
+- **Explainers**: Configure credit cost per explainer visual (default: 1.0)
 - **Magix Edits**: Set credit cost per image edit (default: 1.0)
+- **Virtual Try-On**: Set credit cost per virtual try-on (default: 1.0)
 - **LoRA Training**: Define credit cost per training session (default: 40.0)
 
 #### **Configuration Interface**
@@ -258,13 +259,13 @@ The system automatically calculates feature availability per plan:
 Example with current defaults:
 Free Plan (3 credits):
 - AI Images: 3 (1 credit each)
-- Banners: 6 (0.5 credits each)
+- Explainers: 3 (1 credit each)
 - Magix Edits: 3 (1 credit each)
 - LoRA Training: 0 (40 credits each)
 
 Premium Plan (100 credits):
 - AI Images: 100 (1 credit each)
-- Banners: 200 (0.5 credits each)
+- Explainers: 100 (1 credit each)
 - Magix Edits: 100 (1 credit each)
 - LoRA Training: 2 (40 credits each)
 ```

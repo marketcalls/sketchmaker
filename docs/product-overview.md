@@ -16,7 +16,7 @@
 ### 🚀 **Advanced Features**
 - **Intelligent Prompt Enhancement** - AI-powered prompt optimization
 - **Custom LoRA Training** - Train personalized AI models
-- **Banner & Logo Generation** - Specialized tools for branding
+- **Explainer Tool** - Create infographics, diagrams, and visual explanations
 - **Multi-Format Export** - WEBP, PNG, JPEG support
 - **Batch Processing** - Generate multiple variations
 - **Real-time Preview** - Instant feedback and adjustments
@@ -80,14 +80,14 @@
 
 ### **Marketing & Branding**
 - **Social Media Content** - Instagram posts, Twitter headers
-- **Marketing Materials** - Banners, advertisements, flyers
+- **Marketing Materials** - Infographics, advertisements, flyers
 - **Brand Assets** - Logos, icons, brand illustrations
 - **Website Graphics** - Hero images, backgrounds, icons
 
 ### **E-commerce & Product**
 - **Product Mockups** - Lifestyle and product shots
 - **Category Images** - Visual category representations
-- **Promotional Graphics** - Sale banners, featured products
+- **Promotional Graphics** - Sale visuals, featured products
 - **User-Generated Content** - Customer story illustrations
 
 ### **Content & Publishing**

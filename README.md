@@ -148,15 +148,30 @@ Nano Studio includes intelligent image optimization that automatically processes
 - **Batch Processing**: Handle multiple images simultaneously
 - **Real-time Progress**: Visual progress tracking with descriptive updates
 
-### 🎯 Banner Generation
-- SVG banner creation with precise control
-- Multiple style presets (modern, minimalist, artistic, corporate, playful, tech, elegant)
-- Dynamic text alignment and positioning
-- Automatic viewBox and preserveAspectRatio handling
-- Support for gradients, patterns, and effects
-- Auto-conversion to PNG, WebP, JPEG formats
+### 🎯 Explainer Tool - Visual Content Creation
+**Create stunning infographics, diagrams, and visual explanations with AI**
 
-![AI Generated Banner](https://marketcalls.in/wp-content/uploads/2024/08/Converge-2024.jpg)
+Transform complex ideas into professional visual content using the Nano Banana Pro AI model with support for 2000+ word detailed prompts.
+
+#### Content Types:
+- **Concept Explainer**: Educational breakdowns of complex topics
+- **Infographic**: Data visualization, statistics, timelines
+- **Flowchart/Diagram**: Process flows, decision trees, architectures
+- **Kids Explainer**: Child-friendly illustrations with simple language
+- **Technical Diagram**: System architectures, workflows, code concepts
+- **Comparison Chart**: Side-by-side comparisons, pros/cons
+- **Step-by-Step Guide**: Numbered tutorials, how-to guides
+- **Startup Pitchdeck**: Investor presentations, startup visuals
+
+#### Key Features:
+- **AI Prompt Enhancement**: Optional AI-powered prompt improvement for better results
+- **2000+ Word Prompts**: Detailed descriptions for complex visuals
+- **Multiple Visual Styles**: Professional, Vibrant, Educational, Playful, Technical, Minimalist
+- **Flexible Aspect Ratios**: Square (1:1), Landscape (16:9, 4:3), Portrait (9:16), Ultra-wide (21:9)
+- **Resolution Options**: 1K, 2K, 4K output quality
+- **Multiple Formats**: PNG, JPEG, WebP export
+
+![AI Generated Infographic](https://marketcalls.in/wp-content/uploads/2024/08/Converge-2024.jpg)
 
 ### 🎓 Custom LoRA Training
 - Upload 5-20 images for custom style training
@@ -505,7 +520,7 @@ Configure in **Admin → Email Settings**:
 #### Dynamic Credit System
 - **Configurable Costs**: Administrators can adjust credit costs per feature
   - AI Images: Default 1 credit (configurable)
-  - Banners: Default 0.5 credits (configurable)
+  - Explainers: Default 1 credit (configurable)
   - Magix Edits: Default 1 credit (configurable)
   - Virtual Try-On: Default 1 credit (configurable)
   - LoRA Training: Default 40 credits (configurable)
@@ -520,11 +535,11 @@ Configure in **Admin → Email Settings**:
 1. **Register/Login**: Create account or login with Google
 2. **Automatic Free Plan**: Get 3 credits automatically upon registration
 3. **Check Credits**: View remaining credits on dashboard
-4. **Generate Images**: 
+4. **Generate Images**:
    - Enter prompt description
    - Select model and parameters
    - Click generate (uses 1 credit)
-5. **Create Banners**: Design SVG banners with AI (uses 0.5 credits)
+5. **Create Explainers**: Design infographics and visual content with AI (uses 1 credit)
 6. **Edit Images**: Use Magix for inpainting (uses 1 credit)
 7. **Train Models**: Upload images for custom LoRA (uses 40 credits)
 8. **View Gallery**: Access all your creations

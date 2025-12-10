@@ -107,25 +107,42 @@ Print Ready: 300 DPI options
 
 ## 🏗️ Specialized Tools
 
-### **🎯 Banner Generator**
+### **🎯 Explainer Tool - Visual Content Creation**
 
-#### **Template-Based Creation**
-- Pre-designed layouts for common use cases
-- Automatic text overlay capabilities
-- Brand color integration
-- Multiple size variations
+**Transform complex ideas into professional visual content using AI**
 
-#### **Smart Composition**
-- Automatic layout optimization
-- Text-safe area detection
-- Logo placement suggestions
-- Background/foreground balance
+#### **Content Types**
+| Type | Description | Best For |
+|------|-------------|----------|
+| **Concept Explainer** | Educational breakdowns | Complex topics, learning materials |
+| **Infographic** | Data visualization | Statistics, timelines, reports |
+| **Flowchart/Diagram** | Process flows | Workflows, decision trees |
+| **Kids Explainer** | Child-friendly visuals | Educational content for children |
+| **Technical Diagram** | System architectures | Code concepts, workflows |
+| **Comparison Chart** | Side-by-side analysis | Product comparisons, pros/cons |
+| **Step-by-Step Guide** | Numbered tutorials | How-to guides, instructions |
+| **Startup Pitchdeck** | Investor presentations | Startup visuals, pitch decks |
 
-#### **Export Options**
-- Vector formats (SVG)
-- High-resolution raster
-- Web-optimized versions
-- Print-ready files
+#### **AI Prompt Enhancement**
+- **2000+ Word Support**: Detailed prompts for complex visuals
+- **Automatic Enhancement**: AI improves your prompts for better results
+- **Editable Output**: Review and modify enhanced prompts before generation
+- **Re-Enhancement**: Iterate on prompts until satisfied
+
+#### **Visual Styles**
+| Style | Description |
+|-------|-------------|
+| **Professional** | Clean, corporate, minimal design |
+| **Vibrant** | Colorful, engaging, modern |
+| **Educational** | Clear hierarchy, learning-focused |
+| **Playful** | Fun, illustrated, cartoon-style |
+| **Technical** | Detailed, precise, schematic |
+| **Minimalist** | Simple, focused, whitespace |
+
+#### **Output Options**
+- **Aspect Ratios**: Square (1:1), Landscape (16:9, 4:3), Portrait (9:16), Ultra-wide (21:9)
+- **Resolutions**: 1K (Standard), 2K (High Quality), 4K (Ultra HD)
+- **Formats**: PNG (best quality), JPEG (smaller size), WebP (modern format)
 
 ### **🎨 Magix Image Editor**
 
@@ -210,7 +227,7 @@ Learning Rate: Optimized automatically
 #### **Dynamic Credit Costs**
 ```
 AI Images: 1 credit (configurable by admin)
-Banners: 0.5 credits (configurable by admin)
+Explainers: 1 credit (configurable by admin)
 Magix Edits: 1 credit (configurable by admin)
 LoRA Training: 40 credits (configurable by admin)
 ```
