@@ -151,8 +151,8 @@ modelSelect?.addEventListener('change', function(e) {
     // Get Z-Image controls
     const zImageSizeControl = document.getElementById('zImageSizeControl');
 
-    // Reset all controls first
-    imageSizeControl?.classList.remove('hidden');
+    // Reset all controls first - hide all model-specific controls
+    imageSizeControl?.classList.add('hidden');
     aspectRatioControl?.classList.add('hidden');
     loraInputs?.classList.add('hidden');
     if (numInferenceStepsControl) numInferenceStepsControl.classList.remove('hidden');
@@ -181,8 +181,6 @@ modelSelect?.addEventListener('change', function(e) {
     switch(e.target.value) {
         case 'fal-ai/z-image/turbo/lora':
             // Hide controls that don't apply to Z-Image
-            imageSizeControl?.classList.add('hidden');
-            aspectRatioControl?.classList.add('hidden');
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
 
@@ -191,8 +189,6 @@ modelSelect?.addEventListener('change', function(e) {
             break;
         case 'fal-ai/nano-banana-pro':
             // Hide controls that don't apply to Nano Banana Pro
-            imageSizeControl?.classList.add('hidden');
-            aspectRatioControl?.classList.add('hidden');
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
 
@@ -203,8 +199,6 @@ modelSelect?.addEventListener('change', function(e) {
             break;
         case 'fal-ai/bytedance/seedream/v4/text-to-image':
             // Hide controls that don't apply to Seedream V4
-            imageSizeControl?.classList.add('hidden');
-            aspectRatioControl?.classList.add('hidden');
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
 
@@ -220,8 +214,6 @@ modelSelect?.addEventListener('change', function(e) {
             break;
         case 'fal-ai/flux-pro/kontext/max/text-to-image':
             // Hide controls that don't apply to Flux Kontext Max
-            imageSizeControl?.classList.add('hidden');
-            aspectRatioControl?.classList.add('hidden');
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
 
@@ -229,19 +221,33 @@ modelSelect?.addEventListener('change', function(e) {
             fluxKontextAspectRatioControl?.classList.remove('hidden');
             break;
         case 'fal-ai/flux-pro/v1.1-ultra':
-            imageSizeControl?.classList.add('hidden');
-            aspectRatioControl?.classList.remove('hidden');
+            // Hide controls that don't apply to Flux Pro Ultra
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Flux Pro Ultra specific controls
+            aspectRatioControl?.classList.remove('hidden');
             break;
         case 'fal-ai/flux-lora':
+            // Hide controls that don't apply to Flux Lora
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Flux Lora specific controls
+            flux2FlexImageSizeControl?.classList.remove('hidden');
             loraInputs?.classList.remove('hidden');
             updateLoraDropdown(); // Fetch and update LoRA options
             break;
+        case 'fal-ai/flux-realism':
+            // Hide controls that don't apply to Flux Realism
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Flux Realism specific controls (uses same size control as Flux 2 Flex)
+            flux2FlexImageSizeControl?.classList.remove('hidden');
+            break;
         case 'fal-ai/flux-2-flex':
             // Hide controls that don't apply to Flux 2 Flex
-            imageSizeControl?.classList.add('hidden');
-            aspectRatioControl?.classList.add('hidden');
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
 
@@ -261,20 +267,24 @@ modelSelect?.addEventListener('change', function(e) {
             if (enhancedCharacterCount) enhancedCharacterCount.classList.remove('hidden');
             break;
         case 'fal-ai/imagen4/preview':
-            imageSizeControl?.classList.add('hidden');
-            imagen4AspectRatioControl?.classList.remove('hidden');
-            imagen4NegativePromptControl?.classList.remove('hidden');
+            // Hide controls that don't apply to Imagen4
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Imagen4 specific controls
+            imagen4AspectRatioControl?.classList.remove('hidden');
+            imagen4NegativePromptControl?.classList.remove('hidden');
             break;
         case 'fal-ai/ideogram/v3':
-            imageSizeControl?.classList.add('hidden');
+            // Hide controls that don't apply to Ideogram V3
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Ideogram V3 specific controls
             ideogramV3ImageSizeControl?.classList.remove('hidden');
             ideogramV3ExpandPromptControl?.classList.remove('hidden');
             ideogramV3NegativePromptControl?.classList.remove('hidden');
             ideogramV3RenderingSpeedControl?.classList.remove('hidden');
-            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
-            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
             break;
     }
     
@@ -285,9 +295,16 @@ modelSelect?.addEventListener('change', function(e) {
 
 // Initialize controls based on default model
 window.addEventListener('DOMContentLoaded', function() {
+    // Hide imageSizeControl by default on page load
+    const imageSizeControl = document.getElementById('imageSizeControl');
+    if (imageSizeControl) {
+        imageSizeControl.classList.add('hidden');
+    }
+
     const model = document.getElementById('model');
     if (model) {
-        const event = new Event('change');
+        // Trigger change event to set up controls for default model
+        const event = new Event('change', { bubbles: true });
         model.dispatchEvent(event);
     }
 
