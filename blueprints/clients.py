@@ -77,10 +77,12 @@ class LiteLLMClient:
         'gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5-pro', 'gpt-5.1',
         'o1', 'o1-mini', 'o1-preview', 'o3', 'o3-mini', 'o3-pro', 'o4-mini'
     ]
-    # Groq reasoning models (gpt-oss uses different reasoning_effort values)
+    # Groq reasoning models (uses 'none', 'default', 'low', 'medium', 'high')
     GROQ_REASONING_MODELS = ['gpt-oss-120b', 'gpt-oss-20b']
+    # Cerebras reasoning models
+    CEREBRAS_REASONING_MODELS = ['gpt-oss-120b', 'qwen-3-32b']
     # Combined for detection
-    REASONING_MODELS = OPENAI_REASONING_MODELS + GROQ_REASONING_MODELS
+    REASONING_MODELS = OPENAI_REASONING_MODELS + GROQ_REASONING_MODELS + CEREBRAS_REASONING_MODELS
 
     def generate_completion(self, system_content, user_content, model,
                           temperature=0.7, max_tokens=500):
@@ -118,10 +120,13 @@ class LiteLLMClient:
                 # Different providers support different reasoning_effort values:
                 # - OpenAI: 'minimal', 'low', 'medium', 'high' (NO 'none')
                 # - Groq: 'none', 'default', 'low', 'medium', 'high' (NO 'minimal')
+                # - Cerebras: 'low', 'medium', 'high' (check their docs)
                 if self.provider_name == 'Groq':
                     extra_params['reasoning_effort'] = 'low'  # Groq doesn't support 'minimal'
                 elif self.provider_name == 'OpenAI':
                     extra_params['reasoning_effort'] = 'minimal'  # OpenAI supports 'minimal'
+                elif self.provider_name == 'Cerebras':
+                    extra_params['reasoning_effort'] = 'low'  # Cerebras uses low/medium/high
                 else:
                     extra_params['reasoning_effort'] = 'low'  # Safe default for other providers
                 print(f"[DEBUG] Reasoning model detected, reasoning_effort={extra_params['reasoning_effort']}")

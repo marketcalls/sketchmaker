@@ -46,47 +46,42 @@ else:
     cerebras_id = result[0]
     print(f"Cerebras provider ID: {cerebras_id}\n")
 
-# Cerebras models to add
+# Cerebras models to add - Latest as of December 2025
 cerebras_models = [
     {
-        "name": "qwen3-coder-480b",
-        "display_name": "Qwen3 Coder 480B",
-        "description": "Top coding model at 2,000 tokens/sec",
+        "name": "zai-glm-4.6",
+        "display_name": "ZAI GLM 4.6",
+        "description": "Latest GLM model on Cerebras",
         "is_latest": True,
         "sort_order": 1
     },
     {
-        "name": "qwen3-235b-a22b",
-        "display_name": "Qwen3 235B A22B",
-        "description": "MoE with 22B active params, 262K context",
+        "name": "llama-3.3-70b",
+        "display_name": "Llama 3.3 70B",
+        "description": "Multilingual Llama with ultra-fast inference",
         "is_latest": True,
         "sort_order": 2
     },
     {
-        "name": "qwen3-32b",
-        "display_name": "Qwen3 32B",
-        "description": "Real-time reasoning at 60x faster than competitors",
+        "name": "qwen-3-235b-a22b-instruct-2507",
+        "display_name": "Qwen 3 235B A22B Instruct",
+        "description": "MoE with 22B active params, 262K context",
         "is_latest": True,
         "sort_order": 3
     },
     {
-        "name": "llama-4-maverick",
-        "display_name": "Llama 4 Maverick",
-        "description": "400B Llama 4 at 2,500+ tokens/sec world record",
+        "name": "qwen-3-32b",
+        "display_name": "Qwen 3 32B",
+        "description": "Fast reasoning model, 60x faster than competitors",
         "is_latest": True,
         "sort_order": 4
     },
     {
-        "name": "llama-3.3-70b",
-        "display_name": "Llama 3.3 70B",
-        "description": "Multilingual Llama with fast inference",
+        "name": "gpt-oss-120b",
+        "display_name": "GPT-OSS 120B",
+        "description": "OpenAI's open-weight 120B reasoning model",
+        "is_latest": True,
         "sort_order": 5
-    },
-    {
-        "name": "deepseek-r1-distill-llama-70b",
-        "display_name": "DeepSeek R1 Distill 70B",
-        "description": "DeepSeek reasoning model on Cerebras",
-        "sort_order": 6
     }
 ]
 
