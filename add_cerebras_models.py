@@ -36,8 +36,8 @@ result = c.fetchone()
 if not result:
     print("Cerebras provider not found, creating it...")
     c.execute("""
-        INSERT INTO api_provider (name, display_name, api_base_url, is_active)
-        VALUES ('Cerebras', 'Cerebras', 'https://api.cerebras.ai/v1', 1)
+        INSERT INTO api_provider (name, is_active)
+        VALUES ('Cerebras', 1)
     """)
     conn.commit()
     cerebras_id = c.lastrowid
