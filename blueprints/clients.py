@@ -111,9 +111,16 @@ class LiteLLMClient:
             is_reasoning_model = any(rm in model_base for rm in self.REASONING_MODELS)
             extra_params = {}
             if is_reasoning_model:
-                # Use minimal reasoning to save tokens and get faster output
-                extra_params['reasoning_effort'] = 'minimal'
-                print(f"[DEBUG] Reasoning model detected, reasoning_effort=minimal")
+                # Different providers support different reasoning_effort values:
+                # - OpenAI: 'minimal', 'low', 'medium', 'high' (NO 'none')
+                # - Groq: 'none', 'default', 'low', 'medium', 'high' (NO 'minimal')
+                if self.provider_name == 'Groq':
+                    extra_params['reasoning_effort'] = 'low'  # Groq doesn't support 'minimal'
+                elif self.provider_name == 'OpenAI':
+                    extra_params['reasoning_effort'] = 'minimal'  # OpenAI supports 'minimal'
+                else:
+                    extra_params['reasoning_effort'] = 'low'  # Safe default for other providers
+                print(f"[DEBUG] Reasoning model detected, reasoning_effort={extra_params['reasoning_effort']}")
 
             # Build messages
             messages = []
