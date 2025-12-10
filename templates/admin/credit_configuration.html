@@ -52,25 +52,25 @@
                            required>
                 </div>
 
-                <!-- Banners -->
+                <!-- Explainers -->
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text font-semibold">
                             <svg class="w-5 h-5 inline mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4h10m-10 0V6a1 1 0 011-1h8a1 1 0 011 1v2m-10 0v10a1 1 0 001 1h8a1 1 0 001-1V8"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                             </svg>
-                            Banners
+                            Explainers
                         </span>
-                        <span class="label-text-alt">Credits per banner creation</span>
+                        <span class="label-text-alt">Credits per explainer visual</span>
                     </label>
-                    <input type="number" 
-                           name="banners" 
-                           id="credit_cost_banners"
-                           value="{{ settings.credit_cost_banners }}" 
-                           min="0.1" 
-                           max="100" 
-                           step="0.1" 
-                           class="input input-bordered" 
+                    <input type="number"
+                           name="explainers"
+                           id="credit_cost_explainers"
+                           value="{{ settings.credit_cost_explainers }}"
+                           min="0.1"
+                           max="100"
+                           step="0.1"
+                           class="input input-bordered"
                            required>
                 </div>
 
@@ -171,18 +171,18 @@
                     <div class="stat-title">Free Plan (3 Credits)</div>
                     <div class="stat-desc text-sm space-y-1" id="freePlanImpact">
                         <div>• <span id="freeImages">3</span> AI Images</div>
-                        <div>• <span id="freeBanners">6</span> Banners</div>
+                        <div>• <span id="freeExplainers">3</span> Explainers</div>
                         <div>• <span id="freeMagix">3</span> Magix Edits</div>
                         <div>• <span id="freeLora">0</span> LoRA Trainings</div>
                     </div>
                 </div>
-                
+
                 <!-- Premium Plan Impact -->
                 <div class="stat bg-base-200 rounded-lg">
                     <div class="stat-title">Premium Plan (100 Credits)</div>
                     <div class="stat-desc text-sm space-y-1" id="premiumPlanImpact">
                         <div>• <span id="premiumImages">100</span> AI Images</div>
-                        <div>• <span id="premiumBanners">200</span> Banners</div>
+                        <div>• <span id="premiumExplainers">100</span> Explainers</div>
                         <div>• <span id="premiumMagix">100</span> Magix Edits</div>
                         <div>• <span id="premiumLora">2</span> LoRA Trainings</div>
                     </div>
@@ -193,7 +193,7 @@
                     <div class="stat-title">Professional Plan (1000 Credits)</div>
                     <div class="stat-desc text-sm space-y-1" id="proPlanImpact">
                         <div>• <span id="proImages">1000</span> AI Images</div>
-                        <div>• <span id="proBanners">2000</span> Banners</div>
+                        <div>• <span id="proExplainers">1000</span> Explainers</div>
                         <div>• <span id="proMagix">1000</span> Magix Edits</div>
                         <div>• <span id="proLora">25</span> LoRA Trainings</div>
                     </div>
@@ -207,7 +207,7 @@
 // Store original values for reset
 const originalValues = {
     images: {{ settings.credit_cost_images }},
-    banners: {{ settings.credit_cost_banners }},
+    explainers: {{ settings.credit_cost_explainers }},
     magix: {{ settings.credit_cost_magix }},
     lora_training: {{ settings.credit_cost_lora_training }}
 };
@@ -215,36 +215,36 @@ const originalValues = {
 // Update impact preview when values change
 function updateImpactPreview() {
     const images = parseFloat(document.getElementById('credit_cost_images').value) || 1;
-    const banners = parseFloat(document.getElementById('credit_cost_banners').value) || 0.5;
+    const explainers = parseFloat(document.getElementById('credit_cost_explainers').value) || 1;
     const magix = parseFloat(document.getElementById('credit_cost_magix').value) || 1;
     const lora = parseFloat(document.getElementById('credit_cost_lora_training').value) || 40;
-    
+
     // Free plan (3 credits)
     document.getElementById('freeImages').textContent = Math.floor(3 / images);
-    document.getElementById('freeBanners').textContent = Math.floor(3 / banners);
+    document.getElementById('freeExplainers').textContent = Math.floor(3 / explainers);
     document.getElementById('freeMagix').textContent = Math.floor(3 / magix);
     document.getElementById('freeLora').textContent = Math.floor(3 / lora);
-    
+
     // Premium plan (100 credits)
     document.getElementById('premiumImages').textContent = Math.floor(100 / images);
-    document.getElementById('premiumBanners').textContent = Math.floor(100 / banners);
+    document.getElementById('premiumExplainers').textContent = Math.floor(100 / explainers);
     document.getElementById('premiumMagix').textContent = Math.floor(100 / magix);
     document.getElementById('premiumLora').textContent = Math.floor(100 / lora);
-    
+
     // Professional plan (1000 credits)
     document.getElementById('proImages').textContent = Math.floor(1000 / images);
-    document.getElementById('proBanners').textContent = Math.floor(1000 / banners);
+    document.getElementById('proExplainers').textContent = Math.floor(1000 / explainers);
     document.getElementById('proMagix').textContent = Math.floor(1000 / magix);
     document.getElementById('proLora').textContent = Math.floor(1000 / lora);
 }
 
 // Add event listeners to inputs
 document.addEventListener('DOMContentLoaded', function() {
-    const inputs = ['credit_cost_images', 'credit_cost_banners', 'credit_cost_magix', 'credit_cost_lora_training'];
+    const inputs = ['credit_cost_images', 'credit_cost_explainers', 'credit_cost_magix', 'credit_cost_lora_training'];
     inputs.forEach(id => {
         document.getElementById(id).addEventListener('input', updateImpactPreview);
     });
-    
+
     // Initial update
     updateImpactPreview();
 });
@@ -263,7 +263,7 @@ document.getElementById('creditConfigForm').addEventListener('submit', function(
     const formData = new FormData(this);
     const creditCosts = {
         images: parseFloat(formData.get('images')),
-        banners: parseFloat(formData.get('banners')),
+        explainers: parseFloat(formData.get('explainers')),
         magix: parseFloat(formData.get('magix')),
         lora_training: parseFloat(formData.get('lora_training'))
     };
@@ -301,7 +301,7 @@ document.getElementById('creditConfigForm').addEventListener('submit', function(
 // Reset form to original values
 function resetForm() {
     document.getElementById('credit_cost_images').value = originalValues.images;
-    document.getElementById('credit_cost_banners').value = originalValues.banners;
+    document.getElementById('credit_cost_explainers').value = originalValues.explainers;
     document.getElementById('credit_cost_magix').value = originalValues.magix;
     document.getElementById('credit_cost_lora_training').value = originalValues.lora_training;
     updateImpactPreview();

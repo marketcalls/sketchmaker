@@ -67,6 +67,10 @@ MIGRATIONS = {
         'description': 'LiteLLM providers (xAI, Cerebras, OpenRouter)',
         'depends_on': 'add_credit_security_constraints',
     },
+    'rename_banners_to_explainers': {
+        'description': 'Rename banners to explainers',
+        'depends_on': 'add_new_litellm_providers',
+    },
 }
 
 
@@ -135,6 +139,12 @@ def get_applied_migrations(cursor):
         cols = get_table_columns(cursor, 'api_settings')
         if 'xai_api_key' in cols and 'cerebras_api_key' in cols:
             applied.add('add_new_litellm_providers')
+
+    # Check for banners to explainers rename
+    if table_exists(cursor, 'system_settings'):
+        cols = get_table_columns(cursor, 'system_settings')
+        if 'credit_cost_explainers' in cols:
+            applied.add('rename_banners_to_explainers')
 
     return applied
 
@@ -381,6 +391,23 @@ def run_migrations():
                     print("       + Added api_settings.openrouter_api_key column")
 
             migrations_applied.append('add_new_litellm_providers')
+
+        # ============================================================
+        # Migration: rename_banners_to_explainers
+        # ============================================================
+        if 'rename_banners_to_explainers' in pending:
+            print("\n[7/7] Applying: rename_banners_to_explainers")
+
+            if table_exists(cursor, 'system_settings'):
+                columns = get_table_columns(cursor, 'system_settings')
+
+                if 'credit_cost_banners' in columns and 'credit_cost_explainers' not in columns:
+                    # SQLite doesn't support RENAME COLUMN directly in older versions
+                    # We need to recreate the table with the new column name
+                    cursor.execute("ALTER TABLE system_settings RENAME COLUMN credit_cost_banners TO credit_cost_explainers")
+                    print("       + Renamed system_settings.credit_cost_banners to credit_cost_explainers")
+
+            migrations_applied.append('rename_banners_to_explainers')
 
         # Update alembic version to latest
         if migrations_applied:

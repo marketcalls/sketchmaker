@@ -57,7 +57,7 @@ def create_app():
         from blueprints.download import download_bp
         from blueprints.admin import admin
         from blueprints.training import training_bp
-        from blueprints.banner import banner
+        from blueprints.explainer import explainer
         from blueprints.image_generator import image_generator_bp
         from blueprints.magix import magix_bp
         from blueprints.virtual import virtual_bp
@@ -75,7 +75,7 @@ def create_app():
         app.register_blueprint(admin_subscription_bp)
         app.register_blueprint(admin_api_bp)
         app.register_blueprint(training_bp)
-        app.register_blueprint(banner)
+        app.register_blueprint(explainer)
         app.register_blueprint(image_generator_bp)
         app.register_blueprint(magix_bp)
         app.register_blueprint(virtual_bp)

@@ -6,7 +6,7 @@ from .download import download_bp
 from .admin import admin
 from .magix import magix_bp
 from .training import training_bp
-from .banner import banner
+from .explainer import explainer
 from .image_generator import image_generator_bp
 
 __all__ = [
@@ -18,6 +18,6 @@ __all__ = [
     'admin',
     'magix_bp',
     'training_bp',
-    'banner',
+    'explainer',
     'image_generator_bp'
 ]

@@ -7,7 +7,7 @@ class SystemSettings(db.Model):
     
     # Credit configuration
     credit_cost_images = db.Column(db.Float, default=1.0)
-    credit_cost_banners = db.Column(db.Float, default=0.5)
+    credit_cost_explainers = db.Column(db.Float, default=1.0)
     credit_cost_magix = db.Column(db.Float, default=1.0)
     credit_cost_virtual = db.Column(db.Float, default=1.0)
     credit_cost_lora_training = db.Column(db.Float, default=40.0)
@@ -28,7 +28,7 @@ class SystemSettings(db.Model):
         """Get credit cost for a specific feature"""
         feature_map = {
             'images': self.credit_cost_images,
-            'banners': self.credit_cost_banners,
+            'explainers': self.credit_cost_explainers,
             'magix': self.credit_cost_magix,
             'virtual': self.credit_cost_virtual,
             'lora_training': self.credit_cost_lora_training
@@ -39,7 +39,7 @@ class SystemSettings(db.Model):
         """Get all credit costs as a dictionary"""
         return {
             'images': self.credit_cost_images,
-            'banners': self.credit_cost_banners,
+            'explainers': self.credit_cost_explainers,
             'magix': self.credit_cost_magix,
             'virtual': self.credit_cost_virtual,
             'lora_training': self.credit_cost_lora_training
@@ -49,14 +49,14 @@ class SystemSettings(db.Model):
         """Update credit costs from a dictionary"""
         if 'images' in credit_costs:
             self.credit_cost_images = float(credit_costs['images'])
-        if 'banners' in credit_costs:
-            self.credit_cost_banners = float(credit_costs['banners'])
+        if 'explainers' in credit_costs:
+            self.credit_cost_explainers = float(credit_costs['explainers'])
         if 'magix' in credit_costs:
             self.credit_cost_magix = float(credit_costs['magix'])
         if 'virtual' in credit_costs:
             self.credit_cost_virtual = float(credit_costs['virtual'])
         if 'lora_training' in credit_costs:
             self.credit_cost_lora_training = float(credit_costs['lora_training'])
-        
+
         self.updated_at = datetime.utcnow()
         db.session.commit()

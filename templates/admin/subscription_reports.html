@@ -35,9 +35,9 @@
         </div>
         
         <div class="stat">
-            <div class="stat-title">Banners Created</div>
-            <div class="stat-value text-green-500">{{ feature_usage.total_banners or 0 }}</div>
-            <div class="stat-desc">{{ ((feature_usage.total_banners or 0) * system_settings.credit_cost_banners)|round(1) }} credits used</div>
+            <div class="stat-title">Explainers Created</div>
+            <div class="stat-value text-green-500">{{ feature_usage.total_explainers or 0 }}</div>
+            <div class="stat-desc">{{ ((feature_usage.total_explainers or 0) * system_settings.credit_cost_explainers)|round(1) }} credits used</div>
         </div>
         
         <div class="stat">
@@ -164,22 +164,22 @@
             <div class="card-body">
                 <h3 class="card-title text-green-500">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4h10m-10 0V6a1 1 0 011-1h8a1 1 0 011 1v2m-10 0v10a1 1 0 001 1h8a1 1 0 001-1V8"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                     </svg>
-                    Top Banner Users
+                    Top Explainer Users
                 </h3>
                 <div class="space-y-2">
-                    <div class="text-xs text-base-content/60 mb-2">{{ system_settings.credit_cost_banners }} {{ 'credit' if system_settings.credit_cost_banners == 1 else 'credits' }} per banner</div>
-                    {% for username, usage in top_banner_users %}
+                    <div class="text-xs text-base-content/60 mb-2">{{ system_settings.credit_cost_explainers }} {{ 'credit' if system_settings.credit_cost_explainers == 1 else 'credits' }} per explainer</div>
+                    {% for username, usage in top_explainer_users %}
                     <div class="flex justify-between items-center">
                         <span class="text-sm">{{ username }}</span>
                         <div class="flex items-center gap-1">
                             <span class="badge badge-success badge-sm">{{ usage }}</span>
-                            <span class="text-xs opacity-60">{{ (usage * system_settings.credit_cost_banners)|round(1) }}c</span>
+                            <span class="text-xs opacity-60">{{ (usage * system_settings.credit_cost_explainers)|round(1) }}c</span>
                         </div>
                     </div>
                     {% else %}
-                    <p class="text-sm text-base-content/70">No banner usage this month</p>
+                    <p class="text-sm text-base-content/70">No explainer usage this month</p>
                     {% endfor %}
                 </div>
             </div>

@@ -1,0 +1,599 @@
+{% extends "base.html" %}
+
+{% block title %}Explainer Tool - Create Visual Content - Sketch Maker AI{% endblock %}
+
+{% block content %}
+<div class="min-h-screen">
+    <!-- Header Section -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex items-center space-x-3">
+            <svg class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <div>
+                <h1 class="text-xl sm:text-2xl font-semibold">Explainer Tool</h1>
+                <p class="text-sm text-base-content/60">Create infographics, diagrams, and visual explanations</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div class="card bg-base-200/50 backdrop-blur-lg border border-base-content/10">
+            <div class="card-body p-4 sm:p-6 lg:p-8">
+                <form id="explainerForm" class="space-y-8">
+
+                    <!-- Step 1: Content Type Selection -->
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-semibold mb-2">What would you like to create?</h2>
+                        <p class="text-base-content/60 mb-6">Select the type of visual content that best fits your needs</p>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4" id="contentTypeGrid">
+                            {% for key, template in content_templates.items() %}
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="content_type" value="{{ key }}" class="hidden peer" {% if loop.first %}checked{% endif %}>
+                                <div class="card bg-base-100/70 backdrop-blur-sm border-2 border-base-300/50 hover:border-primary/50 peer-checked:border-primary peer-checked:bg-primary/10 transition-all duration-200 h-full">
+                                    <div class="card-body p-3 sm:p-4 text-center">
+                                        <div class="text-2xl sm:text-3xl mb-2 text-primary">
+                                            <i class="fas fa-{{ template.icon }}"></i>
+                                        </div>
+                                        <h3 class="font-semibold text-xs sm:text-sm">{{ template.name }}</h3>
+                                        <p class="text-xs text-base-content/60 mt-1 hidden sm:block">{{ template.description }}</p>
+                                    </div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Describe Your Content -->
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-semibold mb-2">Describe Your Content</h2>
+                        <p class="text-base-content/60 mb-4">Be as detailed as possible - include topics, data points, structure, and any specific requirements</p>
+
+                        <div class="relative">
+                            <textarea
+                                class="textarea textarea-bordered w-full bg-base-100/70 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/90 transition-all duration-200 min-h-[250px]"
+                                name="prompt"
+                                id="promptInput"
+                                placeholder="Example: Create a visual explainer about how photosynthesis works. Include the main stages (light reaction and Calvin cycle), show the inputs (sunlight, water, CO2) and outputs (glucose, oxygen). Use a plant cell diagram in the center with arrows showing the flow of energy and materials. Add detailed annotations explaining each step of the process..."
+                                maxlength="15000"
+                                rows="12"
+                                required></textarea>
+                            <div class="absolute bottom-3 right-3 text-sm opacity-70">
+                                <span id="charCount">0</span> words / ~2000 max
+                            </div>
+                        </div>
+
+                        <!-- Template Loader -->
+                        <div class="mt-4">
+                            <button type="button" class="btn btn-outline btn-sm gap-2" id="loadTemplateBtn">
+                                <i class="fas fa-file-alt"></i>
+                                Load Example Template
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Style & Settings -->
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-semibold mb-2">Style & Settings</h2>
+                        <p class="text-base-content/60 mb-6">Customize the look and format of your visual</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <!-- Visual Style -->
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-medium">Visual Style</span>
+                                </label>
+                                <select class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm" name="style" id="styleSelect">
+                                    {% for key, style in visual_styles.items() %}
+                                    <option value="{{ key }}" {% if key == 'professional' %}selected{% endif %}>{{ style.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="label">
+                                    <span class="label-text-alt text-base-content/50" id="styleDescription">Clean, corporate, minimal design</span>
+                                </label>
+                            </div>
+
+                            <!-- Aspect Ratio -->
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-medium">Aspect Ratio</span>
+                                </label>
+                                <select class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm" name="aspect_ratio" id="aspectRatioSelect">
+                                    {% for key, ratio in aspect_ratios.items() %}
+                                    <option value="{{ key }}" {% if key == '16:9' %}selected{% endif %}>{{ ratio.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="label">
+                                    <span class="label-text-alt text-base-content/50" id="ratioDescription">Presentations, YouTube</span>
+                                </label>
+                            </div>
+
+                            <!-- Resolution -->
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-medium">Resolution</span>
+                                </label>
+                                <select class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm" name="resolution" id="resolutionSelect">
+                                    <option value="1K" selected>1K - Standard</option>
+                                    <option value="2K">2K - High Quality</option>
+                                    <option value="4K">4K - Ultra HD</option>
+                                </select>
+                                <label class="label">
+                                    <span class="label-text-alt text-base-content/50">Default resolution</span>
+                                </label>
+                            </div>
+
+                            <!-- Output Format -->
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-medium">Output Format</span>
+                                </label>
+                                <select class="select select-bordered w-full bg-base-100/70 backdrop-blur-sm" name="output_format" id="outputFormatSelect">
+                                    <option value="png" selected>PNG - Best Quality</option>
+                                    <option value="jpeg">JPEG - Smaller Size</option>
+                                    <option value="webp">WebP - Modern Format</option>
+                                </select>
+                                <label class="label">
+                                    <span class="label-text-alt text-base-content/50">Best for transparency</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- AI Enhancement Toggle -->
+                        <div class="mt-6 p-4 bg-base-100/50 rounded-lg border border-base-300/30">
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="text-2xl text-primary">
+                                        <i class="fas fa-magic"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">AI Prompt Enhancement</span>
+                                        <p class="text-sm text-base-content/60">Let AI improve your prompt before generating</p>
+                                    </div>
+                                </div>
+                                <input type="checkbox" name="enhance_prompt" id="enhancePrompt" class="toggle toggle-primary toggle-lg">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center pt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-12 gap-2" id="generateBtn">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <span id="generateBtnText">Generate Visual</span>
+                        </button>
+                        <p class="text-sm text-base-content/50 mt-2">1 credit per generation</p>
+                    </div>
+                </form>
+
+                <!-- Enhanced Prompt Container (shown after enhancement) -->
+                <div id="enhancedPromptContainer" class="hidden mt-8">
+                    <div class="card bg-base-200/80 backdrop-blur-md border border-primary/30">
+                        <div class="card-body">
+                            <h3 class="card-title text-primary">
+                                <i class="fas fa-magic mr-2"></i>
+                                Enhanced Prompt
+                            </h3>
+                            <p class="text-sm text-base-content/60 mb-4">AI has improved your prompt. You can edit it before generating.</p>
+                            <div class="relative">
+                                <textarea id="enhancedPromptText"
+                                    class="textarea textarea-bordered w-full bg-base-100/80 backdrop-blur-sm border-base-300/50 hover:border-primary/30 focus:border-primary/50 focus:bg-base-100/95 transition-all duration-200 min-h-[250px]"
+                                    maxlength="15000"
+                                    rows="12"></textarea>
+                                <div class="absolute bottom-3 right-3 text-sm opacity-70">
+                                    <span id="enhancedCharCount">0</span> words
+                                </div>
+                            </div>
+                            <div class="card-actions justify-center mt-6 gap-4">
+                                <button type="button" id="reEnhanceBtn" class="btn btn-outline btn-lg gap-2">
+                                    <i class="fas fa-rotate"></i>
+                                    Re-Enhance
+                                </button>
+                                <button type="button" id="generateFromEnhancedBtn" class="btn btn-primary btn-lg gap-2">
+                                    <i class="fas fa-wand-magic-sparkles"></i>
+                                    Generate Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="hidden mt-8">
+                    <div class="bg-base-200 rounded-lg p-8 text-center">
+                        <div class="loading loading-spinner loading-lg text-primary mb-4"></div>
+                        <h3 class="text-xl font-semibold" id="loadingTitle">Creating your visual...</h3>
+                        <p class="text-base-content/70 mt-2" id="loadingStatus">This may take a moment</p>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="errorState" class="hidden mt-8">
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle text-xl"></i>
+                        <div>
+                            <h3 class="font-bold">Operation Failed</h3>
+                            <div class="text-sm" id="errorMessage"></div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-ghost" id="dismissErrorBtn">Dismiss</button>
+                    </div>
+                </div>
+
+                <!-- Result Section -->
+                <div id="resultSection" class="hidden mt-8">
+                    <div class="bg-base-200 rounded-lg p-4 sm:p-6">
+                        <!-- Image Preview -->
+                        <div id="previewContainer" class="relative mx-auto max-w-4xl group">
+                            <img id="previewImage" src="" alt="Generated visual" class="w-full h-auto rounded-lg shadow-lg">
+
+                            <!-- Hover overlay with download options -->
+                            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-white text-sm" id="imageDimensions"></span>
+                                    <div class="flex gap-2">
+                                        <a id="downloadPng" href="#" download class="btn btn-sm btn-ghost text-white hover:bg-white/20">
+                                            <i class="fas fa-download mr-1"></i> PNG
+                                        </a>
+                                        <a id="downloadWebp" href="#" download class="btn btn-sm btn-ghost text-white hover:bg-white/20">
+                                            <i class="fas fa-download mr-1"></i> WebP
+                                        </a>
+                                        <a id="downloadJpeg" href="#" download class="btn btn-sm btn-ghost text-white hover:bg-white/20">
+                                            <i class="fas fa-download mr-1"></i> JPEG
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap justify-center gap-4 mt-6">
+                            <a id="viewInGallery" href="#" class="btn btn-outline gap-2">
+                                <i class="fas fa-images"></i>
+                                View in Gallery
+                            </a>
+                            <button type="button" class="btn btn-primary gap-2" id="createAnotherBtn">
+                                <i class="fas fa-plus"></i>
+                                Create Another
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template Modal -->
+<dialog id="templateModal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box max-w-3xl">
+        <h3 class="font-bold text-xl mb-4">Example Templates</h3>
+        <p class="text-base-content/60 mb-6">Click on a template to load it into the prompt field</p>
+
+        <div class="space-y-3 max-h-[60vh] overflow-y-auto" id="templateList">
+            <!-- Templates loaded dynamically -->
+        </div>
+
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn">Close</button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    // Content type templates and style descriptions
+    const contentTemplates = {{ content_templates | tojson | safe }};
+    const visualStyles = {{ visual_styles | tojson | safe }};
+    const aspectRatios = {{ aspect_ratios | tojson | safe }};
+
+    // DOM Elements
+    const form = document.getElementById('explainerForm');
+    const promptInput = document.getElementById('promptInput');
+    const charCount = document.getElementById('charCount');
+    const styleSelect = document.getElementById('styleSelect');
+    const aspectRatioSelect = document.getElementById('aspectRatioSelect');
+    const enhanceToggle = document.getElementById('enhancePrompt');
+    const generateBtn = document.getElementById('generateBtn');
+    const generateBtnText = document.getElementById('generateBtnText');
+    const loadTemplateBtn = document.getElementById('loadTemplateBtn');
+    const templateModal = document.getElementById('templateModal');
+    const templateList = document.getElementById('templateList');
+
+    const enhancedContainer = document.getElementById('enhancedPromptContainer');
+    const enhancedPromptText = document.getElementById('enhancedPromptText');
+    const enhancedCharCount = document.getElementById('enhancedCharCount');
+    const reEnhanceBtn = document.getElementById('reEnhanceBtn');
+    const generateFromEnhancedBtn = document.getElementById('generateFromEnhancedBtn');
+
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const loadingTitle = document.getElementById('loadingTitle');
+    const loadingStatus = document.getElementById('loadingStatus');
+    const errorState = document.getElementById('errorState');
+    const errorMessage = document.getElementById('errorMessage');
+    const dismissErrorBtn = document.getElementById('dismissErrorBtn');
+    const resultSection = document.getElementById('resultSection');
+    const createAnotherBtn = document.getElementById('createAnotherBtn');
+
+    // State
+    let currentImageId = null;
+    let currentImageUrls = null;
+
+    // Word counter helper
+    function countWords(text) {
+        return text.trim() ? text.trim().split(/\s+/).length : 0;
+    }
+
+    // Word counter for main prompt
+    promptInput.addEventListener('input', function() {
+        const wordCount = countWords(this.value);
+        charCount.textContent = wordCount;
+        if (wordCount > 2200) {
+            charCount.classList.add('text-error');
+            charCount.classList.remove('text-warning');
+        } else if (wordCount > 1800) {
+            charCount.classList.add('text-warning');
+            charCount.classList.remove('text-error');
+        } else {
+            charCount.classList.remove('text-warning', 'text-error');
+        }
+    });
+
+    // Word counter for enhanced prompt
+    enhancedPromptText.addEventListener('input', function() {
+        const wordCount = countWords(this.value);
+        enhancedCharCount.textContent = wordCount;
+    });
+
+    // Style description updates
+    styleSelect.addEventListener('change', function() {
+        const style = visualStyles[this.value];
+        if (style) {
+            document.getElementById('styleDescription').textContent = style.description;
+        }
+    });
+
+    aspectRatioSelect.addEventListener('change', function() {
+        const ratio = aspectRatios[this.value];
+        if (ratio) {
+            document.getElementById('ratioDescription').textContent = ratio.description;
+        }
+    });
+
+    // Update button text based on enhancement toggle
+    enhanceToggle.addEventListener('change', function() {
+        generateBtnText.textContent = this.checked ? 'Enhance Prompt' : 'Generate Visual';
+    });
+
+    // Template modal
+    loadTemplateBtn.addEventListener('click', function() {
+        templateList.innerHTML = '';
+        for (const [key, template] of Object.entries(contentTemplates)) {
+            const div = document.createElement('div');
+            div.className = 'card bg-base-200 cursor-pointer hover:bg-base-300 transition-colors';
+            div.innerHTML = `
+                <div class="card-body p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="text-2xl text-primary mt-1">
+                            <i class="fas fa-${template.icon}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold">${template.name}</h4>
+                            <p class="text-sm text-base-content/60 mb-2">${template.description}</p>
+                            <pre class="text-xs bg-base-100 p-3 rounded-lg overflow-x-auto whitespace-pre-wrap font-mono">${template.template}</pre>
+                        </div>
+                    </div>
+                </div>
+            `;
+            div.addEventListener('click', function() {
+                // Set content type
+                const radio = document.querySelector(`input[name="content_type"][value="${key}"]`);
+                if (radio) radio.checked = true;
+
+                // Set template text
+                promptInput.value = template.template;
+                promptInput.dispatchEvent(new Event('input'));
+
+                templateModal.close();
+            });
+            templateList.appendChild(div);
+        }
+        templateModal.showModal();
+    });
+
+    // Get form data
+    function getFormData() {
+        return {
+            prompt: promptInput.value.trim(),
+            content_type: form.querySelector('input[name="content_type"]:checked').value,
+            style: styleSelect.value,
+            aspect_ratio: aspectRatioSelect.value,
+            resolution: document.getElementById('resolutionSelect').value,
+            output_format: document.getElementById('outputFormatSelect').value
+        };
+    }
+
+    // Show loading state
+    function showLoading(title, status) {
+        loadingTitle.textContent = title;
+        loadingStatus.textContent = status;
+        loadingIndicator.classList.remove('hidden');
+        loadingIndicator.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Hide loading state
+    function hideLoading() {
+        loadingIndicator.classList.add('hidden');
+    }
+
+    // Show error
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorState.classList.remove('hidden');
+        errorState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Hide error
+    dismissErrorBtn.addEventListener('click', function() {
+        errorState.classList.add('hidden');
+    });
+
+    // Enhance prompt
+    async function enhancePrompt(formData) {
+        showLoading('Enhancing your prompt...', 'AI is improving your description');
+
+        try {
+            const response = await fetch('/explainer/enhance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': window.csrf_token || ''
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || data.error) {
+                throw new Error(data.details || data.error || 'Enhancement failed');
+            }
+
+            // Show enhanced prompt
+            enhancedPromptText.value = data.enhanced_prompt;
+            enhancedPromptText.dispatchEvent(new Event('input'));
+            enhancedContainer.classList.remove('hidden');
+            enhancedContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        } catch (error) {
+            console.error('Enhancement error:', error);
+            showError(error.message || 'Failed to enhance prompt');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // Generate image
+    async function generateImage(prompt, formData) {
+        showLoading('Creating your visual...', 'This may take a moment');
+
+        // Disable buttons
+        generateBtn.disabled = true;
+        generateFromEnhancedBtn.disabled = true;
+
+        try {
+            const requestData = {
+                ...formData,
+                prompt: prompt,
+                enhance_prompt: false  // Already enhanced or user chose not to
+            };
+
+            const response = await fetch('/explainer/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': window.csrf_token || ''
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || data.error) {
+                throw new Error(data.details || data.error || 'Generation failed');
+            }
+
+            // Display result
+            if (data.image) {
+                currentImageId = data.image.id;
+                currentImageUrls = data.image.urls;
+
+                document.getElementById('previewImage').src = currentImageUrls.png;
+                document.getElementById('viewInGallery').href = `/gallery/${currentImageId}`;
+                document.getElementById('downloadPng').href = currentImageUrls.png;
+                document.getElementById('downloadWebp').href = currentImageUrls.webp;
+                document.getElementById('downloadJpeg').href = currentImageUrls.jpeg;
+                document.getElementById('imageDimensions').textContent = `${data.image.width} x ${data.image.height}px`;
+
+                // Hide enhanced container and show result
+                enhancedContainer.classList.add('hidden');
+                resultSection.classList.remove('hidden');
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+        } catch (error) {
+            console.error('Generation error:', error);
+            showError(error.message || 'Failed to generate image');
+        } finally {
+            hideLoading();
+            generateBtn.disabled = false;
+            generateFromEnhancedBtn.disabled = false;
+        }
+    }
+
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = getFormData();
+
+        if (!formData.prompt) {
+            showError('Please enter a description for your visual');
+            return;
+        }
+
+        // Hide previous states
+        resultSection.classList.add('hidden');
+        errorState.classList.add('hidden');
+        enhancedContainer.classList.add('hidden');
+
+        if (enhanceToggle.checked) {
+            // Enhance first
+            await enhancePrompt(formData);
+        } else {
+            // Generate directly
+            await generateImage(formData.prompt, formData);
+        }
+    });
+
+    // Re-enhance button
+    reEnhanceBtn.addEventListener('click', async function() {
+        const formData = getFormData();
+        formData.prompt = promptInput.value.trim(); // Use original prompt
+        await enhancePrompt(formData);
+    });
+
+    // Generate from enhanced prompt
+    generateFromEnhancedBtn.addEventListener('click', async function() {
+        const formData = getFormData();
+        const enhancedPrompt = enhancedPromptText.value.trim();
+
+        if (!enhancedPrompt) {
+            showError('Enhanced prompt is empty');
+            return;
+        }
+
+        await generateImage(enhancedPrompt, formData);
+    });
+
+    // Create another button
+    createAnotherBtn.addEventListener('click', function() {
+        resultSection.classList.add('hidden');
+        enhancedContainer.classList.add('hidden');
+        promptInput.value = '';
+        promptInput.dispatchEvent(new Event('input'));
+        enhanceToggle.checked = false;
+        generateBtnText.textContent = 'Generate Visual';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+})();
+</script>
+{% endblock %}

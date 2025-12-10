@@ -144,7 +144,7 @@
                         {% endif %}
                         {% if current_user.is_authenticated %}
                             <li><a href="{{ url_for('core.dashboard') }}" class="{% if request.endpoint == 'core.dashboard' %}active{% endif %}">Dashboard</a></li>
-                            <li><a href="{{ url_for('banner.banner_page') }}" class="{% if request.endpoint == 'banner.banner_page' %}active{% endif %}">Banner</a></li>
+                            <li><a href="{{ url_for('explainer.explainer_page') }}" class="{% if request.endpoint == 'explainer.explainer_page' %}active{% endif %}">Explainer</a></li>
                             <li><a href="{{ url_for('magix.magix_page') }}" class="{% if request.endpoint == 'magix.magix_page' %}active{% endif %}">Magix</a></li>
                             <li><a href="{{ url_for('virtual.virtual_page') }}" class="{% if request.endpoint == 'virtual.virtual_page' %}active{% endif %}">Virtual</a></li>
                             <li><a href="{{ url_for('gallery.view_gallery') }}" class="{% if request.endpoint == 'gallery.view_gallery' %}active{% endif %}">Gallery</a></li>
@@ -174,7 +174,7 @@
                 {% endif %}
                 {% if current_user.is_authenticated %}
                     <li><a href="{{ url_for('core.dashboard') }}" class="btn btn-ghost btn-sm {% if request.endpoint == 'core.dashboard' %}btn-active{% endif %}">Dashboard</a></li>
-                    <li><a href="{{ url_for('banner.banner_page') }}" class="btn btn-ghost btn-sm {% if request.endpoint == 'banner.banner_page' %}btn-active{% endif %}">Banner</a></li>
+                    <li><a href="{{ url_for('explainer.explainer_page') }}" class="btn btn-ghost btn-sm {% if request.endpoint == 'explainer.explainer_page' %}btn-active{% endif %}">Explainer</a></li>
                     <li><a href="{{ url_for('magix.magix_page') }}" class="btn btn-ghost btn-sm {% if request.endpoint == 'magix.magix_page' %}btn-active{% endif %}">Magix</a></li>
                     <li><a href="{{ url_for('virtual.virtual_page') }}" class="btn btn-ghost btn-sm {% if request.endpoint == 'virtual.virtual_page' %}btn-active{% endif %}">Virtual</a></li>
                     <li><a href="{{ url_for('gallery.view_gallery') }}" class="btn btn-ghost btn-sm {% if request.endpoint == 'gallery.view_gallery' %}btn-active{% endif %}">Gallery</a></li>

@@ -152,9 +152,9 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4h10m-10 0V6a1 1 0 011-1h8a1 1 0 011 1v2m-10 0v10a1 1 0 001 1h8a1 1 0 001-1V8"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                             </svg>
-                            <span class="text-sm">{{ (3 / system_settings.credit_cost_banners)|int }} Banners <span class="text-xs opacity-60">({{ system_settings.credit_cost_banners }} credit{{ 's' if system_settings.credit_cost_banners != 1 else '' }} each)</span></span>
+                            <span class="text-sm">{{ (3 / system_settings.credit_cost_explainers)|int }} Explainers <span class="text-xs opacity-60">({{ system_settings.credit_cost_explainers }} credit{{ 's' if system_settings.credit_cost_explainers != 1 else '' }} each)</span></span>
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,9 +238,9 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4h10m-10 0V6a1 1 0 011-1h8a1 1 0 011 1v2m-10 0v10a1 1 0 001 1h8a1 1 0 001-1V8"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                             </svg>
-                            <span class="text-sm">{{ (100 / system_settings.credit_cost_banners)|int }} Banners <span class="text-xs opacity-60">({{ system_settings.credit_cost_banners }} credit{{ 's' if system_settings.credit_cost_banners != 1 else '' }} each)</span></span>
+                            <span class="text-sm">{{ (100 / system_settings.credit_cost_explainers)|int }} Explainers <span class="text-xs opacity-60">({{ system_settings.credit_cost_explainers }} credit{{ 's' if system_settings.credit_cost_explainers != 1 else '' }} each)</span></span>
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -320,9 +320,9 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4h10m-10 0V6a1 1 0 011-1h8a1 1 0 011 1v2m-10 0v10a1 1 0 001 1h8a1 1 0 001-1V8"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                             </svg>
-                            <span class="text-sm">{{ (1000 / system_settings.credit_cost_banners)|int }} Banners <span class="text-xs opacity-60">({{ system_settings.credit_cost_banners }} credit{{ 's' if system_settings.credit_cost_banners != 1 else '' }} each)</span></span>
+                            <span class="text-sm">{{ (1000 / system_settings.credit_cost_explainers)|int }} Explainers <span class="text-xs opacity-60">({{ system_settings.credit_cost_explainers }} credit{{ 's' if system_settings.credit_cost_explainers != 1 else '' }} each)</span></span>
                         </div>
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,10 +399,10 @@
                             <td class="text-center">Up to {{ (1000 / system_settings.credit_cost_images)|int }}</td>
                         </tr>
                         <tr>
-                            <td class="font-medium">Banners <span class="text-xs opacity-60">({{ system_settings.credit_cost_banners }} credit{{ 's' if system_settings.credit_cost_banners != 1 else '' }} each)</span></td>
-                            <td class="text-center">Up to {{ (3 / system_settings.credit_cost_banners)|int }}</td>
-                            <td class="text-center">Up to {{ (100 / system_settings.credit_cost_banners)|int }}</td>
-                            <td class="text-center">Up to {{ (1000 / system_settings.credit_cost_banners)|int }}</td>
+                            <td class="font-medium">Explainers <span class="text-xs opacity-60">({{ system_settings.credit_cost_explainers }} credit{{ 's' if system_settings.credit_cost_explainers != 1 else '' }} each)</span></td>
+                            <td class="text-center">Up to {{ (3 / system_settings.credit_cost_explainers)|int }}</td>
+                            <td class="text-center">Up to {{ (100 / system_settings.credit_cost_explainers)|int }}</td>
+                            <td class="text-center">Up to {{ (1000 / system_settings.credit_cost_explainers)|int }}</td>
                         </tr>
                         <tr>
                             <td class="font-medium">Magix Edits <span class="text-xs opacity-60">({{ system_settings.credit_cost_magix }} credit{{ 's' if system_settings.credit_cost_magix != 1 else '' }} each)</span></td>
