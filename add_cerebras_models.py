@@ -29,17 +29,22 @@ print("=" * 50)
 conn = sqlite3.connect(db_path)
 c = conn.cursor()
 
-# Get Cerebras provider ID
+# Get or create Cerebras provider
 c.execute("SELECT id FROM api_provider WHERE name = 'Cerebras'")
 result = c.fetchone()
 
 if not result:
-    print("Error: Cerebras provider not found in database")
-    print("Run migrations first: python migrations/migrate_all.py")
-    exit(1)
-
-cerebras_id = result[0]
-print(f"Cerebras provider ID: {cerebras_id}\n")
+    print("Cerebras provider not found, creating it...")
+    c.execute("""
+        INSERT INTO api_provider (name, display_name, api_base_url, is_active)
+        VALUES ('Cerebras', 'Cerebras', 'https://api.cerebras.ai/v1', 1)
+    """)
+    conn.commit()
+    cerebras_id = c.lastrowid
+    print(f"Created Cerebras provider with ID: {cerebras_id}\n")
+else:
+    cerebras_id = result[0]
+    print(f"Cerebras provider ID: {cerebras_id}\n")
 
 # Cerebras models to add
 cerebras_models = [
