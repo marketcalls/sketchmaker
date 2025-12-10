@@ -32,13 +32,12 @@
                             {% for key, template in content_templates.items() %}
                             <label class="cursor-pointer group content-type-card">
                                 <input type="radio" name="content_type" value="{{ key }}" class="hidden content-type-radio" {% if loop.first %}checked{% endif %}>
-                                <div class="card bg-base-100/70 backdrop-blur-sm border-2 border-base-300/50 hover:border-primary/50 transition-all duration-200 h-full content-type-box {% if loop.first %}border-primary bg-primary/10{% endif %}">
-                                    <div class="card-body p-3 sm:p-4 text-center">
-                                        <div class="text-2xl sm:text-3xl mb-2 text-primary">
-                                            <i class="fas fa-{{ template.icon }}"></i>
-                                        </div>
-                                        <h3 class="font-semibold text-xs sm:text-sm">{{ template.name }}</h3>
-                                        <p class="text-xs text-base-content/60 mt-1 hidden sm:block">{{ template.description }}</p>
+                                <div class="flex items-center justify-center rounded-xl bg-base-100/70 backdrop-blur-sm border-2 border-base-300/50 hover:border-primary/50 transition-all duration-200 h-20 sm:h-24 content-type-box {% if loop.first %}border-primary bg-primary/10{% endif %}">
+                                    <div class="text-center px-3">
+                                        <span class="text-xl sm:text-2xl text-primary mr-2">
+                                            <i class="fa-solid fa-{{ template.icon }}"></i>
+                                        </span>
+                                        <span class="font-semibold text-xs sm:text-sm">{{ template.name }}</span>
                                     </div>
                                 </div>
                             </label>
