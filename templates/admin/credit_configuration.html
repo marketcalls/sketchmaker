@@ -272,6 +272,7 @@ document.getElementById('creditConfigForm').addEventListener('submit', function(
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': window.csrf_token || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
         },
         body: JSON.stringify({
             credit_costs: creditCosts
