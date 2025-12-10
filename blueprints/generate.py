@@ -282,6 +282,14 @@ def generate_image_route():
                 'num_inference_steps': 28,
                 'sync_mode': False
             })
+        elif model == 'fal-ai/flux-2-pro':
+            # Flux 2 Pro specific parameters
+            generation_params.update({
+                'image_size': data.get('image_size', 'landscape_4_3'),
+                'safety_tolerance': '2',
+                'enable_safety_checker': True,
+                'output_format': data.get('output_format', 'jpeg')
+            })
         elif model == 'fal-ai/z-image/turbo/lora':
             # Z-Image specific parameters
             generation_params.update({
