@@ -10,7 +10,7 @@ cachetools==5.5.0
 cairocffi==1.7.1
 CairoSVG==2.7.1
 certifi==2025.11.12
-cffi==1.17.1
+cffi==2.0.0
 charset-normalizer==3.3.2
 click==8.1.7
 cryptography==46.0.3
