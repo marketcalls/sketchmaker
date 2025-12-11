@@ -18,7 +18,14 @@
       "Bash(git commit:*)",
       "Bash(git push)",
       "Bash(uv run:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Skill(frontend-design:frontend-design)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh api:*)",
+      "Bash(pip-audit:*)",
+      "Bash(pip index:*)"
     ],
     "deny": [],
     "ask": []
