@@ -582,7 +582,7 @@
 
 {% block extra_js %}
 <!-- Particles.js -->
-<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script src="{{ url_for('static', filename='js/particles.min.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize particles

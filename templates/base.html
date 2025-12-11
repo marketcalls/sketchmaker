@@ -55,7 +55,7 @@
     <meta name="application-name" content="Sketch Maker AI">
 
     <link href="{{ url_for('static', filename='css/output.css') }}?v=20250127" rel="stylesheet" type="text/css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/gsap.min.js') }}"></script>
     
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -107,9 +107,6 @@
     
     <!-- Additional SEO Enhancements -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
     
     {% endblock %}
     {% block extra_css %}{% endblock %}
