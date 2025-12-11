@@ -121,20 +121,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-base-100 via-base-200 to-base-300 relative overflow-hidden">
+<div class="min-h-screen relative overflow-hidden">
     <!-- Particles Background -->
     <div id="particles-js"></div>
     
-    <!-- Diagonal Design Element -->
-    <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary opacity-10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute top-1/3 -left-24 w-80 h-80 bg-secondary opacity-10 rounded-full blur-3xl pointer-events-none"></div>
     
     <!-- Hero Section -->
     <section class="py-12 sm:py-16 md:py-28 relative z-10">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center gap-8 md:gap-16">
                 <div class="flex-1 text-center md:text-left relative">
-                    <div class="absolute -top-10 -left-10 w-24 h-24 bg-primary opacity-5 rounded-full blur-xl"></div>
                     
                     <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 gradient-text leading-tight">
                         Transform Text Into <span class="relative inline-block">Art<span class="absolute -bottom-1 left-0 w-full h-1 bg-secondary rounded-full"></span></span>
@@ -170,11 +166,12 @@
                     <!-- Tech badges -->
                     <div class="mt-10 flex flex-wrap gap-2 justify-center md:justify-start">
                         <span class="badge badge-lg font-bold py-3" style="background: linear-gradient(135deg, #7c3aed, #ec4899); color: white;">Nano Studio</span>
+                        <span class="badge badge-lg font-bold py-3" style="background: linear-gradient(135deg, #3b82f6, #06b6d4); color: white;">Z-Image</span>
                         <span class="badge badge-primary badge-outline font-medium py-3">GPT-5</span>
                         <span class="badge badge-secondary badge-outline font-medium py-3">Anthropic</span>
-                        <span class="badge badge-accent badge-outline font-medium py-3">Gemini 2.5</span>
+                        <span class="badge badge-accent badge-outline font-medium py-3">Gemini 3</span>
                         <span class="badge badge-info badge-outline font-medium py-3">Groq</span>
-                        <span class="badge badge-success badge-outline font-medium py-3">Flux Pro</span>
+                        <span class="badge badge-success badge-outline font-medium py-3">Flux Pro 2</span>
                         <span class="badge badge-warning badge-outline font-medium py-3">Ideogram</span>
                         <span class="badge badge-error badge-outline font-medium py-3">Seedream</span>
                         <span class="badge badge-info badge-outline font-medium py-3">Recraft</span>
@@ -230,7 +227,7 @@
     </section>
 
     <!-- Logo Marquee -->
-    <div class="py-6 bg-base-300/50 overflow-hidden">
+    <div class="py-6 overflow-hidden glass-dark">
         <div class="marquee-container">
             <div class="marquee-content">
                 <!-- These would be your tech partners/models - add logos here -->
@@ -240,12 +237,13 @@
                     <div class="text-4xl font-bold opacity-10 text-secondary">Anthropic</div>
                     <div class="text-4xl font-bold opacity-10 text-accent">Google</div>
                     <div class="text-4xl font-bold opacity-10 text-info">Groq</div>
-                    <div class="text-4xl font-bold opacity-10 text-success">Flux Pro</div>
+                    <div class="text-4xl font-bold opacity-10 text-cyan-500">Z-Image</div>
+                    <div class="text-4xl font-bold opacity-10 text-success">Flux Pro 2</div>
                     <div class="text-4xl font-bold opacity-10 text-warning">Flux Lora</div>
                     <div class="text-4xl font-bold opacity-10 text-error">Ideogram</div>
                     <div class="text-4xl font-bold opacity-10 text-primary">Imagen</div>
                     <div class="text-4xl font-bold opacity-10 text-info">Recraft</div>
-                    <div class="text-4xl font-bold opacity-10 text-purple-500">Nano Bannana</div>
+                    <div class="text-4xl font-bold opacity-10 text-purple-500">Nano Banana</div>
                     <div class="text-4xl font-bold opacity-10 text-error">Seedream</div>
                 </div>
                 {% endfor %}
@@ -254,8 +252,7 @@
     </div>
 
     <!-- Features Section -->
-    <section class="py-12 sm:py-16 md:py-24 bg-base-200/50 relative z-10">
-        <div class="absolute top-0 right-0 w-full h-64 bg-gradient-to-b from-base-300/50 to-transparent pointer-events-none"></div>
+    <section class="py-12 sm:py-16 md:py-24 relative z-10">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 inline-block gradient-text">Key Features</h2>
@@ -265,7 +262,7 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Nano Studio -->
-                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="card hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
                         <div class="feature-icon">
                             <svg class="w-14 h-14 text-purple-500 mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -283,7 +280,7 @@
                 </div>
 
                 <!-- Advanced AI Models -->
-                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="card hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
                         <div class="feature-icon">
                             <svg class="w-14 h-14 text-secondary mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -301,7 +298,7 @@
                 </div>
 
                 <!-- Custom Training -->
-                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="card hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
                         <div class="feature-icon">
                             <svg class="w-14 h-14 text-accent mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -317,26 +314,26 @@
                     </div>
                 </div>
 
-                <!-- Multiple Formats -->
-                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <!-- Visual Explainer -->
+                <div class="card hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
                         <div class="feature-icon">
                             <svg class="w-14 h-14 text-info mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
                             </svg>
                         </div>
-                        <h3 class="card-title text-xl mb-3 text-info">Multiple Formats</h3>
-                        <p class="text-base-content/70">Download your creations in WebP, PNG, JPEG formats with optimized quality and compression.</p>
+                        <h3 class="card-title text-xl mb-3 text-info">Visual Explainer</h3>
+                        <p class="text-base-content/70">Create infographics, diagrams, flowcharts, and visual explanations. 8 templates with AI-powered prompt enhancement.</p>
                         <div class="mt-4 flex gap-2">
-                            <div class="badge badge-sm badge-info">WebP</div>
-                            <div class="badge badge-sm badge-success">PNG</div>
-                            <div class="badge badge-sm badge-info">JPEG</div>
+                            <div class="badge badge-sm badge-info">Infographics</div>
+                            <div class="badge badge-sm badge-success">Flowcharts</div>
+                            <div class="badge badge-sm badge-warning">Pitchdecks</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Personal Gallery -->
-                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="card hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
                         <div class="feature-icon">
                             <svg class="w-14 h-14 text-success mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -353,7 +350,7 @@
                 </div>
 
                 <!-- Smart Prompts -->
-                <div class="card bg-base-100/70 glassmorphism hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="card hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div class="card-body">
                         <div class="feature-icon">
                             <svg class="w-14 h-14 text-warning mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -373,7 +370,7 @@
     </section>
     
     <!-- Testimonials Section (New) -->
-    <section class="py-16 bg-base-200/50 relative z-10">
+    <section class="py-16 relative z-10">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-5xl font-bold mb-4 inline-block gradient-text">User Testimonials</h2>
@@ -383,7 +380,7 @@
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Testimonial 1 -->
-                <div class="card bg-base-100/70 glassmorphism">
+                <div class="card">
                     <div class="card-body">
                         <div class="flex mb-4">
                             <div class="rating">
@@ -408,7 +405,7 @@
                 </div>
 
                 <!-- Testimonial 2 -->
-                <div class="card bg-base-100/70 glassmorphism">
+                <div class="card">
                     <div class="card-body">
                         <div class="flex mb-4">
                             <div class="rating">
@@ -433,7 +430,7 @@
                 </div>
 
                 <!-- Testimonial 3 -->
-                <div class="card bg-base-100/70 glassmorphism">
+                <div class="card">
                     <div class="card-body">
                         <div class="flex mb-4">
                             <div class="rating">
@@ -476,7 +473,7 @@
                 <!-- Step 1 -->
                 <div class="relative z-10">
                     <div class="bg-base-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-primary text-primary font-bold">1</div>
-                    <div class="card bg-base-100/70 glassmorphism">
+                    <div class="card">
                         <div class="card-body text-center">
                             <h3 class="font-bold text-xl mb-3">Enter Your Prompt</h3>
                             <p class="text-base-content/70">Describe what you want to create or use our AI-powered prompt suggestions.</p>
@@ -487,7 +484,7 @@
                 <!-- Step 2 -->
                 <div class="relative z-10">
                     <div class="bg-base-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-secondary text-secondary font-bold">2</div>
-                    <div class="card bg-base-100/70 glassmorphism">
+                    <div class="card">
                         <div class="card-body text-center">
                             <h3 class="font-bold text-xl mb-3">Choose Your Model</h3>
                             <p class="text-base-content/70">Select from multiple AI providers or use your own custom-trained model.</p>
@@ -498,7 +495,7 @@
                 <!-- Step 3 -->
                 <div class="relative z-10">
                     <div class="bg-base-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-accent text-accent font-bold">3</div>
-                    <div class="card bg-base-100/70 glassmorphism">
+                    <div class="card">
                         <div class="card-body text-center">
                             <h3 class="font-bold text-xl mb-3">Generate & Download</h3>
                             <p class="text-base-content/70">Get your finished artwork in seconds and save it in your preferred format.</p>
@@ -510,10 +507,7 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 md:py-32 relative bg-gradient-to-br from-base-300/80 via-primary/10 to-secondary/10">
-        <!-- Decorative elements -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-primary opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-        <div class="absolute bottom-0 left-0 w-80 h-80 bg-secondary opacity-5 rounded-full blur-3xl translate-y-1/4 -translate-x-1/4"></div>
+    <section class="py-16 md:py-32 relative">
         
         <!-- Stars/particles effect -->
         <div class="absolute inset-0 overflow-hidden">
@@ -533,9 +527,6 @@
         </div>
         
         <div class="container mx-auto px-4 text-center relative z-10">
-            <!-- Glow effect behind the heading -->
-            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-48 bg-primary opacity-5 blur-3xl rounded-full"></div>
-            
             <h2 class="text-3xl md:text-5xl font-bold mb-6 gradient-text leading-tight">Ready to Transform Your Ideas?</h2>
             <p class="text-lg md:text-xl text-base-content/80 mb-12 max-w-2xl mx-auto">
                 Join thousands of creators and bring your vision to life with advanced AI technology.
@@ -560,19 +551,10 @@
                 </a>
             </div>
         </div>
-        
-        <!-- Better wave divider implementation with proper coloring -->
-        <div class="absolute -bottom-1 left-0 w-full overflow-hidden leading-0">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" class="w-full h-16 md:h-24">
-                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="var(--fallback-b2,oklch(var(--b2)))" opacity=".8"></path>
-                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="var(--fallback-b2,oklch(var(--b2)))" opacity=".5"></path>
-                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="var(--fallback-b2,oklch(var(--b2)))" opacity=".3"></path>
-            </svg>
-        </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer footer-center p-10 bg-base-200 text-base-content relative z-10">
+    <footer class="footer footer-center p-10 relative z-10">
         <div>
             <svg class="w-12 h-12 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3" y="3" width="18" height="18" rx="4" class="fill-primary"/>
