@@ -132,7 +132,7 @@ modelSelect?.addEventListener('change', function(e) {
     const ideogramV3NegativePromptControl = document.getElementById('ideogramV3NegativePromptControl');
     const ideogramV3RenderingSpeedControl = document.getElementById('ideogramV3RenderingSpeedControl');
 
-    // Get Seedream V4 controls
+    // Get Seedream V4.5 controls
     const seedreamImageSizeControl = document.getElementById('seedreamImageSizeControl');
     const seedreamCustomSizeControl = document.getElementById('seedreamCustomSizeControl');
     const seedreamMaxImagesControl = document.getElementById('seedreamMaxImagesControl');
@@ -197,12 +197,12 @@ modelSelect?.addEventListener('change', function(e) {
             nanoBananaResolutionControl?.classList.remove('hidden');
             nanoBananaOutputFormatControl?.classList.remove('hidden');
             break;
-        case 'fal-ai/bytedance/seedream/v4/text-to-image':
-            // Hide controls that don't apply to Seedream V4
+        case 'fal-ai/bytedance/seedream/v4.5/text-to-image':
+            // Hide controls that don't apply to Seedream V4.5
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
 
-            // Show Seedream V4 specific controls
+            // Show Seedream V4.5 specific controls
             seedreamImageSizeControl?.classList.remove('hidden');
             seedreamMaxImagesControl?.classList.remove('hidden');
 
@@ -397,7 +397,7 @@ document.getElementById('addColorBtn')?.addEventListener('click', function() {
     colorPickers.appendChild(colorPickerWrapper);
 });
 
-// Seedream V4 image size preset handler
+// Seedream V4.5 image size preset handler
 document.getElementById('seedreamImageSizePreset')?.addEventListener('change', function(e) {
     const seedreamCustomSizeControl = document.getElementById('seedreamCustomSizeControl');
     if (e.target.value === 'custom') {

@@ -68,7 +68,7 @@ def get_model_arguments(model, data):
             "output_format": "jpeg",
             "safety_tolerance": "2"
         }
-    elif model == "fal-ai/bytedance/seedream/v4/text-to-image":
+    elif model == "fal-ai/bytedance/seedream/v4.5/text-to-image":
         model_args = {
             "image_size": data.get("image_size", {"width": 1024, "height": 1024}),
             "max_images": data.get("max_images", 1),

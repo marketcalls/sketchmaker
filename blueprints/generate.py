@@ -187,8 +187,8 @@ def generate_image_route():
             })
         elif model == 'fal-ai/flux-pro/v1.1-ultra':
             generation_params['aspect_ratio'] = data.get('aspect_ratio', '16:9')
-        elif model == 'fal-ai/bytedance/seedream/v4/text-to-image':
-            # Seedream V4 specific parameters
+        elif model == 'fal-ai/bytedance/seedream/v4.5/text-to-image':
+            # Seedream V4.5 specific parameters
             preset = data.get('seedream_image_size_preset', 'landscape_16_9')
 
             # Handle image size based on preset

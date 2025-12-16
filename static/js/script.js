@@ -244,8 +244,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.image_size = dimensions;
             } else if (selectedModel === 'fal-ai/flux-pro/v1.1-ultra') {
                 formData.aspect_ratio = document.getElementById('aspectRatio').value;
-            } else if (selectedModel === 'fal-ai/bytedance/seedream/v4/text-to-image') {
-                // Add Seedream V4 specific parameters
+            } else if (selectedModel === 'fal-ai/bytedance/seedream/v4.5/text-to-image') {
+                // Add Seedream V4.5 specific parameters
                 const presetElement = document.getElementById('seedreamImageSizePreset');
                 const maxImagesElement = document.getElementById('seedreamMaxImages');
                 const widthElement = document.getElementById('seedreamWidth');
