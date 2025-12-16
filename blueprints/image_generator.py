@@ -137,6 +137,14 @@ def get_model_arguments(model, data):
             "enable_safety_checker": True,
             "output_format": data.get("output_format", "jpeg")
         }
+    elif model == "fal-ai/flux-2-max":
+        # Flux 2 Max specific parameters
+        model_args = {
+            "image_size": data.get("image_size", "landscape_4_3"),
+            "safety_tolerance": "2",
+            "enable_safety_checker": True,
+            "output_format": data.get("output_format", "jpeg")
+        }
     elif model == "fal-ai/z-image/turbo/lora":
         # Z-Image specific parameters
         model_args = {

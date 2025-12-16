@@ -262,6 +262,14 @@ modelSelect?.addEventListener('change', function(e) {
             // Show Flux 2 Pro specific controls (same as Flux 2 Flex)
             flux2FlexImageSizeControl?.classList.remove('hidden');
             break;
+        case 'fal-ai/flux-2-max':
+            // Hide controls that don't apply to Flux 2 Max
+            if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
+            if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
+
+            // Show Flux 2 Max specific controls (same as Flux 2 Pro/Flex)
+            flux2FlexImageSizeControl?.classList.remove('hidden');
+            break;
         case 'fal-ai/flux/dev':
             if (numInferenceStepsControl) numInferenceStepsControl.classList.add('hidden');
             if (guidanceScaleControl) guidanceScaleControl.classList.add('hidden');
