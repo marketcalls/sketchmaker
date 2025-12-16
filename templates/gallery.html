@@ -3,40 +3,38 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Gallery</h1>
-    
-    {% if images %}
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {% for image in images %}
-        <div class="aspect-square relative group">
-            <a href="{{ url_for('gallery.view_image', image_id=image.id) }}" 
-               class="block w-full h-full">
-                <img src="{{ image.get_url() }}" 
-                     alt="Generated image" 
-                     class="w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-[1.02]">
-                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                    <span class="text-white text-sm">View Details</span>
-                </div>
-            </a>
-            <button data-delete-id="{{ image.id }}"
-                    class="delete-btn absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Delete Image">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        {% endfor %}
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Gallery</h1>
+        <span id="imageCount" class="text-base-content/70">
+            {% if total_images > 0 %}
+                {{ total_images }} image{{ 's' if total_images != 1 else '' }}
+            {% endif %}
+        </span>
     </div>
-    {% else %}
-    <div class="text-center py-16">
+
+    <!-- Image Grid Container -->
+    <div id="galleryGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- Images will be loaded dynamically -->
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="flex justify-center py-8 hidden">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+
+    <!-- End of Gallery Message -->
+    <div id="endMessage" class="text-center py-8 text-base-content/50 hidden">
+        No more images to load
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-16 hidden">
         <div class="max-w-md mx-auto">
             <h3 class="text-xl font-semibold mb-4">No images yet</h3>
             <p class="text-base-content/70 mb-8">Start creating amazing artwork with AI</p>
             <a href="{{ url_for('core.dashboard') }}" class="btn btn-primary">Generate Images</a>
         </div>
     </div>
-    {% endif %}
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -54,16 +52,138 @@
 
 {% block scripts %}
 <script>
+// Gallery state
+const galleryState = {
+    currentPage: 0,
+    isLoading: false,
+    hasMore: true,
+    totalImages: {{ total_images }},
+    perPage: {{ images_per_page }}
+};
+
+// DOM elements
+const galleryGrid = document.getElementById('galleryGrid');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const endMessage = document.getElementById('endMessage');
+const emptyState = document.getElementById('emptyState');
+
+// Show empty state if no images
+if (galleryState.totalImages === 0) {
+    emptyState.classList.remove('hidden');
+} else {
+    // Load initial images
+    loadMoreImages();
+}
+
+// Infinite scroll observer
+const observerOptions = {
+    root: null,
+    rootMargin: '200px', // Start loading 200px before reaching the bottom
+    threshold: 0
+};
+
+const scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !galleryState.isLoading && galleryState.hasMore) {
+            loadMoreImages();
+        }
+    });
+}, observerOptions);
+
+// Create sentinel element for infinite scroll
+const sentinel = document.createElement('div');
+sentinel.id = 'scrollSentinel';
+sentinel.style.height = '1px';
+
+async function loadMoreImages() {
+    if (galleryState.isLoading || !galleryState.hasMore) return;
+
+    galleryState.isLoading = true;
+    galleryState.currentPage++;
+    loadingSpinner.classList.remove('hidden');
+
+    try {
+        const response = await fetch(`/api/gallery/images?page=${galleryState.currentPage}&per_page=${galleryState.perPage}`);
+        const data = await response.json();
+
+        if (data.images && data.images.length > 0) {
+            // Remove sentinel before adding new images
+            if (sentinel.parentNode) {
+                sentinel.parentNode.removeChild(sentinel);
+            }
+
+            // Add images to grid
+            data.images.forEach(image => {
+                const imageElement = createImageElement(image);
+                galleryGrid.appendChild(imageElement);
+            });
+
+            // Update state
+            galleryState.hasMore = data.has_next;
+
+            // Re-add sentinel at the end for continued infinite scroll
+            if (galleryState.hasMore) {
+                galleryGrid.appendChild(sentinel);
+                scrollObserver.observe(sentinel);
+            } else {
+                endMessage.classList.remove('hidden');
+            }
+        } else {
+            galleryState.hasMore = false;
+            if (galleryState.currentPage === 1) {
+                emptyState.classList.remove('hidden');
+            } else {
+                endMessage.classList.remove('hidden');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading images:', error);
+        showToast('Failed to load images', 'error');
+    } finally {
+        galleryState.isLoading = false;
+        loadingSpinner.classList.add('hidden');
+    }
+}
+
+function createImageElement(image) {
+    const div = document.createElement('div');
+    div.className = 'aspect-square relative group';
+    div.dataset.imageId = image.id;
+
+    div.innerHTML = `
+        <a href="/gallery/${image.id}" class="block w-full h-full">
+            <img src="${image.url}"
+                 alt="Generated image"
+                 loading="lazy"
+                 class="w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-[1.02]"
+                 onerror="this.src='/static/images/placeholder.png'">
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                <span class="text-white text-sm">View Details</span>
+            </div>
+        </a>
+        <button data-delete-id="${image.id}"
+                class="delete-btn absolute top-2 right-2 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                title="Delete Image">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    `;
+
+    // Add delete event listener
+    const deleteBtn = div.querySelector('.delete-btn');
+    deleteBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteImage(image.id);
+    });
+
+    return div;
+}
+
+// Delete functionality
 let imageIdToDelete = null;
 const deleteModal = document.getElementById('deleteModal');
-
-// Add click event listeners to all delete buttons
-document.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', () => {
-        const imageId = button.getAttribute('data-delete-id');
-        deleteImage(imageId);
-    });
-});
 
 function deleteImage(imageId) {
     imageIdToDelete = imageId;
@@ -79,7 +199,7 @@ function closeDeleteModal() {
 
 document.getElementById('confirmDelete').addEventListener('click', async () => {
     if (!imageIdToDelete) return;
-    
+
     try {
         const response = await fetch(`/gallery/${imageIdToDelete}/delete`, {
             method: 'POST',
@@ -88,22 +208,27 @@ document.getElementById('confirmDelete').addEventListener('click', async () => {
                 'X-CSRFToken': window.csrf_token
             }
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             // Remove the image from the UI
-            const imageElement = document.querySelector(`[data-delete-id="${imageIdToDelete}"]`).parentElement;
-            imageElement.remove();
-            
-            // Show success message using the built-in toast system
-            showToast('Image deleted successfully', 'success');
-            
-            // If no more images, reload the page to show the "No images" message
-            const remainingImages = document.querySelectorAll('.grid > div');
-            if (remainingImages.length === 0) {
-                location.reload();
+            const imageElement = document.querySelector(`[data-image-id="${imageIdToDelete}"]`);
+            if (imageElement) {
+                imageElement.remove();
             }
+
+            // Update count
+            galleryState.totalImages--;
+            const countElement = document.getElementById('imageCount');
+            if (galleryState.totalImages > 0) {
+                countElement.textContent = `${galleryState.totalImages} image${galleryState.totalImages !== 1 ? 's' : ''}`;
+            } else {
+                countElement.textContent = '';
+                emptyState.classList.remove('hidden');
+            }
+
+            showToast('Image deleted successfully', 'success');
         } else {
             throw new Error(data.message || 'Failed to delete image');
         }
@@ -118,6 +243,13 @@ document.getElementById('confirmDelete').addEventListener('click', async () => {
 // Close modal when clicking outside
 deleteModal.addEventListener('click', (e) => {
     if (e.target === deleteModal) {
+        closeDeleteModal();
+    }
+});
+
+// Keyboard support for modal
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
         closeDeleteModal();
     }
 });
