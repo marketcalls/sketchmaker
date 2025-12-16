@@ -275,27 +275,29 @@ def generate_magix():
 
         except Exception as e:
             print(f"Error calling Nano Banana Pro API: {str(e)}")
-            return jsonify({'error': f'Generation failed: {str(e)}'}), 500
+            return jsonify({'error': 'Generation failed. Please try again.'}), 500
 
     except Exception as e:
         print(f"Error in generate_magix: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': 'An error occurred. Please try again.'}), 500
 
 
 @magix_bp.route('/api/magix/history/<int:user_id>')
+@limiter.limit(get_rate_limit_string())
 @login_required
 def get_history(user_id):
     """Get user's Nano Studio history"""
-    if current_user.id != user_id and not current_user.is_admin:
+    # Use is_admin() method instead of is_admin attribute for proper authorization check
+    if current_user.id != user_id and not current_user.is_admin():
         return jsonify({'error': 'Unauthorized'}), 403
-        
+
     try:
         images = Image.query.filter_by(user_id=user_id)\
                            .filter(Image.art_style.like('nano_%'))\
                            .order_by(Image.created_at.desc())\
                            .limit(50)\
                            .all()
-        
+
         history = []
         for img in images:
             history.append({
@@ -305,8 +307,9 @@ def get_history(user_id):
                 'mode': img.art_style.replace('nano_', ''),
                 'created_at': img.created_at.isoformat()
             })
-        
+
         return jsonify({'history': history})
-        
+
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error fetching history: {str(e)}")
+        return jsonify({'error': 'Failed to fetch history'}), 500

@@ -4,8 +4,7 @@ from .image_generator import generate_image
 from .prompt_generator import generate_prompt
 from .clients import APIKeyError
 from models import db, Image, APISettings
-from extensions import limiter, get_rate_limit_string, csrf
-from flask_wtf.csrf import CSRFError
+from extensions import limiter, get_rate_limit_string
 import os
 from PIL import Image as PILImage
 import uuid
@@ -22,7 +21,6 @@ def get_absolute_path(filename):
     return os.path.join(current_app.root_path, 'static', 'images', filename)
 
 @generate_bp.route('/generate/prompt', methods=['POST'])
-@csrf.exempt
 @limiter.limit(get_rate_limit_string())
 @login_required
 def generate_prompt_route():
@@ -104,32 +102,22 @@ def generate_prompt_route():
                 'type': 'api_key_error'
             }), 400
         except Exception as e:
-            print(f"Error generating prompt: {str(e)}")
-            print(traceback.format_exc())
+            current_app.logger.error(f"Error generating prompt: {str(e)}\n{traceback.format_exc()}")
             return jsonify({
                 'error': 'Failed to generate prompt',
-                'details': str(e),
+                'details': 'An internal error occurred. Please try again.',
                 'type': 'generation_error'
             }), 500
 
-    except CSRFError as e:
-        print(f"CSRF error in generate_prompt_route: {str(e)}")
-        return jsonify({
-            'error': 'CSRF token validation failed',
-            'details': 'Please refresh the page and try again',
-            'type': 'csrf_error'
-        }), 400
     except Exception as e:
-        print(f"Unexpected error in generate_prompt_route: {str(e)}")
-        print(traceback.format_exc())
+        current_app.logger.error(f"Unexpected error in generate_prompt_route: {str(e)}\n{traceback.format_exc()}")
         return jsonify({
             'error': 'An unexpected error occurred',
-            'details': str(e),
+            'details': 'Please try again. If the problem persists, contact support.',
             'type': 'unexpected_error'
         }), 500
 
 @generate_bp.route('/generate/image', methods=['POST'])
-@csrf.exempt
 @limiter.limit(get_rate_limit_string())
 @login_required
 def generate_image_route():
@@ -193,9 +181,20 @@ def generate_image_route():
 
             # Handle image size based on preset
             if preset == 'custom':
+                # Validate custom dimensions to prevent resource exhaustion
+                MIN_DIMENSION = 256
+                MAX_DIMENSION = 4096
+                try:
+                    width = int(data.get('seedream_width', 2048))
+                    height = int(data.get('seedream_height', 1152))
+                    # Clamp values to safe range
+                    width = max(MIN_DIMENSION, min(MAX_DIMENSION, width))
+                    height = max(MIN_DIMENSION, min(MAX_DIMENSION, height))
+                except (ValueError, TypeError):
+                    width, height = 2048, 1152  # Safe defaults
                 generation_params['image_size'] = {
-                    'width': int(data.get('seedream_width', 2048)),
-                    'height': int(data.get('seedream_height', 1152))
+                    'width': width,
+                    'height': height
                 }
             elif preset == 'square_hd':
                 generation_params['image_size'] = {'width': 2048, 'height': 2048}
@@ -499,23 +498,15 @@ def generate_image_route():
                 }), 400
     except APIKeyError as e:
         return jsonify({
-            'error': str(e),
+            'error': 'API configuration issue',
             'details': 'Contact administrator - system API configuration issue',
             'type': 'api_key_error'
         }), 400
-    except CSRFError as e:
-        print(f"CSRF error in generate_image_route: {str(e)}")
-        return jsonify({
-            'error': 'CSRF token validation failed',
-            'details': 'Please refresh the page and try again',
-            'type': 'csrf_error'
-        }), 400
     except Exception as e:
-        print(f"Error in generate_image_route: {str(e)}")
-        print(traceback.format_exc())
+        current_app.logger.error(f"Error in generate_image_route: {str(e)}\n{traceback.format_exc()}")
         db.session.rollback()
         return jsonify({
             'error': 'An unexpected error occurred',
-            'details': str(e),
+            'details': 'Please try again. If the problem persists, contact support.',
             'type': 'unexpected_error'
         }), 500

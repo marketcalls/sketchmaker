@@ -8,8 +8,28 @@ import os
 from datetime import datetime
 import re
 import requests
+import secrets
+from urllib.parse import urlparse
 
 auth_bp = Blueprint('auth', __name__)
+
+def is_safe_url(target):
+    """Validate that the redirect URL is safe (relative URL only)"""
+    if not target:
+        return False
+    # Parse the target URL
+    parsed = urlparse(target)
+    # Only allow relative URLs (no scheme or netloc)
+    # Also reject protocol-relative URLs (//evil.com)
+    if parsed.scheme or parsed.netloc:
+        return False
+    # Reject URLs that start with // or have backslashes
+    if target.startswith('//') or '\\' in target:
+        return False
+    # Only allow URLs starting with /
+    if not target.startswith('/'):
+        return False
+    return True
 
 def is_valid_password(password):
     """Check if password meets requirements"""
@@ -204,11 +224,11 @@ def login():
 
         login_user(user, remember=remember)
         next_page = request.args.get('next')
-        
-        # Redirect admin users to manage page if they're trying to access it
-        if user.is_admin() and next_page and 'manage' in next_page:
+
+        # Validate next_page to prevent open redirect attacks
+        if next_page and is_safe_url(next_page):
             return redirect(next_page)
-        return redirect(next_page or url_for('core.dashboard'))
+        return redirect(url_for('core.dashboard'))
 
     return render_template('auth/login.html', auth_settings=auth_settings)
 
@@ -221,6 +241,10 @@ def google_login():
         flash('Google authentication is disabled.')
         return redirect(url_for('auth.login'))
 
+    # Generate and store OAuth state parameter to prevent CSRF attacks
+    oauth_state = secrets.token_urlsafe(32)
+    session['oauth_state'] = oauth_state
+
     # Construct the callback URL
     callback_url = url_for('auth.google_callback', _external=True)
 
@@ -232,8 +256,9 @@ def google_login():
         'scope': 'openid email profile',
         'access_type': 'offline',
         'prompt': 'consent',
+        'state': oauth_state,
     }
-    
+
     # Redirect to Google's OAuth page
     auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?' + '&'.join([f'{k}={v}' for k, v in params.items()])
     return redirect(auth_url)
@@ -247,9 +272,16 @@ def google_callback():
         flash('Google authentication is disabled.')
         return redirect(url_for('auth.login'))
 
+    # Verify OAuth state parameter to prevent CSRF attacks
+    state = request.args.get('state')
+    stored_state = session.pop('oauth_state', None)
+    if not state or not stored_state or state != stored_state:
+        flash('Authentication failed: Invalid state parameter. Please try again.')
+        return redirect(url_for('auth.login'))
+
     error = request.args.get('error')
     if error:
-        flash('Google authentication failed: ' + error)
+        flash('Google authentication failed. Please try again.')
         return redirect(url_for('auth.login'))
 
     code = request.args.get('code')
