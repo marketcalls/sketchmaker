@@ -473,6 +473,30 @@ COMPOSITION: Creative, possibly unconventional composition that serves the conce
 
 Additional instructions: {prompt}"""
 
+        elif mode == 'dating':
+            vibe = data.get('dating_vibe', 'confident_authentic')
+            arguments['prompt'] = f"""Transform this image into an attractive dating profile photo with {vibe.replace('_', ' ')} energy:
+
+DATING PROFILE OPTIMIZATION: Create a photo that makes an immediate positive impression on dating apps like Tinder, Bumble, and Hinge. The image should be scroll-stopping, approachable, and convey genuine personality.
+
+EXPRESSION & ENERGY: Capture authentic, warm expression that invites connection. Genuine smile that reaches the eyes, approachable body language, confident but not arrogant. The expression should say "I'm fun to be around" and "I'm genuinely interested in meeting you." Avoid stiff posed looks - aim for natural, candid-feeling moments.
+
+LIGHTING & COLOR: Warm, flattering lighting that enhances natural features. Vibrant but natural colors that pop on mobile screens. Golden hour warmth or soft natural light preferred. Colors should be eye-catching without being oversaturated. The photo should stand out in a sea of other profiles.
+
+POSES & FRAMING: Natural, relaxed poses that show personality. Slight angle (not straight-on) for dimension. Head and shoulders or upper body framing works best. Show genuine personality through body language - whether that's playful, confident, adventurous, or warm.
+
+BACKGROUND: Clean, uncluttered background that doesn't distract. Can suggest lifestyle (café, outdoors, travel) but subject is clearly the focus. Blurred backgrounds work well to keep attention on you.
+
+AUTHENTICITY: Look like yourself on your best day - enhanced but not transformed beyond recognition. The person you meet should recognize you from your photo. Enhance natural attractiveness while maintaining authentic appearance.
+
+APPEAL FACTORS: Studies show dating photos perform best with: genuine smiles, eye contact with camera, warm lighting, clean backgrounds, and confident body language. This photo should incorporate these proven elements.
+
+TECHNICAL: Sharp focus on face, pleasing bokeh if background visible, professional quality but not overly produced. Should feel like a great candid photo, not a formal portrait.
+
+{face_preserve}
+
+Additional instructions: {prompt}"""
+
         elif mode == 'influencer':
             aesthetic = data.get('aesthetic', 'glamorous')
             arguments['prompt'] = f"""Transform this image into a social media influencer portrait with {aesthetic} aesthetic:

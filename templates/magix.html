@@ -317,11 +317,11 @@
                     </div>
                 </div>
 
-                <div class="mode-card card bg-gradient-to-br from-rose-500/20 to-red-500/20 p-4 border border-rose-500/30" data-mode="influencer">
+                <div class="mode-card card bg-gradient-to-br from-rose-500/20 to-red-500/20 p-4 border border-rose-500/30" data-mode="dating">
                     <div class="text-center">
-                        <i class="fab fa-instagram mode-icon text-rose-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">Influencer</h3>
-                        <p class="text-xs text-base-content/60">Social Media</p>
+                        <i class="fas fa-heart mode-icon text-rose-500"></i>
+                        <h3 class="font-bold mt-2 text-sm">Dating</h3>
+                        <p class="text-xs text-base-content/60">Tinder & Apps</p>
                     </div>
                 </div>
 
@@ -466,6 +466,13 @@
                                 <h3 class="font-bold mt-2 text-xs">Restore</h3>
                             </div>
                         </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="influencer">
+                            <div class="text-center">
+                                <i class="fab fa-instagram mode-icon text-pink-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Influencer</h3>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -556,6 +563,21 @@
                                     <option value="urban_chic">Urban Chic</option>
                                     <option value="soft_dreamy">Soft & Dreamy</option>
                                     <option value="vibrant_bold">Vibrant & Bold</option>
+                                </select>
+                            </div>
+
+                            <!-- Dating Profile Options -->
+                            <div id="datingControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Dating Vibe</span>
+                                </label>
+                                <select id="datingVibeSelect" class="select select-bordered w-full">
+                                    <option value="confident_authentic">Confident & Authentic</option>
+                                    <option value="playful_fun">Playful & Fun</option>
+                                    <option value="warm_approachable">Warm & Approachable</option>
+                                    <option value="adventurous">Adventurous Spirit</option>
+                                    <option value="sophisticated">Sophisticated & Classy</option>
+                                    <option value="casual_relaxed">Casual & Relaxed</option>
                                 </select>
                             </div>
 
@@ -871,9 +893,15 @@ class NanoStudio {
                 title: 'Fashion Editorial',
                 text: 'High-fashion magazine quality with dramatic intentional lighting, bold editorial poses, and Vogue-worthy styling. Perfect for modeling portfolios, fashion campaigns, and artistic photography.'
             },
+            dating: {
+                icon: 'fas fa-heart',
+                color: 'text-rose-500',
+                title: 'Dating Profile Photos',
+                text: 'Look your best on Tinder, Bumble, and Hinge. Authentic, attractive photos with warm lighting, genuine expressions, and approachable vibes. Stand out and get more matches with photos that show the real you.'
+            },
             influencer: {
                 icon: 'fab fa-instagram',
-                color: 'text-rose-500',
+                color: 'text-pink-500',
                 title: 'Social Media Influencer',
                 text: 'Instagram-ready photos with trendy aesthetics, flattering lighting, and scroll-stopping appeal. Choose from glamorous, natural, golden hour, urban chic, or soft dreamy styles. Optimized for engagement.'
             },
@@ -999,6 +1027,9 @@ class NanoStudio {
             case 'influencer':
                 document.getElementById('influencerControls')?.classList.remove('hidden');
                 break;
+            case 'dating':
+                document.getElementById('datingControls')?.classList.remove('hidden');
+                break;
             case 'founder_headshot':
                 document.getElementById('founderControls')?.classList.remove('hidden');
                 break;
@@ -1030,6 +1061,11 @@ class NanoStudio {
                 'High-fashion magazine styling',
                 'Dramatic lighting and bold poses',
                 'Editorial quality results'
+            ],
+            dating: [
+                'Optimized for Tinder, Bumble, Hinge',
+                'Authentic yet attractive photos',
+                'Get more matches with genuine appeal'
             ],
             influencer: [
                 'Instagram-ready social media shots',
@@ -1374,6 +1410,10 @@ class NanoStudio {
             case 'influencer':
                 const aestheticSelect = document.getElementById('aestheticSelect');
                 if (aestheticSelect) data.aesthetic = aestheticSelect.value;
+                break;
+            case 'dating':
+                const datingVibeSelect = document.getElementById('datingVibeSelect');
+                if (datingVibeSelect) data.dating_vibe = datingVibeSelect.value;
                 break;
             case 'founder_headshot':
                 const vibeSelect = document.getElementById('vibeSelect');
