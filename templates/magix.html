@@ -1322,15 +1322,21 @@ class NanoStudio {
             // Add mode-specific parameters
             this.addModeParameters(requestData);
 
-            // Add advanced settings
-            requestData.temperature = parseFloat(document.getElementById('temperatureSlider').value);
-            const seed = document.getElementById('seedInput').value;
-            if (seed) requestData.seed = parseInt(seed);
+            // Add advanced settings (with null checks)
+            const tempSlider = document.getElementById('temperatureSlider');
+            if (tempSlider) requestData.temperature = parseFloat(tempSlider.value);
+
+            const seedInput = document.getElementById('seedInput');
+            if (seedInput && seedInput.value) requestData.seed = parseInt(seedInput.value);
 
             // Add Nano Banana Pro specific parameters
-            requestData.resolution = document.getElementById('resolutionSelect').value;
-            requestData.aspect_ratio = document.getElementById('aspectRatioSelect').value;
-            requestData.output_format = document.getElementById('outputFormatSelect').value;
+            const resSelect = document.getElementById('resolutionSelect');
+            const aspectSelect = document.getElementById('aspectRatioSelect');
+            const formatSelect = document.getElementById('outputFormatSelect');
+
+            if (resSelect) requestData.resolution = resSelect.value;
+            if (aspectSelect) requestData.aspect_ratio = aspectSelect.value;
+            if (formatSelect) requestData.output_format = formatSelect.value;
 
             const response = await fetch('/api/magix/generate', {
                 method: 'POST',
@@ -1362,16 +1368,20 @@ class NanoStudio {
     addModeParameters(data) {
         switch(this.currentMode) {
             case 'corporate_headshot':
-                data.background = document.getElementById('backgroundSelect')?.value;
+                const bgSelect = document.getElementById('backgroundSelect');
+                if (bgSelect) data.background = bgSelect.value;
                 break;
             case 'influencer':
-                data.aesthetic = document.getElementById('aestheticSelect')?.value;
+                const aestheticSelect = document.getElementById('aestheticSelect');
+                if (aestheticSelect) data.aesthetic = aestheticSelect.value;
                 break;
             case 'founder_headshot':
-                data.vibe = document.getElementById('vibeSelect')?.value;
+                const vibeSelect = document.getElementById('vibeSelect');
+                if (vibeSelect) data.vibe = vibeSelect.value;
                 break;
             case 'avatar':
-                data.style = document.getElementById('avatarStyleSelect')?.value;
+                const avatarSelect = document.getElementById('avatarStyleSelect');
+                if (avatarSelect) data.style = avatarSelect.value;
                 break;
         }
     }

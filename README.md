@@ -69,17 +69,17 @@ Virtual Try-On revolutionizes online shopping by allowing users to see themselve
 - **Social Media**: Create fashion content without physical photoshoots
 - **Virtual Wardrobes**: Build digital clothing collections
 
-### 🎯 Nano Studio - Revolutionary AI Image Manipulation
-**Powered by Google's Nano Banana Pro (Nano Banana 2)**
+### 📸 Magix - AI Photography Studio
+**Powered by Google's Nano Banana Pro with 2000+ Word Prompts**
 
-Nano Studio features Google's state-of-the-art image generation and editing model, offering unprecedented control and quality through seven specialized modes with 1K/2K/4K resolution support.
+Magix transforms your photos into stunning professional portraits with 22 specialized photography styles. Features comprehensive prompts (400-600 words each) leveraging Nano Banana Pro's full capabilities, with **100% facial feature preservation**.
 
 #### 🚀 Automatic Image Optimization
-Nano Studio includes intelligent image optimization that automatically processes images before AI manipulation:
+Magix includes intelligent image optimization that automatically processes images before AI manipulation:
 
 **Key Features:**
 - **Smart Compression**: Automatically reduces file sizes while maintaining visual quality
-- **Dimension Optimization**: Resizes images to optimal dimensions (max 1536x1536 for Magix)
+- **Dimension Optimization**: Resizes images to optimal dimensions (max 1536x1536)
 - **Format Conversion**: Converts images to JPEG for optimal processing speed
 - **EXIF Orientation Fix**: Automatically corrects image orientation from phone cameras
 - **Progressive Loading**: Uses progressive JPEG encoding for faster web display
@@ -88,65 +88,61 @@ Nano Studio includes intelligent image optimization that automatically processes
 - **Maximum Dimensions**: 1536x1536 pixels (maintains aspect ratio)
 - **Quality Level**: 90% JPEG quality for optimal balance
 - **File Size Target**: Under 4MB for efficient processing
-- **Automatic Fallback**: Gracefully handles optimization failures
-- **Batch Support**: Can optimize multiple images simultaneously
+- **Resolution Options**: 1K, 2K, 4K output quality
+- **Aspect Ratios**: Auto, 1:1, 4:5, 9:16, 16:9, 21:9, and more
 
-**Benefits:**
-- ✅ **3-5x faster upload times** for large images
-- ✅ **Reduced API costs** through smaller payload sizes
-- ✅ **Better compatibility** with AI models
-- ✅ **Preserves image quality** for AI processing
-- ✅ **Handles iPhone/Android photos** with proper orientation
+#### ⭐ **Main Portrait Styles** (Always Visible)
 
-#### 🎬 **Director Mode** - Sequential Editing with Version Control
-- Chain multiple edits while maintaining perfect consistency
-- Visual timeline with edit history thumbnails
-- Branch different edit paths and rollback to any point
-- Perfect for iterative creative workflows
+| Style | Description |
+|-------|-------------|
+| **Studio Portrait** | Professional studio photography with clean background, soft three-point lighting, polished look |
+| **Cinematic Portrait** | Movie-scene quality with dramatic lighting, shallow depth of field, atmospheric mood |
+| **Corporate Headshot** | LinkedIn-ready professional headshots with clean backgrounds and executive presence |
+| **Fashion Editorial** | High-fashion magazine quality with dramatic lighting and Vogue-worthy styling |
+| **Influencer** | Instagram-ready photos with trendy aesthetics and scroll-stopping appeal |
+| **Founder Headshot** | Pitch-deck ready photos conveying visionary leadership for startups |
 
-#### 🔮 **3D Vision Mode** - Multi-View Generation
-- Generate 360° turntable views from a single image
-- Create character sheets with multiple poses
-- Product visualization from different angles
-- "Show me the back" feature with accurate physics understanding
+#### 🎨 **Additional Portrait Styles** (16 More in Expandable Section)
 
-#### 📚 **Story Mode** - Comic Strip & Narrative Creation
-- Automatic 4-6 panel comic generation
-- Perfect character consistency across all panels
-- Story progression with narrative understanding
-- Add speech bubbles and visual effects
+- **Environmental Portrait** - Contextual portraits in meaningful real-world settings
+- **Lifestyle Portrait** - Authentic, candid-feeling photos with warm atmosphere
+- **Street Portrait** - Urban photography with authentic city backdrops
+- **Low-Key Dramatic** - Portraits dominated by shadows with high contrast
+- **High-Key Bright** - Bright, airy portraits with minimal shadows
+- **Black & White** - Timeless monochrome with rich tonal range
+- **Beauty Close-Up** - Professional beauty photography emphasizing facial features
+- **Athletic Portrait** - Dynamic sports photography showcasing strength
+- **Creative Color** - Bold artistic portraits with neon gels and vibrant colors
+- **Vintage Retro** - Nostalgic film photography aesthetics (70s, 80s, Polaroid)
+- **Minimalist** - Maximum impact through simplicity and negative space
+- **Cultural Portrait** - Celebrating heritage with traditional styling
+- **Conceptual Art** - Artistic portraits with symbolic elements
+- **Luxury Elite** - Premium portraits exuding wealth and sophistication
+- **Stylized Avatar** - Artistic character transformation (3D, anime, comic)
+- **Photo Restoration** - Enhance and restore image quality
 
-#### 🎨 **Style Transfer Mode** - Advanced Artistic Transformations
-- Transform images into any artistic style (anime, oil painting, sketch, etc.)
-- Mix multiple styles with precise control sliders
-- Preserve specific elements while styling others
-- Material changes (glass, metal, wood, ice transformations)
+#### 🎯 **100% Facial Feature Preservation**
+Every prompt includes comprehensive facial preservation instructions:
+- Exact face shape and bone structure
+- Eye shape, color, size, and spacing
+- Nose and mouth shape
+- Eyebrow shape and position
+- Skin texture and natural marks
+- Hairline shape
+- Overall facial proportions
 
-#### 🔧 **Restoration Mode** - Fix and Enhance Photos
-- Automatic damage and tear repair
-- Intelligent colorization of black & white photos
-- Upscale and enhance detail quality
-- Remove artifacts and noise while preserving authenticity
+#### 🛠️ **Mode-Specific Controls**
+- **Corporate**: Background style (neutral, white, gradient, office blur)
+- **Influencer**: Aesthetic (glamorous, natural, golden hour, urban chic)
+- **Founder**: Leadership vibe (visionary, approachable CEO, tech innovator)
+- **Avatar**: Style (semi-realistic, 3D Pixar, anime, comic book, fantasy)
 
-#### 💼 **Professional Mode** - Content Creation Tools
-- YouTube thumbnail generation with smart templates
-- Instant background removal and replacement
-- Edit text within existing images
-- Brand asset and social media content generation
-
-#### ⚡ **Physics Mode** - Realistic Effects & Simulations
-- Add physically accurate reflections and shadows
-- Weather effects (rain, snow, lightning)
-- Liquid and particle simulations
-- Time progression effects (aging, decay, growth)
-
-**Key Advantages of Nano Studio:**
-- **Perfect Physics Understanding**: Accurately predicts reflections, shadows, and physical interactions
-- **Character Consistency**: Maintains exact character features across multiple edits
-- **3D Understanding**: Can rotate objects and show different angles accurately
-- **Style Preservation**: Maintains original image style when adding new elements
+#### ✨ **Key Features**
+- **Comprehensive Prompts**: 400-600 words per mode with detailed specifications
+- **Mode Description Panel**: Shows exactly what photos you'll create when selecting a style
+- **Real-time Preview**: Visual progress tracking with descriptive updates
 - **Batch Processing**: Handle multiple images simultaneously
-- **Real-time Progress**: Visual progress tracking with descriptive updates
+- **Continue Editing**: Chain edits together for iterative workflows
 
 ### 🎯 Explainer Tool - Visual Content Creation
 **Create stunning infographics, diagrams, and visual explanations with AI**
@@ -309,58 +305,63 @@ Transform complex ideas into professional visual content using the Nano Banana P
 - **Environment**: python-dotenv
 - **File Storage**: Local filesystem with multi-format support
 
-## 🎯 Using Nano Studio
+## 📸 Using Magix AI Photography Studio
 
-### Accessing Nano Studio
+### Accessing Magix
 1. Navigate to `/magix` in your Sketch Maker application
-2. Or click on "Nano Studio" from the dashboard
+2. Or click on "Magix" from the navigation menu
 
 ### Quick Start Guide
 
-1. **Select a Mode**: Choose from the 7 available modes based on your needs
-2. **Upload Image(s)**: Drag and drop or click to upload (supports batch processing)
-3. **Enter Prompt**: Describe what you want to create or modify
-4. **Adjust Settings** (Optional):
-   - Temperature: Controls creativity (0-2)
-   - Number of images: Generate multiple variations (1-4)
-   - Seed: For reproducible results
-5. **Generate**: Click the Generate button and watch the real-time progress
-6. **Download or Continue**: Save your results or use them as input for further editing
+1. **Select a Portrait Style**: Choose from 6 main styles or expand "More Styles" for 16 additional options
+2. **Read the Description**: The mode description panel explains exactly what photos you'll create
+3. **Upload Your Photo**: Drag and drop or click to upload your image
+4. **Choose Resolution & Aspect Ratio**:
+   - Resolution: 1K (Standard), 2K (High Quality), 4K (Ultra HD)
+   - Aspect Ratio: Auto, 1:1 (Square), 4:5 (Portrait), 9:16 (Story), 16:9 (Wide), etc.
+5. **Add Custom Instructions** (Optional): Add specific details like "black background" or "outdoor setting"
+6. **Generate**: Click Generate and watch real-time progress
+7. **Download or Continue**: Save your results or use as input for further editing
 
-### Example Prompts by Mode
+### Example Usage by Style
 
-**Director Mode:**
-- "First add a sunset, then add birds flying, finally add a lighthouse"
-- "Remove the person, then change the sky to night, then add stars"
+**Studio Portrait:**
+- Just upload - the comprehensive prompt handles everything
+- Optional: "with blue gradient background" or "dramatic side lighting"
 
-**3D Vision Mode:**
-- "Show this product from 5 different angles"
-- "Create a character sheet with front, side, and back views"
-- "Rotate this object 180 degrees"
+**Cinematic Portrait:**
+- Optional: "teal and orange color grading" or "noir style"
+- Optional: "Blade Runner aesthetic" or "moody atmospheric"
 
-**Story Mode:**
-- "Create a 4-panel comic about a cat's adventure"
-- "Show this character's day from morning to night"
+**Corporate Headshot:**
+- Select background style from dropdown (neutral, white, office blur)
+- Optional: "confident smile" or "professional but approachable"
 
-**Style Transfer Mode:**
-- "Convert this to anime style"
-- "Make it look like an oil painting"
-- "Transform to pixel art"
+**Fashion Editorial:**
+- Optional: "Vogue cover style" or "high contrast dramatic"
+- Optional: "bold red lips emphasis" or "avant-garde styling"
 
-**Restoration Mode:**
-- "Repair all damage and colorize this old photo"
-- "Remove scratches and enhance details"
-- "Upscale and improve quality"
+**Influencer:**
+- Select aesthetic from dropdown (glamorous, natural, golden hour, etc.)
+- Optional: "lifestyle cafe setting" or "outdoor golden hour"
 
-**Professional Mode:**
-- "Create a YouTube thumbnail with dramatic text"
-- "Remove background and add professional gradient"
-- "Change the text to say 'HUGE NEWS'"
+**Founder Headshot:**
+- Select leadership vibe (visionary, tech innovator, approachable CEO)
+- Optional: "modern tech office background" or "startup energy"
 
-**Physics Mode:**
-- "Add realistic water reflection"
-- "Make it rain with proper physics"
-- "Add fire effect with smoke"
+**Black & White:**
+- Optional: "high contrast dramatic" or "soft romantic"
+- Optional: "Avedon style" or "classic portraiture"
+
+**Creative Color:**
+- Optional: "neon pink and blue" or "cyberpunk aesthetic"
+- Optional: "split lighting with gels"
+
+### Pro Tips
+- **Facial features are automatically preserved** - no need to specify
+- **Prompts are comprehensive** (400-600 words) - you only need to add specifics
+- **Chain edits together** using "Continue Editing" for iterative refinement
+- **Use 4K resolution** for print-quality output
 
 ## 🚀 Quick Start
 
