@@ -334,6 +334,17 @@
                 </div>
             </div>
 
+            <!-- Selected Mode Description -->
+            <div id="modeDescription" class="alert bg-base-200 mb-4">
+                <div>
+                    <i id="modeDescIcon" class="fas fa-camera text-2xl text-purple-500"></i>
+                    <div>
+                        <h3 id="modeDescTitle" class="font-bold">Studio Portrait</h3>
+                        <p id="modeDescText" class="text-sm text-base-content/70">Professional studio photography with clean background, soft diffused lighting, and polished refined look. Perfect for portfolios and professional use.</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- More Styles - Collapsible -->
             <div class="collapse collapse-arrow bg-base-200 rounded-xl">
                 <input type="checkbox" id="moreStylesToggle" />
@@ -815,7 +826,7 @@ class NanoStudio {
 
     selectMode(mode) {
         this.currentMode = mode;
-        
+
         // Update UI
         document.querySelectorAll('.mode-card').forEach(card => {
             card.classList.remove('active');
@@ -826,9 +837,154 @@ class NanoStudio {
 
         // Show mode-specific controls
         this.showModeControls(mode);
-        
+
+        // Update mode description
+        this.updateModeDescription(mode);
+
         // Update tips
         this.updateTips(mode);
+    }
+
+    updateModeDescription(mode) {
+        const descriptions = {
+            studio_portrait: {
+                icon: 'fas fa-camera',
+                color: 'text-purple-500',
+                title: 'Studio Portrait',
+                text: 'Professional studio photography with clean seamless background, soft three-point lighting setup, and polished refined look. Perfect for portfolios, headshots, and professional branding. Your facial features are preserved with 100% accuracy.'
+            },
+            cinematic: {
+                icon: 'fas fa-film',
+                color: 'text-amber-500',
+                title: 'Cinematic Portrait',
+                text: 'Movie-scene quality with dramatic lighting, shallow depth of field, and atmospheric mood. Includes film-like color grading (teal & orange, etc.), bokeh effects, and narrative composition. Perfect for creative portfolios and artistic expression.'
+            },
+            corporate_headshot: {
+                icon: 'fas fa-user-tie',
+                color: 'text-blue-500',
+                title: 'Corporate Headshot',
+                text: 'LinkedIn-ready professional headshot with clean background, flattering business lighting, and confident approachable expression. Ideal for job applications, company websites, and professional networking. Executive presence guaranteed.'
+            },
+            fashion_editorial: {
+                icon: 'fas fa-gem',
+                color: 'text-pink-500',
+                title: 'Fashion Editorial',
+                text: 'High-fashion magazine quality with dramatic intentional lighting, bold editorial poses, and Vogue-worthy styling. Perfect for modeling portfolios, fashion campaigns, and artistic photography.'
+            },
+            influencer: {
+                icon: 'fab fa-instagram',
+                color: 'text-rose-500',
+                title: 'Social Media Influencer',
+                text: 'Instagram-ready photos with trendy aesthetics, flattering lighting, and scroll-stopping appeal. Choose from glamorous, natural, golden hour, urban chic, or soft dreamy styles. Optimized for engagement.'
+            },
+            founder_headshot: {
+                icon: 'fas fa-rocket',
+                color: 'text-emerald-500',
+                title: 'Startup Founder',
+                text: 'Pitch-deck ready headshots conveying visionary leadership and innovation. Modern tech aesthetic perfect for investor meetings, company about pages, and press features. Project confidence and authority.'
+            },
+            environmental: {
+                icon: 'fas fa-tree',
+                color: 'text-green-500',
+                title: 'Environmental Portrait',
+                text: 'Contextual portraits in meaningful real-world settings that tell your story. Natural lighting with background elements that reveal personality, profession, or interests.'
+            },
+            lifestyle: {
+                icon: 'fas fa-coffee',
+                color: 'text-amber-600',
+                title: 'Lifestyle Portrait',
+                text: 'Authentic, candid-feeling photos capturing natural everyday moments. Warm, inviting atmosphere with relaxed expressions. Perfect for personal branding and social media.'
+            },
+            street_portrait: {
+                icon: 'fas fa-city',
+                color: 'text-slate-500',
+                title: 'Street Portrait',
+                text: 'Urban photography with authentic city backdrops, raw energy, and genuine character. Textured walls, graffiti, and street scenes add context and edge.'
+            },
+            low_key: {
+                icon: 'fas fa-moon',
+                color: 'text-gray-700',
+                title: 'Low-Key Dramatic',
+                text: 'Dramatic portraits dominated by shadows and darkness. Strong single-source lighting sculpts features with high contrast. Mysterious, powerful, and artistic.'
+            },
+            high_key: {
+                icon: 'fas fa-sun',
+                color: 'text-yellow-400',
+                title: 'High-Key Bright',
+                text: 'Bright, airy portraits with minimal shadows. Clean white backgrounds, soft wrap-around lighting, and fresh optimistic mood. Perfect for beauty and wellness.'
+            },
+            black_white: {
+                icon: 'fas fa-adjust',
+                color: 'text-gray-600',
+                title: 'Black & White',
+                text: 'Timeless monochrome portraits with rich tonal range, emotional depth, and classic appeal. Focus on texture, form, and expression without color distraction.'
+            },
+            beauty_closeup: {
+                icon: 'fas fa-spa',
+                color: 'text-pink-400',
+                title: 'Beauty Close-Up',
+                text: 'Professional beauty photography emphasizing flawless skin, makeup details, and facial features. Tight framing with butterfly lighting for glamorous results.'
+            },
+            athletic: {
+                icon: 'fas fa-running',
+                color: 'text-orange-500',
+                title: 'Athletic Portrait',
+                text: 'Dynamic sports photography showcasing strength, power, and physical capability. Dramatic lighting sculpts physique with intense, determined energy.'
+            },
+            creative_color: {
+                icon: 'fas fa-palette',
+                color: 'text-violet-500',
+                title: 'Creative Color',
+                text: 'Bold artistic portraits with neon gels, colored lighting, and vibrant color grading. Contemporary, edgy aesthetic perfect for music, fashion, and creative industries.'
+            },
+            vintage_retro: {
+                icon: 'fas fa-clock',
+                color: 'text-amber-700',
+                title: 'Vintage Retro',
+                text: 'Nostalgic film photography aesthetics - 70s warmth, 80s bold colors, Polaroid feel, or classic Kodachrome. Authentic grain and period-appropriate color science.'
+            },
+            minimalist: {
+                icon: 'fas fa-minus',
+                color: 'text-gray-400',
+                title: 'Minimalist',
+                text: 'Maximum impact through simplicity. Generous negative space, clean backgrounds, and refined elegance. Calm, contemplative, and sophisticated.'
+            },
+            cultural: {
+                icon: 'fas fa-globe',
+                color: 'text-teal-500',
+                title: 'Cultural Portrait',
+                text: 'Celebrating heritage with traditional attire, ethnic styling, and respectful representation. Honors cultural identity with dignified, authentic presentation.'
+            },
+            conceptual: {
+                icon: 'fas fa-lightbulb',
+                color: 'text-yellow-500',
+                title: 'Conceptual Art',
+                text: 'Artistic portraits with symbolic elements, surreal touches, and visual storytelling. Fine art sensibility for creative expression beyond documentation.'
+            },
+            luxury: {
+                icon: 'fas fa-crown',
+                color: 'text-amber-500',
+                title: 'Luxury Elite',
+                text: 'Premium portraits exuding wealth, power, and sophistication. Rich lighting, high-end fashion aesthetic, and refined elegance. Aspirational quality.'
+            },
+            avatar: {
+                icon: 'fas fa-user-astronaut',
+                color: 'text-indigo-500',
+                title: 'Stylized Avatar',
+                text: 'Artistic character transformation while maintaining your likeness. Choose semi-realistic, 3D Pixar, anime, comic book, or fantasy styles for profile pictures and gaming.'
+            },
+            restoration: {
+                icon: 'fas fa-magic',
+                color: 'text-cyan-500',
+                title: 'Photo Restoration',
+                text: 'Enhance and restore image quality. Fix imperfections, improve sharpness, correct colors, and elevate overall quality while maintaining authenticity.'
+            }
+        };
+
+        const desc = descriptions[mode] || descriptions.studio_portrait;
+        document.getElementById('modeDescIcon').className = `${desc.icon} text-2xl ${desc.color}`;
+        document.getElementById('modeDescTitle').textContent = desc.title;
+        document.getElementById('modeDescText').textContent = desc.text;
     }
 
     showModeControls(mode) {
