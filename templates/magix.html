@@ -281,105 +281,180 @@
 
         <!-- Mode Selection -->
         <div class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4">Select Mode</h2>
+            <h2 class="text-2xl font-semibold mb-4">Select Portrait Style</h2>
 
-            <!-- All Modes in Single Grid -->
-            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-12 gap-3">
-                <!-- Photo Enhancement Modes -->
-                <div class="mode-card card bg-gradient-to-br from-pink-500/20 to-purple-500/20 p-3 border border-pink-500/30" data-mode="instagram">
+            <!-- Main Popular Modes -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                <div class="mode-card card bg-gradient-to-br from-purple-500/20 to-indigo-500/20 p-4 border border-purple-500/30" data-mode="studio_portrait">
                     <div class="text-center">
-                        <i class="fab fa-instagram mode-icon text-pink-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">Instagram</h3>
-                        <p class="text-xs text-base-content/60">Influencer</p>
+                        <i class="fas fa-camera mode-icon text-purple-500"></i>
+                        <h3 class="font-bold mt-2 text-sm">Studio</h3>
+                        <p class="text-xs text-base-content/60">Clean & Polished</p>
                     </div>
                 </div>
 
-                <div class="mode-card card bg-gradient-to-br from-amber-500/20 to-orange-500/20 p-3 border border-amber-500/30" data-mode="ai_photography">
+                <div class="mode-card card bg-gradient-to-br from-amber-500/20 to-orange-500/20 p-4 border border-amber-500/30" data-mode="cinematic">
                     <div class="text-center">
-                        <i class="fas fa-camera-retro mode-icon text-amber-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">AI Photo</h3>
-                        <p class="text-xs text-base-content/60">Artistic</p>
+                        <i class="fas fa-film mode-icon text-amber-500"></i>
+                        <h3 class="font-bold mt-2 text-sm">Cinematic</h3>
+                        <p class="text-xs text-base-content/60">Movie Scene</p>
                     </div>
                 </div>
 
-                <div class="mode-card card bg-gradient-to-br from-rose-500/20 to-red-500/20 p-3 border border-rose-500/30" data-mode="attractive">
+                <div class="mode-card card bg-gradient-to-br from-blue-500/20 to-cyan-500/20 p-4 border border-blue-500/30" data-mode="corporate_headshot">
                     <div class="text-center">
-                        <i class="fas fa-heart mode-icon text-rose-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">Attractive</h3>
-                        <p class="text-xs text-base-content/60">Appeal</p>
+                        <i class="fas fa-user-tie mode-icon text-blue-500"></i>
+                        <h3 class="font-bold mt-2 text-sm">Corporate</h3>
+                        <p class="text-xs text-base-content/60">LinkedIn Ready</p>
                     </div>
                 </div>
 
-                <div class="mode-card card bg-gradient-to-br from-blue-500/20 to-indigo-500/20 p-3 border border-blue-500/30" data-mode="pro_headshot">
+                <div class="mode-card card bg-gradient-to-br from-pink-500/20 to-rose-500/20 p-4 border border-pink-500/30" data-mode="fashion_editorial">
                     <div class="text-center">
-                        <i class="fab fa-linkedin mode-icon text-blue-600"></i>
-                        <h3 class="font-bold mt-2 text-sm">LinkedIn</h3>
-                        <p class="text-xs text-base-content/60">Headshot</p>
+                        <i class="fas fa-gem mode-icon text-pink-500"></i>
+                        <h3 class="font-bold mt-2 text-sm">Fashion</h3>
+                        <p class="text-xs text-base-content/60">Editorial Style</p>
                     </div>
                 </div>
 
-                <div class="mode-card card bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-3 border border-emerald-500/30" data-mode="founder_headshot">
+                <div class="mode-card card bg-gradient-to-br from-rose-500/20 to-red-500/20 p-4 border border-rose-500/30" data-mode="influencer">
+                    <div class="text-center">
+                        <i class="fab fa-instagram mode-icon text-rose-500"></i>
+                        <h3 class="font-bold mt-2 text-sm">Influencer</h3>
+                        <p class="text-xs text-base-content/60">Social Media</p>
+                    </div>
+                </div>
+
+                <div class="mode-card card bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-4 border border-emerald-500/30" data-mode="founder_headshot">
                     <div class="text-center">
                         <i class="fas fa-rocket mode-icon text-emerald-500"></i>
                         <h3 class="font-bold mt-2 text-sm">Founder</h3>
-                        <p class="text-xs text-base-content/60">Startup</p>
+                        <p class="text-xs text-base-content/60">Startup Leader</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Creative Tools -->
-                <div class="mode-card card bg-base-200 p-3" data-mode="director">
-                    <div class="text-center">
-                        <i class="fas fa-film mode-icon text-purple-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">Director</h3>
-                        <p class="text-xs text-base-content/60">Sequence</p>
-                    </div>
+            <!-- More Styles - Collapsible -->
+            <div class="collapse collapse-arrow bg-base-200 rounded-xl">
+                <input type="checkbox" id="moreStylesToggle" />
+                <div class="collapse-title font-medium flex items-center gap-2">
+                    <i class="fas fa-th-large text-base-content/60"></i>
+                    More Portrait Styles
+                    <span class="badge badge-sm badge-primary">+16 styles</span>
                 </div>
+                <div class="collapse-content">
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 pt-2">
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="environmental">
+                            <div class="text-center">
+                                <i class="fas fa-tree mode-icon text-green-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Environmental</h3>
+                            </div>
+                        </div>
 
-                <div class="mode-card card bg-base-200 p-3" data-mode="3d_vision">
-                    <div class="text-center">
-                        <i class="fas fa-cube mode-icon text-blue-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">3D Vision</h3>
-                        <p class="text-xs text-base-content/60">Multi-view</p>
-                    </div>
-                </div>
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="lifestyle">
+                            <div class="text-center">
+                                <i class="fas fa-coffee mode-icon text-amber-600"></i>
+                                <h3 class="font-bold mt-2 text-xs">Lifestyle</h3>
+                            </div>
+                        </div>
 
-                <div class="mode-card card bg-base-200 p-3" data-mode="story">
-                    <div class="text-center">
-                        <i class="fas fa-book-open mode-icon text-green-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">Story</h3>
-                        <p class="text-xs text-base-content/60">Comics</p>
-                    </div>
-                </div>
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="street_portrait">
+                            <div class="text-center">
+                                <i class="fas fa-city mode-icon text-slate-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Street</h3>
+                            </div>
+                        </div>
 
-                <div class="mode-card card bg-base-200 p-3" data-mode="style_transfer">
-                    <div class="text-center">
-                        <i class="fas fa-palette mode-icon text-pink-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">Style</h3>
-                        <p class="text-xs text-base-content/60">Transfer</p>
-                    </div>
-                </div>
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="low_key">
+                            <div class="text-center">
+                                <i class="fas fa-moon mode-icon text-gray-700"></i>
+                                <h3 class="font-bold mt-2 text-xs">Low-Key</h3>
+                            </div>
+                        </div>
 
-                <div class="mode-card card bg-base-200 p-3" data-mode="restoration">
-                    <div class="text-center">
-                        <i class="fas fa-magic mode-icon text-yellow-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">Restore</h3>
-                        <p class="text-xs text-base-content/60">Enhance</p>
-                    </div>
-                </div>
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="high_key">
+                            <div class="text-center">
+                                <i class="fas fa-sun mode-icon text-yellow-400"></i>
+                                <h3 class="font-bold mt-2 text-xs">High-Key</h3>
+                            </div>
+                        </div>
 
-                <div class="mode-card card bg-base-200 p-3" data-mode="professional">
-                    <div class="text-center">
-                        <i class="fas fa-briefcase mode-icon text-indigo-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">Pro</h3>
-                        <p class="text-xs text-base-content/60">Content</p>
-                    </div>
-                </div>
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="black_white">
+                            <div class="text-center">
+                                <i class="fas fa-adjust mode-icon text-gray-600"></i>
+                                <h3 class="font-bold mt-2 text-xs">B&W</h3>
+                            </div>
+                        </div>
 
-                <div class="mode-card card bg-base-200 p-3" data-mode="physics">
-                    <div class="text-center">
-                        <i class="fas fa-atom mode-icon text-cyan-500"></i>
-                        <h3 class="font-bold mt-2 text-sm">Physics</h3>
-                        <p class="text-xs text-base-content/60">Effects</p>
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="beauty_closeup">
+                            <div class="text-center">
+                                <i class="fas fa-spa mode-icon text-pink-400"></i>
+                                <h3 class="font-bold mt-2 text-xs">Beauty</h3>
+                            </div>
+                        </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="athletic">
+                            <div class="text-center">
+                                <i class="fas fa-running mode-icon text-orange-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Athletic</h3>
+                            </div>
+                        </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="creative_color">
+                            <div class="text-center">
+                                <i class="fas fa-palette mode-icon text-violet-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Creative</h3>
+                            </div>
+                        </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="vintage_retro">
+                            <div class="text-center">
+                                <i class="fas fa-clock mode-icon text-sepia"></i>
+                                <h3 class="font-bold mt-2 text-xs">Vintage</h3>
+                            </div>
+                        </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="minimalist">
+                            <div class="text-center">
+                                <i class="fas fa-minus mode-icon text-gray-400"></i>
+                                <h3 class="font-bold mt-2 text-xs">Minimalist</h3>
+                            </div>
+                        </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="cultural">
+                            <div class="text-center">
+                                <i class="fas fa-globe mode-icon text-teal-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Cultural</h3>
+                            </div>
+                        </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="conceptual">
+                            <div class="text-center">
+                                <i class="fas fa-lightbulb mode-icon text-yellow-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Conceptual</h3>
+                            </div>
+                        </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="luxury">
+                            <div class="text-center">
+                                <i class="fas fa-crown mode-icon text-amber-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Luxury</h3>
+                            </div>
+                        </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="avatar">
+                            <div class="text-center">
+                                <i class="fas fa-user-astronaut mode-icon text-indigo-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Avatar</h3>
+                            </div>
+                        </div>
+
+                        <div class="mode-card card bg-base-100 p-3 hover:bg-base-300" data-mode="restoration">
+                            <div class="text-center">
+                                <i class="fas fa-magic mode-icon text-cyan-500"></i>
+                                <h3 class="font-bold mt-2 text-xs">Restore</h3>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -444,125 +519,37 @@
 
                         <!-- Mode-specific controls -->
                         <div id="modeControls" class="mt-4">
-                            <!-- Style Transfer Options -->
-                            <div id="styleTransferControls" class="hidden">
+                            <!-- Corporate Headshot Options -->
+                            <div id="corporateControls" class="hidden">
                                 <label class="label">
-                                    <span class="label-text font-bold">Style</span>
+                                    <span class="label-text font-bold">Background</span>
                                 </label>
-                                <div class="flex flex-wrap gap-2">
-                                    <button class="style-option btn btn-sm" data-style="anime">Anime</button>
-                                    <button class="style-option btn btn-sm" data-style="realistic">Realistic</button>
-                                    <button class="style-option btn btn-sm" data-style="oil_painting">Oil Painting</button>
-                                    <button class="style-option btn btn-sm" data-style="watercolor">Watercolor</button>
-                                    <button class="style-option btn btn-sm" data-style="pencil_sketch">Sketch</button>
-                                    <button class="style-option btn btn-sm" data-style="3d_render">3D Render</button>
-                                    <button class="style-option btn btn-sm" data-style="pixel_art">Pixel Art</button>
-                                    <button class="style-option btn btn-sm" data-style="vintage">Vintage</button>
-                                </div>
-                            </div>
-
-                            <!-- Professional Templates -->
-                            <div id="professionalControls" class="hidden">
-                                <label class="label">
-                                    <span class="label-text font-bold">Template</span>
-                                </label>
-                                <select id="templateSelect" class="select select-bordered w-full">
-                                    <option value="youtube_thumbnail">YouTube Thumbnail</option>
-                                    <option value="instagram_post">Instagram Post</option>
-                                    <option value="twitter_header">Twitter Header</option>
-                                    <option value="product_showcase">Product Showcase</option>
-                                    <option value="blog_header">Blog Header</option>
-                                    <option value="social_ad">Social Media Ad</option>
+                                <select id="backgroundSelect" class="select select-bordered w-full">
+                                    <option value="neutral_gray">Neutral Gray</option>
+                                    <option value="clean_white">Clean White</option>
+                                    <option value="soft_gradient">Soft Gradient</option>
+                                    <option value="office_blur">Blurred Office</option>
+                                    <option value="outdoor_blur">Blurred Outdoor</option>
                                 </select>
                             </div>
 
-                            <!-- Physics Effects -->
-                            <div id="physicsControls" class="hidden">
+                            <!-- Influencer Options -->
+                            <div id="influencerControls" class="hidden">
                                 <label class="label">
-                                    <span class="label-text font-bold">Effect</span>
-                                </label>
-                                <select id="effectSelect" class="select select-bordered w-full">
-                                    <option value="reflection">Reflections</option>
-                                    <option value="water_splash">Water Splash</option>
-                                    <option value="rain">Rain Effect</option>
-                                    <option value="snow">Snow Effect</option>
-                                    <option value="fire">Fire Effect</option>
-                                    <option value="smoke">Smoke Effect</option>
-                                    <option value="lightning">Lightning</option>
-                                    <option value="particles">Particles</option>
-                                </select>
-                            </div>
-
-                            <!-- Instagram Influencer Options -->
-                            <div id="instagramControls" class="hidden">
-                                <label class="label">
-                                    <span class="label-text font-bold">Aesthetic Style</span>
+                                    <span class="label-text font-bold">Aesthetic</span>
                                 </label>
                                 <select id="aestheticSelect" class="select select-bordered w-full">
                                     <option value="glamorous">Glamorous & Luxe</option>
                                     <option value="natural_beauty">Natural Beauty</option>
                                     <option value="golden_hour">Golden Hour Glow</option>
                                     <option value="urban_chic">Urban Chic</option>
-                                    <option value="minimalist">Clean Minimalist</option>
-                                    <option value="vibrant_bold">Vibrant & Bold</option>
                                     <option value="soft_dreamy">Soft & Dreamy</option>
-                                    <option value="editorial">High Fashion Editorial</option>
-                                </select>
-                            </div>
-
-                            <!-- AI Photography Options -->
-                            <div id="aiPhotographyControls" class="hidden">
-                                <label class="label">
-                                    <span class="label-text font-bold">Lighting Style</span>
-                                </label>
-                                <select id="lightingStyleSelect" class="select select-bordered w-full">
-                                    <option value="studio">Studio Professional</option>
-                                    <option value="rembrandt">Rembrandt Lighting</option>
-                                    <option value="butterfly">Butterfly/Paramount</option>
-                                    <option value="split">Split Lighting</option>
-                                    <option value="rim">Rim/Edge Lighting</option>
-                                    <option value="natural_window">Natural Window Light</option>
-                                    <option value="golden_hour">Golden Hour</option>
-                                    <option value="blue_hour">Blue Hour Moody</option>
-                                    <option value="neon">Neon/Cyberpunk</option>
-                                </select>
-                            </div>
-
-                            <!-- Attractive Photos Options -->
-                            <div id="attractiveControls" class="hidden">
-                                <label class="label">
-                                    <span class="label-text font-bold">Expression & Vibe</span>
-                                </label>
-                                <select id="expressionSelect" class="select select-bordered w-full">
-                                    <option value="confident_smile">Confident Smile</option>
-                                    <option value="playful_wink">Playful & Flirty</option>
-                                    <option value="mysterious">Mysterious Allure</option>
-                                    <option value="warm_friendly">Warm & Friendly</option>
-                                    <option value="candid_laugh">Candid Laugh</option>
-                                    <option value="sultry">Sultry & Intense</option>
-                                    <option value="approachable">Approachable & Kind</option>
-                                    <option value="sophisticated">Sophisticated Elegance</option>
-                                </select>
-                            </div>
-
-                            <!-- Professional Headshot Options -->
-                            <div id="proHeadshotControls" class="hidden">
-                                <label class="label">
-                                    <span class="label-text font-bold">Background Style</span>
-                                </label>
-                                <select id="backgroundSelect" class="select select-bordered w-full">
-                                    <option value="neutral">Neutral Gray</option>
-                                    <option value="white">Clean White</option>
-                                    <option value="navy_blue">Corporate Navy</option>
-                                    <option value="gradient">Subtle Gradient</option>
-                                    <option value="office_blur">Blurred Office</option>
-                                    <option value="modern_minimal">Modern Minimal</option>
-                                    <option value="outdoor_blur">Outdoor Blur</option>
+                                    <option value="vibrant_bold">Vibrant & Bold</option>
                                 </select>
                             </div>
 
                             <!-- Founder Headshot Options -->
-                            <div id="founderHeadshotControls" class="hidden">
+                            <div id="founderControls" class="hidden">
                                 <label class="label">
                                     <span class="label-text font-bold">Leadership Vibe</span>
                                 </label>
@@ -572,9 +559,22 @@
                                     <option value="tech_innovator">Tech Innovator</option>
                                     <option value="disruptor">Industry Disruptor</option>
                                     <option value="thought_leader">Thought Leader</option>
-                                    <option value="young_entrepreneur">Young Entrepreneur</option>
-                                    <option value="seasoned_executive">Seasoned Executive</option>
                                     <option value="creative_founder">Creative Founder</option>
+                                </select>
+                            </div>
+
+                            <!-- Avatar Options -->
+                            <div id="avatarControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Avatar Style</span>
+                                </label>
+                                <select id="avatarStyleSelect" class="select select-bordered w-full">
+                                    <option value="semi_realistic">Semi-Realistic</option>
+                                    <option value="3d_pixar">3D Pixar Style</option>
+                                    <option value="anime">Anime Character</option>
+                                    <option value="comic_book">Comic Book Hero</option>
+                                    <option value="digital_art">Digital Art</option>
+                                    <option value="fantasy">Fantasy Character</option>
                                 </select>
                             </div>
                         </div>
@@ -740,7 +740,7 @@
 // Nano Studio Main Application
 class NanoStudio {
     constructor() {
-        this.currentMode = 'director';
+        this.currentMode = 'studio_portrait';
         this.uploadedImages = [];
         this.editHistory = [];
         this.results = [];
@@ -832,31 +832,19 @@ class NanoStudio {
         // Hide all mode controls
         document.querySelectorAll('[id$="Controls"]').forEach(el => el.classList.add('hidden'));
 
-        // Show specific controls
+        // Show specific controls based on mode
         switch(mode) {
-            case 'style_transfer':
-                document.getElementById('styleTransferControls')?.classList.remove('hidden');
+            case 'corporate_headshot':
+                document.getElementById('corporateControls')?.classList.remove('hidden');
                 break;
-            case 'professional':
-                document.getElementById('professionalControls')?.classList.remove('hidden');
-                break;
-            case 'physics':
-                document.getElementById('physicsControls')?.classList.remove('hidden');
-                break;
-            case 'instagram':
-                document.getElementById('instagramControls')?.classList.remove('hidden');
-                break;
-            case 'ai_photography':
-                document.getElementById('aiPhotographyControls')?.classList.remove('hidden');
-                break;
-            case 'attractive':
-                document.getElementById('attractiveControls')?.classList.remove('hidden');
-                break;
-            case 'pro_headshot':
-                document.getElementById('proHeadshotControls')?.classList.remove('hidden');
+            case 'influencer':
+                document.getElementById('influencerControls')?.classList.remove('hidden');
                 break;
             case 'founder_headshot':
-                document.getElementById('founderHeadshotControls')?.classList.remove('hidden');
+                document.getElementById('founderControls')?.classList.remove('hidden');
+                break;
+            case 'avatar':
+                document.getElementById('avatarControls')?.classList.remove('hidden');
                 break;
         }
     }
@@ -864,74 +852,55 @@ class NanoStudio {
     updateTips(mode) {
         const tipsContainer = document.getElementById('modeTips');
         const tips = {
-            director: [
-                'Chain multiple edits to create complex sequences',
-                'Each edit maintains perfect consistency',
-                'Use timeline to navigate edit history'
+            studio_portrait: [
+                'Clean background with soft, diffused lighting',
+                'Perfect for professional portfolios',
+                'Polished and refined look'
             ],
-            '3d_vision': [
-                'Generate 360° turntable views automatically',
-                'Create character sheets with multiple poses',
-                'Perfect for product visualization'
+            cinematic: [
+                'Movie-scene lighting with shallow depth of field',
+                'Moody atmospheric tones',
+                'Dramatic composition'
             ],
-            story: [
-                'Creates 4-panel comic strips automatically',
-                'Maintains character consistency across panels',
-                'Add narrative prompts for better storytelling'
-            ],
-            style_transfer: [
-                'Transform images into any artistic style',
-                'Mix multiple styles with advanced controls',
-                'Preserve specific elements while styling'
-            ],
-            restoration: [
-                'Automatically repair damaged photos',
-                'Colorize black and white images',
-                'Enhance and upscale old photos'
-            ],
-            professional: [
-                'Generate YouTube thumbnails with templates',
-                'Remove/replace backgrounds instantly',
-                'Edit text within images'
-            ],
-            physics: [
-                'Add realistic reflections and shadows',
-                'Create weather effects like rain or snow',
-                'Simulate liquid and particle physics'
-            ],
-            instagram: [
-                'Create stunning influencer-style photos',
-                'Boost your confidence with captivating images',
-                'Perfect lighting and vibrant colors automatically',
-                'Ideal for growing your social media presence'
-            ],
-            ai_photography: [
-                'Professional studio lighting in any photo',
-                'Artistic compositions with cinematic depth',
-                'Masterful shadow and highlight control',
-                'Transform casual shots into portfolio-worthy art'
-            ],
-            attractive: [
-                'Enhance natural beauty and charm',
-                'Flattering angles and expressions',
-                'Showcase your unique personality',
-                'Create more engaging dating or social profiles'
-            ],
-            pro_headshot: [
+            corporate_headshot: [
                 'LinkedIn-ready professional headshots',
-                'Clean, polished corporate appearance',
-                'Stand out to recruiters and employers',
-                'Make a strong first impression'
+                'Clean corporate appearance',
+                'Stand out to recruiters'
+            ],
+            fashion_editorial: [
+                'High-fashion magazine styling',
+                'Dramatic lighting and bold poses',
+                'Editorial quality results'
+            ],
+            influencer: [
+                'Instagram-ready social media shots',
+                'Trendy poses with lifestyle framing',
+                'Boost your social presence'
             ],
             founder_headshot: [
-                'Perfect for pitch decks and investor meetings',
-                'Convey visionary leadership presence',
-                'Modern tech aesthetic for about pages',
-                'Present yourself as a confident industry disruptor'
-            ]
+                'Perfect for pitch decks & investor meetings',
+                'Visionary leadership presence',
+                'Modern tech aesthetic'
+            ],
+            environmental: ['Person in meaningful real-world setting', 'Natural lighting'],
+            lifestyle: ['Candid everyday moments', 'Relaxed and authentic'],
+            street_portrait: ['Urban backgrounds', 'Raw authentic energy'],
+            low_key: ['Dark dramatic contrast', 'Deep shadows'],
+            high_key: ['Bright airy mood', 'Clean whites'],
+            black_white: ['Timeless emotional portraits', 'Rich tonal range'],
+            beauty_closeup: ['Skin detail emphasis', 'Perfect symmetry'],
+            athletic: ['Power stance and motion', 'Dynamic energy'],
+            creative_color: ['Bold neon lighting', 'Artistic color grading'],
+            vintage_retro: ['Film grain aesthetics', 'Nostalgic tones'],
+            minimalist: ['Simple elegant pose', 'Generous negative space'],
+            cultural: ['Heritage styling', 'Traditional elements'],
+            conceptual: ['Symbolic surreal elements', 'Visual storytelling'],
+            luxury: ['Premium fashion styling', 'Rich sophisticated lighting'],
+            avatar: ['Stylized character transformation', 'Artistic rendering'],
+            restoration: ['Fix and enhance old photos', 'Improve quality']
         };
 
-        const modeTips = tips[mode] || [];
+        const modeTips = tips[mode] || ['Upload an image and add a prompt to get started'];
         tipsContainer.innerHTML = modeTips.map(tip => `
             <p class="flex items-start">
                 <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
@@ -1233,32 +1202,17 @@ class NanoStudio {
 
     addModeParameters(data) {
         switch(this.currentMode) {
-            case 'style_transfer':
-                const selectedStyle = document.querySelector('.style-option.selected');
-                if (selectedStyle) {
-                    data.style = selectedStyle.dataset.style;
-                }
-                break;
-            case 'professional':
-                data.template = document.getElementById('templateSelect')?.value;
-                break;
-            case 'physics':
-                data.effect = document.getElementById('effectSelect')?.value;
-                break;
-            case 'instagram':
-                data.aesthetic = document.getElementById('aestheticSelect')?.value;
-                break;
-            case 'ai_photography':
-                data.lighting_style = document.getElementById('lightingStyleSelect')?.value;
-                break;
-            case 'attractive':
-                data.expression = document.getElementById('expressionSelect')?.value;
-                break;
-            case 'pro_headshot':
+            case 'corporate_headshot':
                 data.background = document.getElementById('backgroundSelect')?.value;
+                break;
+            case 'influencer':
+                data.aesthetic = document.getElementById('aestheticSelect')?.value;
                 break;
             case 'founder_headshot':
                 data.vibe = document.getElementById('vibeSelect')?.value;
+                break;
+            case 'avatar':
+                data.style = document.getElementById('avatarStyleSelect')?.value;
                 break;
         }
     }

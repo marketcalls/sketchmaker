@@ -121,63 +121,83 @@ def generate_magix():
             if not metadata.get('optimization_failed'):
                 print(f"Image optimized: {metadata.get('compression_ratio', 100)}% of original size")
 
-        # Mode-specific configurations
-        if mode == 'director':
-            # Sequential editing with version control
-            arguments['prompt'] = f"Step by step edit: {prompt}"
-            
-        elif mode == '3d_vision':
-            # Generate multiple views
-            arguments['prompt'] = f"Show multiple angles and views: {prompt}"
-            
-        elif mode == 'story':
-            # Comic strip generation
-            arguments['prompt'] = f"Create a 4 panel comic strip: {prompt}"
-            arguments['num_images'] = 4
-            
-        elif mode == 'style_transfer':
-            # Artistic transformations
-            style = data.get('style', 'anime')
-            arguments['prompt'] = f"Convert to {style} style: {prompt}"
-            
-        elif mode == 'restoration':
-            # Fix and enhance
-            arguments['prompt'] = f"Restore and enhance this image: {prompt}"
-            
-        elif mode == 'professional':
-            # Content creation
-            template = data.get('template', 'youtube_thumbnail')
-            arguments['prompt'] = f"Create a {template}: {prompt}"
-            
-        elif mode == 'physics':
-            # Physics simulations
-            effect = data.get('effect', 'reflection')
-            arguments['prompt'] = f"Add realistic {effect}: {prompt}"
+        # Base instruction for facial preservation
+        face_preserve = "CRITICAL: Preserve and retain 100% of the original facial features, face shape, eyes, nose, mouth, and exact likeness of the person."
 
-        elif mode == 'instagram':
-            # Instagram influencer style photos
-            aesthetic = data.get('aesthetic', 'glamorous')
-            arguments['prompt'] = f"Transform into a stunning Instagram influencer photo with {aesthetic} aesthetic. IMPORTANT: Retain and preserve exact facial features, face structure, and likeness of the person. Professional lighting, vibrant colors, perfect skin, high fashion style, engaging and confident pose: {prompt}"
+        # Mode-specific configurations - AI Photography Focus
+        if mode == 'studio_portrait':
+            arguments['prompt'] = f"Create a professional studio portrait with clean background, soft diffused lighting, polished and refined look. {face_preserve} {prompt}"
 
-        elif mode == 'ai_photography':
-            # Artistic AI photography with professional lighting
-            lighting_style = data.get('lighting_style', 'studio')
-            arguments['prompt'] = f"Create a stunning artistic photography portrait with {lighting_style} professional lighting. CRITICAL: Preserve and retain 100% of the original facial features, face shape, eyes, nose, mouth, and exact likeness of the person. Creative composition, cinematic depth of field, masterful shadows and highlights, artistic flair: {prompt}"
+        elif mode == 'environmental':
+            arguments['prompt'] = f"Create an environmental portrait with the person in a meaningful real-world setting that tells their story. Natural lighting, contextual background. {face_preserve} {prompt}"
 
-        elif mode == 'attractive':
-            # Attractive photos with playful expressions
-            expression = data.get('expression', 'confident_smile')
-            arguments['prompt'] = f"Create an attractive, engaging portrait with {expression.replace('_', ' ')} expression. IMPORTANT: Keep the exact same facial features, face structure, and complete likeness of the original person. Flattering angle, natural beauty enhancement, warm and approachable vibe, showcase unique personality and charm: {prompt}"
+        elif mode == 'lifestyle':
+            arguments['prompt'] = f"Create a lifestyle portrait capturing natural, candid everyday moments. Relaxed pose, authentic expression, warm natural lighting. {face_preserve} {prompt}"
 
-        elif mode == 'pro_headshot':
-            # Professional headshots for LinkedIn
+        elif mode == 'fashion_editorial':
+            arguments['prompt'] = f"Create a high-fashion editorial portrait with dramatic lighting, magazine-quality styling, bold poses, and artistic composition. {face_preserve} {prompt}"
+
+        elif mode == 'cinematic':
+            arguments['prompt'] = f"Create a cinematic portrait with movie-scene lighting, shallow depth of field, moody atmospheric tones, and dramatic composition. {face_preserve} {prompt}"
+
+        elif mode == 'corporate_headshot':
             background = data.get('background', 'neutral')
-            arguments['prompt'] = f"Create a professional headshot suitable for LinkedIn with {background} background. CRITICAL: Retain and preserve 100% of the original facial features, exact face shape, eyes, and complete likeness. Corporate professional look, confident and approachable expression, proper business attire styling, clean and polished appearance, executive presence: {prompt}"
+            arguments['prompt'] = f"Create a professional corporate headshot with {background} background. Confident professional posture, approachable expression, executive presence, LinkedIn-ready. {face_preserve} {prompt}"
+
+        elif mode == 'street_portrait':
+            arguments['prompt'] = f"Create an urban street portrait with authentic city background, raw energy, natural lighting, and genuine character. {face_preserve} {prompt}"
+
+        elif mode == 'low_key':
+            arguments['prompt'] = f"Create a dramatic low-key portrait with dark background, deep shadows, high contrast, and moody dramatic lighting. {face_preserve} {prompt}"
+
+        elif mode == 'high_key':
+            arguments['prompt'] = f"Create a bright high-key portrait with clean white background, soft airy lighting, minimal shadows, and fresh uplifting mood. {face_preserve} {prompt}"
+
+        elif mode == 'black_white':
+            arguments['prompt'] = f"Create a timeless black and white portrait with rich tonal range, emotional depth, beautiful texture and contrast. {face_preserve} {prompt}"
+
+        elif mode == 'beauty_closeup':
+            arguments['prompt'] = f"Create a beauty close-up portrait emphasizing flawless skin, makeup details, perfect symmetry, and refined features. {face_preserve} {prompt}"
+
+        elif mode == 'athletic':
+            arguments['prompt'] = f"Create an athletic action portrait with powerful stance, dynamic energy, strength and motion conveyed through pose and lighting. {face_preserve} {prompt}"
+
+        elif mode == 'creative_color':
+            arguments['prompt'] = f"Create a creative color portrait with bold gel lighting, neon tones, artistic color grading, and vibrant artistic expression. {face_preserve} {prompt}"
+
+        elif mode == 'vintage_retro':
+            arguments['prompt'] = f"Create a vintage retro portrait with film grain, nostalgic color tones, classic camera aesthetics, and timeless charm. {face_preserve} {prompt}"
+
+        elif mode == 'minimalist':
+            arguments['prompt'] = f"Create a minimalist portrait with simple elegant pose, generous negative space, calm serene presence, and refined simplicity. {face_preserve} {prompt}"
+
+        elif mode == 'cultural':
+            arguments['prompt'] = f"Create a cultural portrait celebrating heritage with traditional ethnic wear, authentic styling, and respectful representation. {face_preserve} {prompt}"
+
+        elif mode == 'conceptual':
+            arguments['prompt'] = f"Create a conceptual portrait with symbolic elements, surreal artistic touches, and meaningful visual storytelling. {face_preserve} {prompt}"
+
+        elif mode == 'influencer':
+            aesthetic = data.get('aesthetic', 'glamorous')
+            arguments['prompt'] = f"Create a social media influencer portrait with {aesthetic} aesthetic, trendy pose, lifestyle framing, Instagram-ready appeal. {face_preserve} {prompt}"
+
+        elif mode == 'luxury':
+            arguments['prompt'] = f"Create a luxury elite portrait with rich premium lighting, high-end fashion styling, powerful sophisticated presence. {face_preserve} {prompt}"
+
+        elif mode == 'avatar':
+            style = data.get('style', 'semi_realistic')
+            arguments['prompt'] = f"Create a stylized avatar portrait with {style.replace('_', ' ')} artistic transformation while maintaining recognizable likeness. {face_preserve} {prompt}"
 
         elif mode == 'founder_headshot':
-            # Startup founder headshots
             vibe = data.get('vibe', 'visionary')
-            arguments['prompt'] = f"Create a startup founder headshot with {vibe} leadership presence. IMPORTANT: Preserve exact facial features, face structure, and 100% likeness of the original person. Modern tech aesthetic, confident and innovative expression, suitable for pitch decks and investor meetings, approachable yet authoritative: {prompt}"
+            arguments['prompt'] = f"Create a startup founder headshot with {vibe} leadership presence, modern tech aesthetic, pitch-deck ready, approachable yet authoritative. {face_preserve} {prompt}"
+
+        elif mode == 'restoration':
+            arguments['prompt'] = f"Restore and enhance this image, fix imperfections, improve quality. {face_preserve} {prompt}"
+
+        elif mode == 'style_transfer':
+            style = data.get('style', 'artistic')
+            arguments['prompt'] = f"Transform to {style} artistic style while preserving identity. {face_preserve} {prompt}"
 
         # Advanced parameters
         if 'temperature' in data:
