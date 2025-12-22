@@ -282,6 +282,53 @@
         <!-- Mode Selection -->
         <div class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">Select Mode</h2>
+
+            <!-- Photo Enhancement Modes (New) -->
+            <p class="text-sm text-base-content/60 mb-2 font-medium">Photo Enhancement</p>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+                <div class="mode-card card bg-gradient-to-br from-pink-500/10 to-purple-500/10 p-4" data-mode="instagram">
+                    <div class="text-center">
+                        <i class="fab fa-instagram mode-icon text-pink-500"></i>
+                        <h3 class="font-bold mt-2">Instagram</h3>
+                        <p class="text-xs text-base-content/60">Influencer style</p>
+                    </div>
+                </div>
+
+                <div class="mode-card card bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-4" data-mode="ai_photography">
+                    <div class="text-center">
+                        <i class="fas fa-camera-retro mode-icon text-amber-500"></i>
+                        <h3 class="font-bold mt-2">AI Photo</h3>
+                        <p class="text-xs text-base-content/60">Artistic portraits</p>
+                    </div>
+                </div>
+
+                <div class="mode-card card bg-gradient-to-br from-rose-500/10 to-red-500/10 p-4" data-mode="attractive">
+                    <div class="text-center">
+                        <i class="fas fa-heart mode-icon text-rose-500"></i>
+                        <h3 class="font-bold mt-2">Attractive</h3>
+                        <p class="text-xs text-base-content/60">Boost appeal</p>
+                    </div>
+                </div>
+
+                <div class="mode-card card bg-gradient-to-br from-blue-500/10 to-indigo-500/10 p-4" data-mode="pro_headshot">
+                    <div class="text-center">
+                        <i class="fab fa-linkedin mode-icon text-blue-600"></i>
+                        <h3 class="font-bold mt-2">LinkedIn</h3>
+                        <p class="text-xs text-base-content/60">Pro headshots</p>
+                    </div>
+                </div>
+
+                <div class="mode-card card bg-gradient-to-br from-emerald-500/10 to-teal-500/10 p-4" data-mode="founder_headshot">
+                    <div class="text-center">
+                        <i class="fas fa-rocket mode-icon text-emerald-500"></i>
+                        <h3 class="font-bold mt-2">Founder</h3>
+                        <p class="text-xs text-base-content/60">Startup leader</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Creative Tools -->
+            <p class="text-sm text-base-content/60 mb-2 font-medium">Creative Tools</p>
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                 <div class="mode-card card bg-base-200 p-4" data-mode="director">
                     <div class="text-center">
@@ -290,7 +337,7 @@
                         <p class="text-xs text-base-content/60">Sequential edits</p>
                     </div>
                 </div>
-                
+
                 <div class="mode-card card bg-base-200 p-4" data-mode="3d_vision">
                     <div class="text-center">
                         <i class="fas fa-cube mode-icon text-blue-500"></i>
@@ -298,7 +345,7 @@
                         <p class="text-xs text-base-content/60">Multi-view</p>
                     </div>
                 </div>
-                
+
                 <div class="mode-card card bg-base-200 p-4" data-mode="story">
                     <div class="text-center">
                         <i class="fas fa-book-open mode-icon text-green-500"></i>
@@ -306,7 +353,7 @@
                         <p class="text-xs text-base-content/60">Comic strips</p>
                     </div>
                 </div>
-                
+
                 <div class="mode-card card bg-base-200 p-4" data-mode="style_transfer">
                     <div class="text-center">
                         <i class="fas fa-palette mode-icon text-pink-500"></i>
@@ -314,7 +361,7 @@
                         <p class="text-xs text-base-content/60">Art transfer</p>
                     </div>
                 </div>
-                
+
                 <div class="mode-card card bg-base-200 p-4" data-mode="restoration">
                     <div class="text-center">
                         <i class="fas fa-magic mode-icon text-yellow-500"></i>
@@ -322,7 +369,7 @@
                         <p class="text-xs text-base-content/60">Fix & enhance</p>
                     </div>
                 </div>
-                
+
                 <div class="mode-card card bg-base-200 p-4" data-mode="professional">
                     <div class="text-center">
                         <i class="fas fa-briefcase mode-icon text-indigo-500"></i>
@@ -330,7 +377,7 @@
                         <p class="text-xs text-base-content/60">Content tools</p>
                     </div>
                 </div>
-                
+
                 <div class="mode-card card bg-base-200 p-4" data-mode="physics">
                     <div class="text-center">
                         <i class="fas fa-atom mode-icon text-cyan-500"></i>
@@ -446,6 +493,91 @@
                                     <option value="smoke">Smoke Effect</option>
                                     <option value="lightning">Lightning</option>
                                     <option value="particles">Particles</option>
+                                </select>
+                            </div>
+
+                            <!-- Instagram Influencer Options -->
+                            <div id="instagramControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Aesthetic Style</span>
+                                </label>
+                                <select id="aestheticSelect" class="select select-bordered w-full">
+                                    <option value="glamorous">Glamorous & Luxe</option>
+                                    <option value="natural_beauty">Natural Beauty</option>
+                                    <option value="golden_hour">Golden Hour Glow</option>
+                                    <option value="urban_chic">Urban Chic</option>
+                                    <option value="minimalist">Clean Minimalist</option>
+                                    <option value="vibrant_bold">Vibrant & Bold</option>
+                                    <option value="soft_dreamy">Soft & Dreamy</option>
+                                    <option value="editorial">High Fashion Editorial</option>
+                                </select>
+                            </div>
+
+                            <!-- AI Photography Options -->
+                            <div id="aiPhotographyControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Lighting Style</span>
+                                </label>
+                                <select id="lightingStyleSelect" class="select select-bordered w-full">
+                                    <option value="studio">Studio Professional</option>
+                                    <option value="rembrandt">Rembrandt Lighting</option>
+                                    <option value="butterfly">Butterfly/Paramount</option>
+                                    <option value="split">Split Lighting</option>
+                                    <option value="rim">Rim/Edge Lighting</option>
+                                    <option value="natural_window">Natural Window Light</option>
+                                    <option value="golden_hour">Golden Hour</option>
+                                    <option value="blue_hour">Blue Hour Moody</option>
+                                    <option value="neon">Neon/Cyberpunk</option>
+                                </select>
+                            </div>
+
+                            <!-- Attractive Photos Options -->
+                            <div id="attractiveControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Expression & Vibe</span>
+                                </label>
+                                <select id="expressionSelect" class="select select-bordered w-full">
+                                    <option value="confident_smile">Confident Smile</option>
+                                    <option value="playful_wink">Playful & Flirty</option>
+                                    <option value="mysterious">Mysterious Allure</option>
+                                    <option value="warm_friendly">Warm & Friendly</option>
+                                    <option value="candid_laugh">Candid Laugh</option>
+                                    <option value="sultry">Sultry & Intense</option>
+                                    <option value="approachable">Approachable & Kind</option>
+                                    <option value="sophisticated">Sophisticated Elegance</option>
+                                </select>
+                            </div>
+
+                            <!-- Professional Headshot Options -->
+                            <div id="proHeadshotControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Background Style</span>
+                                </label>
+                                <select id="backgroundSelect" class="select select-bordered w-full">
+                                    <option value="neutral">Neutral Gray</option>
+                                    <option value="white">Clean White</option>
+                                    <option value="navy_blue">Corporate Navy</option>
+                                    <option value="gradient">Subtle Gradient</option>
+                                    <option value="office_blur">Blurred Office</option>
+                                    <option value="modern_minimal">Modern Minimal</option>
+                                    <option value="outdoor_blur">Outdoor Blur</option>
+                                </select>
+                            </div>
+
+                            <!-- Founder Headshot Options -->
+                            <div id="founderHeadshotControls" class="hidden">
+                                <label class="label">
+                                    <span class="label-text font-bold">Leadership Vibe</span>
+                                </label>
+                                <select id="vibeSelect" class="select select-bordered w-full">
+                                    <option value="visionary">Visionary Leader</option>
+                                    <option value="approachable_ceo">Approachable CEO</option>
+                                    <option value="tech_innovator">Tech Innovator</option>
+                                    <option value="disruptor">Industry Disruptor</option>
+                                    <option value="thought_leader">Thought Leader</option>
+                                    <option value="young_entrepreneur">Young Entrepreneur</option>
+                                    <option value="seasoned_executive">Seasoned Executive</option>
+                                    <option value="creative_founder">Creative Founder</option>
                                 </select>
                             </div>
                         </div>
@@ -702,7 +834,7 @@ class NanoStudio {
     showModeControls(mode) {
         // Hide all mode controls
         document.querySelectorAll('[id$="Controls"]').forEach(el => el.classList.add('hidden'));
-        
+
         // Show specific controls
         switch(mode) {
             case 'style_transfer':
@@ -713,6 +845,21 @@ class NanoStudio {
                 break;
             case 'physics':
                 document.getElementById('physicsControls')?.classList.remove('hidden');
+                break;
+            case 'instagram':
+                document.getElementById('instagramControls')?.classList.remove('hidden');
+                break;
+            case 'ai_photography':
+                document.getElementById('aiPhotographyControls')?.classList.remove('hidden');
+                break;
+            case 'attractive':
+                document.getElementById('attractiveControls')?.classList.remove('hidden');
+                break;
+            case 'pro_headshot':
+                document.getElementById('proHeadshotControls')?.classList.remove('hidden');
+                break;
+            case 'founder_headshot':
+                document.getElementById('founderHeadshotControls')?.classList.remove('hidden');
                 break;
         }
     }
@@ -754,6 +901,36 @@ class NanoStudio {
                 'Add realistic reflections and shadows',
                 'Create weather effects like rain or snow',
                 'Simulate liquid and particle physics'
+            ],
+            instagram: [
+                'Create stunning influencer-style photos',
+                'Boost your confidence with captivating images',
+                'Perfect lighting and vibrant colors automatically',
+                'Ideal for growing your social media presence'
+            ],
+            ai_photography: [
+                'Professional studio lighting in any photo',
+                'Artistic compositions with cinematic depth',
+                'Masterful shadow and highlight control',
+                'Transform casual shots into portfolio-worthy art'
+            ],
+            attractive: [
+                'Enhance natural beauty and charm',
+                'Flattering angles and expressions',
+                'Showcase your unique personality',
+                'Create more engaging dating or social profiles'
+            ],
+            pro_headshot: [
+                'LinkedIn-ready professional headshots',
+                'Clean, polished corporate appearance',
+                'Stand out to recruiters and employers',
+                'Make a strong first impression'
+            ],
+            founder_headshot: [
+                'Perfect for pitch decks and investor meetings',
+                'Convey visionary leadership presence',
+                'Modern tech aesthetic for about pages',
+                'Present yourself as a confident industry disruptor'
             ]
         };
 
@@ -1070,6 +1247,21 @@ class NanoStudio {
                 break;
             case 'physics':
                 data.effect = document.getElementById('effectSelect')?.value;
+                break;
+            case 'instagram':
+                data.aesthetic = document.getElementById('aestheticSelect')?.value;
+                break;
+            case 'ai_photography':
+                data.lighting_style = document.getElementById('lightingStyleSelect')?.value;
+                break;
+            case 'attractive':
+                data.expression = document.getElementById('expressionSelect')?.value;
+                break;
+            case 'pro_headshot':
+                data.background = document.getElementById('backgroundSelect')?.value;
+                break;
+            case 'founder_headshot':
+                data.vibe = document.getElementById('vibeSelect')?.value;
                 break;
         }
     }

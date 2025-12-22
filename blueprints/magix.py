@@ -154,6 +154,31 @@ def generate_magix():
             effect = data.get('effect', 'reflection')
             arguments['prompt'] = f"Add realistic {effect}: {prompt}"
 
+        elif mode == 'instagram':
+            # Instagram influencer style photos
+            aesthetic = data.get('aesthetic', 'glamorous')
+            arguments['prompt'] = f"Transform into a stunning Instagram influencer photo with {aesthetic} aesthetic. IMPORTANT: Retain and preserve exact facial features, face structure, and likeness of the person. Professional lighting, vibrant colors, perfect skin, high fashion style, engaging and confident pose: {prompt}"
+
+        elif mode == 'ai_photography':
+            # Artistic AI photography with professional lighting
+            lighting_style = data.get('lighting_style', 'studio')
+            arguments['prompt'] = f"Create a stunning artistic photography portrait with {lighting_style} professional lighting. CRITICAL: Preserve and retain 100% of the original facial features, face shape, eyes, nose, mouth, and exact likeness of the person. Creative composition, cinematic depth of field, masterful shadows and highlights, artistic flair: {prompt}"
+
+        elif mode == 'attractive':
+            # Attractive photos with playful expressions
+            expression = data.get('expression', 'confident_smile')
+            arguments['prompt'] = f"Create an attractive, engaging portrait with {expression.replace('_', ' ')} expression. IMPORTANT: Keep the exact same facial features, face structure, and complete likeness of the original person. Flattering angle, natural beauty enhancement, warm and approachable vibe, showcase unique personality and charm: {prompt}"
+
+        elif mode == 'pro_headshot':
+            # Professional headshots for LinkedIn
+            background = data.get('background', 'neutral')
+            arguments['prompt'] = f"Create a professional headshot suitable for LinkedIn with {background} background. CRITICAL: Retain and preserve 100% of the original facial features, exact face shape, eyes, and complete likeness. Corporate professional look, confident and approachable expression, proper business attire styling, clean and polished appearance, executive presence: {prompt}"
+
+        elif mode == 'founder_headshot':
+            # Startup founder headshots
+            vibe = data.get('vibe', 'visionary')
+            arguments['prompt'] = f"Create a startup founder headshot with {vibe} leadership presence. IMPORTANT: Preserve exact facial features, face structure, and 100% likeness of the original person. Modern tech aesthetic, confident and innovative expression, suitable for pitch decks and investor meetings, approachable yet authoritative: {prompt}"
+
         # Advanced parameters
         if 'temperature' in data:
             arguments['temperature'] = float(data['temperature'])
