@@ -579,6 +579,37 @@
                             </div>
                         </div>
 
+                        <!-- Resolution & Aspect Ratio - Always Visible -->
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-bold">Resolution</span>
+                                </label>
+                                <select id="resolutionSelect" class="select select-bordered w-full">
+                                    <option value="1K" selected>1K (Standard)</option>
+                                    <option value="2K">2K (High Quality)</option>
+                                    <option value="4K">4K (Ultra HD)</option>
+                                </select>
+                            </div>
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-bold">Aspect Ratio</span>
+                                </label>
+                                <select id="aspectRatioSelect" class="select select-bordered w-full">
+                                    <option value="auto" selected>Auto</option>
+                                    <option value="1:1">1:1 (Square)</option>
+                                    <option value="4:5">4:5 (Portrait)</option>
+                                    <option value="3:4">3:4</option>
+                                    <option value="2:3">2:3</option>
+                                    <option value="9:16">9:16 (Story)</option>
+                                    <option value="16:9">16:9 (Wide)</option>
+                                    <option value="3:2">3:2</option>
+                                    <option value="4:3">4:3</option>
+                                    <option value="21:9">21:9 (Ultra Wide)</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- Advanced Settings -->
                         <div class="collapse collapse-arrow bg-base-100 mt-4">
                             <input type="checkbox" />
@@ -588,39 +619,11 @@
                             <div class="collapse-content">
                                 <div class="advanced-controls">
                                     <div class="control-group">
-                                        <label class="text-sm">Resolution</label>
-                                        <select id="resolutionSelect" class="select select-bordered select-sm">
-                                            <option value="1K" selected>1K (Standard)</option>
-                                            <option value="2K">2K (High Quality)</option>
-                                            <option value="4K">4K (Ultra HD)</option>
-                                        </select>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="text-sm">Aspect Ratio</label>
-                                        <select id="aspectRatioSelect" class="select select-bordered select-sm">
-                                            <option value="auto" selected>Auto (Default)</option>
-                                            <option value="21:9">21:9 (Ultra Wide)</option>
-                                            <option value="16:9">16:9 (Wide)</option>
-                                            <option value="3:2">3:2</option>
-                                            <option value="4:3">4:3 (Classic)</option>
-                                            <option value="5:4">5:4</option>
-                                            <option value="1:1">1:1 (Square)</option>
-                                            <option value="4:5">4:5</option>
-                                            <option value="3:4">3:4 (Portrait)</option>
-                                            <option value="2:3">2:3</option>
-                                        </select>
-                                    </div>
-                                    <div class="control-group">
                                         <label class="text-sm">Output Format</label>
                                         <select id="outputFormatSelect" class="select select-bordered select-sm">
                                             <option value="png" selected>PNG (Lossless)</option>
                                             <option value="jpeg">JPEG (Compressed)</option>
                                         </select>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="text-sm">Temperature</label>
-                                        <input type="range" id="temperatureSlider" min="0" max="2" step="0.1" value="0.7" class="range range-xs" />
-                                        <span class="text-xs text-center" id="temperatureValue">0.7</span>
                                     </div>
                                     <div class="control-group">
                                         <label class="text-sm">Number of Images</label>
