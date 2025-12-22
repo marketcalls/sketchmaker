@@ -121,523 +121,1260 @@ def generate_magix():
             if not metadata.get('optimization_failed'):
                 print(f"Image optimized: {metadata.get('compression_ratio', 100)}% of original size")
 
-        # Base instruction for facial preservation - comprehensive
-        face_preserve = """CRITICAL REQUIREMENT - FACIAL PRESERVATION: You must preserve and retain 100% of the original facial features with absolute precision. This includes: the exact face shape and bone structure, eye shape, color, size and spacing, nose shape and size, mouth and lip shape, eyebrow shape and position, skin texture and natural marks, ear shape if visible, hairline shape, and overall facial proportions. The person must be immediately recognizable as themselves. Do not idealize, beautify beyond recognition, or alter ethnic features. Maintain the subject's unique identity and likeness throughout the transformation."""
+        # Base instruction for facial preservation - as JSON object
+        face_preserve_obj = {
+            "requirement": "CRITICAL - ABSOLUTE FACIAL PRESERVATION",
+            "preserve_exactly": [
+                "face shape and bone structure",
+                "eye shape, color, size, spacing",
+                "nose shape and size",
+                "mouth and lip shape",
+                "eyebrow shape and position",
+                "skin texture and natural marks",
+                "ear shape if visible",
+                "hairline shape",
+                "overall facial proportions",
+                "ethnic features unchanged"
+            ],
+            "instruction": "Person must be immediately recognizable as themselves. Do not idealize or beautify beyond recognition."
+        }
 
-        # Mode-specific configurations - AI Photography Focus with comprehensive prompts
+        # Mode-specific configurations - AI Photography Focus with JSON structured prompts
         if mode == 'studio_portrait':
-            arguments['prompt'] = f"""Transform this image into a professional studio portrait photography with the following specifications:
-
-LIGHTING SETUP: Use classic three-point lighting with a large softbox as key light positioned 45 degrees from subject creating soft, wrapping illumination. Add fill light at 2:1 ratio to gently open shadows while maintaining dimension. Include subtle hair/rim light from behind to separate subject from background and add depth. Ensure catchlights in eyes are visible and natural.
-
-BACKGROUND: Clean, seamless backdrop - either pure white, neutral gray, or subtle gradient. Background should be evenly lit without hotspots or shadows. Slight vignette acceptable for focus on subject.
-
-TECHNICAL QUALITY: Sharp focus on eyes, professional-grade image quality, no noise or grain, smooth skin with natural texture retained (not plastic), proper white balance for natural skin tones, high dynamic range preserving details in highlights and shadows.
-
-COMPOSITION: Head and shoulders framing, subject positioned using rule of thirds, adequate headroom, eyes at upper third line, shoulders slightly angled for dimension, chin slightly forward and down for flattering angle.
-
-RETOUCHING STYLE: Professional but natural - remove temporary blemishes, even skin tone, subtle under-eye correction, enhance but don't over-process. Maintain all natural features, pores, and skin texture.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Professional photography studio with seamless backdrop",
+                "subjects": [{
+                    "type": "portrait subject",
+                    "description": "The person from the input image with all original features preserved",
+                    "pose": "head and shoulders, shoulders slightly angled, chin forward and down",
+                    "position": "centered using rule of thirds, eyes at upper third"
+                }],
+                "style": "Professional studio portrait photography, polished and refined",
+                "background": {
+                    "type": "seamless backdrop",
+                    "options": ["pure white", "neutral gray hex #808080", "subtle gradient"],
+                    "qualities": "evenly lit, no hotspots or shadows, slight vignette acceptable"
+                },
+                "lighting": {
+                    "setup": "classic three-point lighting",
+                    "key_light": "large softbox at 45 degrees, soft wrapping illumination",
+                    "fill_light": "2:1 ratio to key, gently opens shadows",
+                    "rim_light": "subtle hair light from behind for separation",
+                    "catchlights": "visible and natural in eyes"
+                },
+                "mood": "professional, confident, approachable",
+                "composition": {
+                    "framing": "head and shoulders",
+                    "rule": "rule of thirds",
+                    "headroom": "adequate space above head"
+                },
+                "camera": {
+                    "angle": "eye level",
+                    "distance": "medium shot",
+                    "lens": "85mm portrait lens",
+                    "focus": "sharp on eyes"
+                },
+                "technical": {
+                    "quality": "professional-grade, no noise or grain",
+                    "skin": "smooth with natural texture retained, not plastic",
+                    "white_balance": "natural skin tones",
+                    "dynamic_range": "high, details in highlights and shadows"
+                },
+                "retouching": "Professional but natural - remove temporary blemishes, even skin tone, subtle under-eye correction, maintain natural pores and texture",
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'environmental':
-            arguments['prompt'] = f"""Transform this image into a compelling environmental portrait that tells a story about the subject:
-
-SETTING & CONTEXT: Place the subject in a meaningful, contextual environment that reveals something about their personality, profession, or interests. The background should complement and enhance the narrative without overwhelming the subject. Include relevant environmental details that add depth and interest.
-
-LIGHTING: Utilize available natural light masterfully - window light, golden hour sunlight, or ambient environmental lighting. Balance subject exposure with background. Use natural light modifiers like doorways, windows, or architectural elements. Allow for natural shadows that add dimension and mood.
-
-COMPOSITION: Use environmental elements to frame the subject naturally. Apply depth of field to separate subject from background while keeping context recognizable. Include leading lines, layers, and foreground/background elements for visual interest. Subject should occupy 30-50% of frame with meaningful negative space.
-
-COLOR & MOOD: Natural, authentic color palette derived from environment. Cohesive color story between subject and surroundings. Mood should feel genuine and unposed while remaining visually compelling.
-
-TECHNICAL: Sharp focus on subject's eyes, background appropriately soft but identifiable, professional image quality, balanced exposure throughout frame, natural skin tones.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Meaningful real-world environment revealing personality, profession, or interests",
+                "subjects": [{
+                    "type": "portrait subject",
+                    "description": "The person from input image with preserved features in contextual setting",
+                    "pose": "natural, authentic interaction with environment",
+                    "position": "occupies 30-50% of frame with meaningful negative space"
+                }],
+                "style": "Environmental portrait photography, documentary-meets-portrait",
+                "environment": {
+                    "type": "contextual real-world setting",
+                    "elements": "relevant details that add depth and narrative",
+                    "relationship": "background complements subject without overwhelming"
+                },
+                "lighting": {
+                    "type": "natural available light",
+                    "sources": ["window light", "golden hour sunlight", "ambient environmental"],
+                    "balance": "subject properly exposed with balanced background",
+                    "modifiers": "doorways, windows, architectural elements as natural modifiers",
+                    "shadows": "natural shadows adding dimension and mood"
+                },
+                "mood": "genuine, unposed, authentic, visually compelling",
+                "composition": {
+                    "framing": "environmental elements frame subject naturally",
+                    "elements": ["leading lines", "layers", "foreground interest", "background context"],
+                    "depth_of_field": "subject sharp, background soft but identifiable"
+                },
+                "camera": {
+                    "angle": "contextually appropriate",
+                    "distance": "medium to wide shot showing environment",
+                    "lens": "35mm or 50mm",
+                    "focus": "sharp on subject's eyes"
+                },
+                "color_palette": "natural, authentic colors derived from environment, cohesive story",
+                "technical": {
+                    "quality": "professional, balanced exposure throughout",
+                    "skin_tones": "natural and accurate"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'lifestyle':
-            arguments['prompt'] = f"""Transform this image into an authentic lifestyle portrait capturing genuine, candid moments:
-
-MOOD & FEEL: Natural, relaxed, and authentic - as if captured during a real moment in the subject's life. Avoid stiff or posed appearance. The image should feel warm, inviting, and relatable. Capture genuine emotion and personality.
-
-LIGHTING: Soft, natural lighting that feels effortless - window light, open shade, or golden hour warmth. Avoid harsh shadows or artificial-looking illumination. Light should wrap around subject naturally, creating a comfortable, lived-in atmosphere.
-
-SETTING: Casual, relatable environment - home interior, café, park, or everyday location. Background should feel natural and uncluttered while adding context. Include lifestyle elements that feel organic, not staged.
-
-EXPRESSION & POSE: Relaxed, natural expression - genuine smile, thoughtful gaze, or candid moment. Body language should be comfortable and unforced. Slight motion or interaction with environment adds authenticity.
-
-COLOR GRADING: Warm, inviting tones. Slightly lifted shadows for airy feel. Natural skin tones with subtle warmth. Clean whites, soft contrast. Instagram-worthy but not over-filtered.
-
-COMPOSITION: Casual framing that feels spontaneous. Negative space for breathing room. Subject doesn't need to be centered. Include environmental context. Shoot as if capturing a moment, not posing for a photo.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Casual, relatable everyday environment - home, café, park",
+                "subjects": [{
+                    "type": "portrait subject",
+                    "description": "Person from input image in natural, candid moment",
+                    "pose": "relaxed, comfortable, unforced body language",
+                    "expression": "genuine smile or thoughtful gaze, authentic emotion",
+                    "position": "casual placement, doesn't need to be centered"
+                }],
+                "style": "Authentic lifestyle portrait, candid-feeling photography",
+                "environment": {
+                    "type": "everyday relatable location",
+                    "feel": "natural, uncluttered, organic not staged",
+                    "elements": "lifestyle details that feel authentic"
+                },
+                "lighting": {
+                    "type": "soft natural light",
+                    "sources": ["window light", "open shade", "golden hour warmth"],
+                    "quality": "effortless, wrapping, comfortable atmosphere",
+                    "avoid": "harsh shadows, artificial-looking illumination"
+                },
+                "mood": "warm, inviting, relaxed, authentic, relatable",
+                "composition": {
+                    "framing": "casual, spontaneous feeling",
+                    "negative_space": "breathing room around subject",
+                    "approach": "capturing a moment, not posing for photo"
+                },
+                "camera": {
+                    "angle": "natural, candid",
+                    "distance": "medium shot with context",
+                    "lens": "35mm or 50mm"
+                },
+                "color_palette": {
+                    "tones": "warm, inviting",
+                    "shadows": "slightly lifted for airy feel",
+                    "skin": "natural with subtle warmth",
+                    "whites": "clean",
+                    "contrast": "soft"
+                },
+                "technical": {
+                    "quality": "Instagram-worthy but not over-filtered",
+                    "feel": "lived-in atmosphere"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'fashion_editorial':
-            arguments['prompt'] = f"""Transform this image into a high-fashion editorial portrait worthy of Vogue or Harper's Bazaar:
-
-LIGHTING: Dramatic, intentional lighting that sculpts features and creates visual impact. Options include: hard directional light for bold shadows, beauty dish for glamorous glow, dramatic side lighting for editorial edge, or creative mixed lighting. Lighting should be a deliberate creative choice that enhances the fashion narrative.
-
-STYLING & AESTHETIC: High-fashion sensibility with attention to every detail. Emphasize clothing, accessories, and overall styling. Create a cohesive visual story. The image should feel curated, intentional, and magazine-ready. Bold, confident, and fashion-forward.
-
-POSE & EXPRESSION: Editorial poses with attitude and intention. Strong body lines, dynamic angles, and purposeful positioning. Expression should convey confidence, mystery, or high-fashion aloofness. Elongate the body, create interesting shapes, emphasize fashion elements.
-
-COMPOSITION: Bold, graphic composition with strong visual impact. Use negative space dramatically. Unconventional framing encouraged. Create tension and visual interest through positioning and cropping. Magazine cover or spread worthy.
-
-POST-PROCESSING: Fashion-grade retouching - flawless skin while maintaining texture, enhanced eyes, sculpted features through light and shadow. Color grading should support the editorial concept - could be rich and saturated, desaturated and moody, or high-contrast black and white.
-
-PRODUCTION VALUE: Every element should feel intentional and elevated. Hair styled to perfection, makeup editorial-ready, clothing presented beautifully. The complete package of high-fashion photography.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "High-fashion editorial setting, Vogue or Harper's Bazaar worthy",
+                "subjects": [{
+                    "type": "fashion portrait subject",
+                    "description": "Person from input image as high-fashion model",
+                    "pose": "editorial with attitude, strong body lines, dynamic angles, purposeful positioning",
+                    "expression": "confidence, mystery, or high-fashion aloofness",
+                    "styling": "hair perfection, editorial makeup, clothing beautifully presented"
+                }],
+                "style": "High-fashion editorial photography, magazine-ready",
+                "aesthetic": {
+                    "sensibility": "curated, intentional, bold, confident, fashion-forward",
+                    "emphasis": ["clothing", "accessories", "overall styling"],
+                    "narrative": "cohesive visual story"
+                },
+                "lighting": {
+                    "type": "dramatic, intentional, sculpting",
+                    "options": ["hard directional for bold shadows", "beauty dish for glamorous glow", "dramatic side lighting", "creative mixed lighting"],
+                    "purpose": "deliberate creative choice enhancing fashion narrative"
+                },
+                "mood": "bold, confident, editorial, high-fashion",
+                "composition": {
+                    "style": "bold, graphic, strong visual impact",
+                    "negative_space": "used dramatically",
+                    "framing": "unconventional encouraged",
+                    "goal": "magazine cover or spread worthy"
+                },
+                "camera": {
+                    "angle": "dynamic, fashion photography angles",
+                    "distance": "varies for editorial impact",
+                    "lens": "85mm or 70-200mm"
+                },
+                "post_processing": {
+                    "retouching": "fashion-grade, flawless skin with texture maintained",
+                    "eyes": "enhanced",
+                    "features": "sculpted through light and shadow",
+                    "color_grading": "supports editorial concept - rich saturated, desaturated moody, or high-contrast B&W"
+                },
+                "production_value": "every element intentional and elevated",
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'cinematic':
-            arguments['prompt'] = f"""Transform this image into a cinematic portrait that looks like a still from a major motion picture:
-
-LIGHTING: Cinematic lighting techniques - motivated lighting that appears to come from a natural source within the scene. Use of practicals, window light, or dramatic single-source illumination. Strong light-to-shadow ratio creating mood and depth. Rim lighting to separate subject from background. Consider classic cinema lighting: Rembrandt, split light, or atmospheric haze.
-
-DEPTH & ATMOSPHERE: Shallow depth of field (f/1.4-2.8 equivalent) with creamy bokeh. Subject sharp, background beautifully blurred. Add atmospheric elements if appropriate - subtle haze, dust particles in light beams, or environmental depth. Create layers of foreground, subject, and background.
-
-COLOR GRADING: Cinematic color science - could be teal and orange complementary scheme, desaturated with selective color, rich shadows with film-like rolloff, or specific movie color palette (Blade Runner neons, Amelie greens, Matrix greens, etc.). Lifted blacks for film look, controlled highlights.
-
-ASPECT RATIO FEEL: Even if not cropped, compose as if shooting 2.39:1 or 1.85:1 widescreen. Cinematic framing with purposeful negative space. Subject positioned for dramatic effect.
-
-MOOD: Contemplative, dramatic, or emotionally charged. The image should tell a story or suggest a narrative. Evoke curiosity about what's happening or about to happen. Movie poster or film still quality.
-
-TECHNICAL: Film-like grain if appropriate (subtle, not overwhelming), high dynamic range, rich shadows with detail, controlled highlights, professional color depth.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Major motion picture film still, cinematic environment",
+                "subjects": [{
+                    "type": "cinematic portrait subject",
+                    "description": "Person from input image as movie character",
+                    "pose": "dramatic, story-suggesting positioning",
+                    "expression": "contemplative, dramatic, or emotionally charged",
+                    "position": "positioned for dramatic effect"
+                }],
+                "style": "Cinematic portrait, film still quality, movie poster worthy",
+                "atmosphere": {
+                    "depth_of_field": "shallow f/1.4-2.8 with creamy bokeh",
+                    "layers": ["foreground", "subject sharp", "background beautifully blurred"],
+                    "elements": "subtle haze, dust particles in light beams if appropriate"
+                },
+                "lighting": {
+                    "type": "cinematic, motivated from natural scene source",
+                    "techniques": ["practicals", "window light", "dramatic single-source"],
+                    "ratio": "strong light-to-shadow creating mood and depth",
+                    "rim_light": "separates subject from background",
+                    "styles": ["Rembrandt", "split light", "atmospheric haze"]
+                },
+                "mood": "contemplative, dramatic, emotionally charged, narrative-suggesting",
+                "composition": {
+                    "aspect_feel": "2.39:1 or 1.85:1 widescreen composition",
+                    "framing": "cinematic with purposeful negative space",
+                    "goal": "evoke curiosity about story"
+                },
+                "camera": {
+                    "angle": "cinematic, dramatic",
+                    "distance": "medium shot with depth",
+                    "lens": "50mm or 85mm anamorphic feel"
+                },
+                "color_grading": {
+                    "style": "cinematic color science",
+                    "options": ["teal and orange complementary", "desaturated with selective color", "rich shadows with film rolloff"],
+                    "references": ["Blade Runner neons", "Amelie greens", "custom palette"],
+                    "blacks": "lifted for film look",
+                    "highlights": "controlled"
+                },
+                "technical": {
+                    "grain": "subtle film-like if appropriate",
+                    "dynamic_range": "high",
+                    "shadows": "rich with detail",
+                    "quality": "professional color depth"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'corporate_headshot':
             background = data.get('background', 'neutral_gray')
-            arguments['prompt'] = f"""Transform this image into a polished corporate headshot suitable for LinkedIn, company websites, and professional materials:
-
-BACKGROUND: {background.replace('_', ' ')} background - clean, professional, non-distracting. If office environment, use shallow depth of field to blur while maintaining professional context. Solid backgrounds should be evenly lit without gradients or shadows.
-
-LIGHTING: Professional, flattering illumination that conveys competence and approachability. Soft key light at 30-45 degrees, fill light to reduce shadows to professional level (not flat, but not dramatic). Subtle rim light for separation. Even, consistent lighting that would work for company-wide headshot consistency.
-
-EXPRESSION & POSE: Confident, approachable, professional expression - genuine but controlled smile or pleasant neutral expression. Direct eye contact with camera. Shoulders at slight angle (not straight-on), head straight or very slight tilt. Chin slightly forward for defined jawline. Posture conveying confidence and competence.
-
-ATTIRE & GROOMING: Ensure professional appearance - neat, polished look appropriate for business environment. Clothing should be crisp and professional. Hair neat and styled. Overall impression of someone you'd want to do business with.
-
-FRAMING: Head and shoulders composition, tight enough to see facial features clearly but with adequate breathing room. Centered or rule-of-thirds positioning. Consistent with professional headshot standards.
-
-RETOUCHING: Professional but authentic - remove temporary blemishes, minimize under-eye shadows, even skin tone, subtle enhancement while maintaining authentic appearance. The person should look like themselves on their best day, not artificially perfected.
-
-COLOR: Natural, accurate skin tones. Clean whites in eyes. Professional color balance - not too warm or cool. Colors should work in both digital and print contexts.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            background_colors = {
+                "neutral_gray": "#808080",
+                "clean_white": "#FFFFFF",
+                "soft_gradient": "gradient from #E8E8E8 to #C0C0C0",
+                "office_blur": "blurred office environment",
+                "outdoor_blur": "blurred outdoor professional setting"
+            }
+            prompt_json = {
+                "scene": "Professional corporate headshot setting for LinkedIn and business materials",
+                "subjects": [{
+                    "type": "corporate portrait subject",
+                    "description": "Person from input image as business professional",
+                    "pose": "shoulders at slight angle, head straight or very slight tilt, chin forward for defined jawline",
+                    "expression": "confident, approachable, genuine but controlled smile or pleasant neutral",
+                    "eye_contact": "direct with camera",
+                    "grooming": "neat, polished, professional appearance"
+                }],
+                "style": "Polished corporate headshot, LinkedIn-ready, company website quality",
+                "background": {
+                    "type": background.replace('_', ' '),
+                    "color": background_colors.get(background, "#808080"),
+                    "qualities": "clean, professional, non-distracting, evenly lit"
+                },
+                "lighting": {
+                    "type": "professional, flattering, conveys competence",
+                    "key_light": "soft at 30-45 degrees",
+                    "fill_light": "reduces shadows to professional level, not flat",
+                    "rim_light": "subtle for separation",
+                    "consistency": "suitable for company-wide headshot standards"
+                },
+                "mood": "professional, confident, approachable, trustworthy",
+                "composition": {
+                    "framing": "head and shoulders",
+                    "space": "adequate breathing room",
+                    "positioning": "centered or rule-of-thirds",
+                    "standard": "professional headshot conventions"
+                },
+                "camera": {
+                    "angle": "eye level",
+                    "distance": "close-up to medium",
+                    "lens": "85mm portrait"
+                },
+                "retouching": {
+                    "level": "professional but authentic",
+                    "includes": ["remove temporary blemishes", "minimize under-eye shadows", "even skin tone"],
+                    "goal": "look like best version of themselves, not artificially perfected"
+                },
+                "color": {
+                    "skin_tones": "natural, accurate",
+                    "eyes": "clean whites",
+                    "balance": "professional, works in digital and print"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'street_portrait':
-            arguments['prompt'] = f"""Transform this image into a compelling street portrait with urban authenticity:
-
-URBAN ENVIRONMENT: Authentic city backdrop - textured walls, graffiti, urban architecture, neon signs, or street scenes. The environment should feel real and lived-in, adding character and context. Include urban textures, layers, and visual interest without overwhelming the subject.
-
-LIGHTING: Natural street lighting - could be harsh midday sun with hard shadows, golden hour warmth in urban canyon, neon and artificial city lights, or overcast diffused light. Embrace imperfect lighting as part of the authentic street aesthetic. Mixed color temperatures welcome.
-
-MOOD & ATTITUDE: Raw, authentic energy and genuine character. The subject should feel connected to their urban environment. Capture personality, attitude, and individuality. Street photography sensibility - real, unpolished, honest.
-
-COMPOSITION: Dynamic street photography composition - use of leading lines, urban geometry, layers of depth. Subject can be off-center, partially framed, or interacting with environment. Include environmental context that tells a story. Shoot from interesting angles.
-
-STYLE: Documentary-meets-portrait aesthetic. Not overly processed or artificial. Retain grit and authenticity of street photography while still being a compelling portrait. Colors can be bold or muted depending on environment.
-
-TECHNICAL: Sharp focus on subject, environmental bokeh as appropriate, embrace some imperfection as authentic. Natural skin tones that work with environmental color cast. High-quality but not sterile.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Authentic urban street environment with character",
+                "subjects": [{
+                    "type": "street portrait subject",
+                    "description": "Person from input image connected to urban environment",
+                    "pose": "natural, possibly off-center or interacting with environment",
+                    "expression": "raw, authentic, genuine character and personality",
+                    "attitude": "street photography sensibility - real, unpolished, honest"
+                }],
+                "style": "Street portrait photography, documentary-meets-portrait",
+                "environment": {
+                    "type": "authentic city backdrop",
+                    "elements": ["textured walls", "graffiti", "urban architecture", "neon signs", "street scenes"],
+                    "feel": "real, lived-in, adding character and context",
+                    "textures": "urban layers and visual interest"
+                },
+                "lighting": {
+                    "type": "natural street lighting",
+                    "options": ["harsh midday sun with hard shadows", "golden hour urban canyon", "neon and artificial city lights", "overcast diffused"],
+                    "color_temperature": "mixed welcome as authentic",
+                    "approach": "embrace imperfect lighting as part of street aesthetic"
+                },
+                "mood": "raw, authentic, energetic, genuine, urban",
+                "composition": {
+                    "style": "dynamic street photography",
+                    "elements": ["leading lines", "urban geometry", "layers of depth"],
+                    "subject_placement": "can be off-center, partially framed",
+                    "angles": "interesting, unconventional"
+                },
+                "camera": {
+                    "angle": "dynamic street photography angles",
+                    "distance": "varies with context",
+                    "lens": "35mm street photography"
+                },
+                "color_palette": "bold or muted depending on environment, authentic urban tones",
+                "technical": {
+                    "focus": "sharp on subject",
+                    "bokeh": "environmental as appropriate",
+                    "imperfection": "embrace as authentic",
+                    "skin_tones": "natural, works with environmental color cast",
+                    "quality": "high but not sterile"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'low_key':
-            arguments['prompt'] = f"""Transform this image into a dramatic low-key portrait with powerful shadows and contrast:
-
-LIGHTING CONCEPT: Predominantly dark image with selective, dramatic illumination. Single strong light source creating defined shadows and highlights. Light should sculpt the face, revealing form through shadow. Lighting ratio of 8:1 or higher. Consider: strong side light, Rembrandt lighting, or split lighting for maximum drama.
-
-SHADOW TREATMENT: Deep, rich blacks that dominate the frame. Shadows should be intentional and compositional elements. Allow parts of the subject to fall into complete darkness. Shadow areas should be clean and noise-free. The darkness is not absence but presence.
-
-HIGHLIGHTS: Controlled, precise highlights that draw attention to key features - eyes, facial planes, essential details. Highlights should not blow out but retain detail. The interplay between highlight and shadow creates the image's power.
-
-MOOD: Mysterious, dramatic, powerful, contemplative, or intense. The darkness creates psychological depth and emotional weight. The image should feel intentional and artistic, not underexposed.
-
-BACKGROUND: Pure black or nearly black, seamlessly blending with shadows on subject. No visible backdrop texture or color. Subject emerges from darkness.
-
-TECHNICAL: Careful exposure for highlights while letting shadows go dark. Rich blacks without losing all shadow detail where intended. Sharp focus on illuminated areas. High contrast but controlled. Professional quality in both technical execution and artistic vision.
-
-COMPOSITION: Use negative space (darkness) as compositional element. Subject can be positioned unconventionally. Let shadows frame and lead the eye to illuminated features.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Dramatic low-key portrait studio with controlled darkness",
+                "subjects": [{
+                    "type": "low-key portrait subject",
+                    "description": "Person from input image emerging from shadows",
+                    "pose": "dramatic positioning, possibly unconventional",
+                    "expression": "mysterious, powerful, contemplative, or intense",
+                    "position": "parts can fall into complete darkness"
+                }],
+                "style": "Dramatic low-key portrait photography, high contrast artistic",
+                "background": {
+                    "color": "hex #000000 pure black",
+                    "treatment": "seamlessly blends with subject shadows",
+                    "visibility": "no visible backdrop texture"
+                },
+                "lighting": {
+                    "type": "single strong source, selective dramatic illumination",
+                    "ratio": "8:1 or higher",
+                    "techniques": ["strong side light", "Rembrandt lighting", "split lighting"],
+                    "purpose": "sculpt face, reveal form through shadow"
+                },
+                "shadows": {
+                    "treatment": "deep, rich blacks dominating frame",
+                    "role": "intentional compositional elements",
+                    "quality": "clean, noise-free",
+                    "philosophy": "darkness as presence, not absence"
+                },
+                "highlights": {
+                    "control": "precise, drawing attention to key features",
+                    "areas": ["eyes", "facial planes", "essential details"],
+                    "retention": "no blowout, retain detail"
+                },
+                "mood": "mysterious, dramatic, powerful, contemplative, intense",
+                "composition": {
+                    "negative_space": "use darkness as compositional element",
+                    "framing": "shadows frame and lead eye to illuminated features"
+                },
+                "camera": {
+                    "angle": "dramatic",
+                    "distance": "medium shot",
+                    "lens": "85mm"
+                },
+                "technical": {
+                    "exposure": "for highlights, let shadows go dark",
+                    "blacks": "rich without losing intended detail",
+                    "focus": "sharp on illuminated areas",
+                    "contrast": "high but controlled"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'high_key':
-            arguments['prompt'] = f"""Transform this image into a bright, airy high-key portrait:
-
-LIGHTING CONCEPT: Predominantly bright image with minimal shadows. Multiple soft light sources creating even, wrap-around illumination. Low contrast with lifted shadows. Light should feel abundant and uplifting. Clean, fresh, optimistic mood.
-
-BACKGROUND: Pure white or very light gray, evenly lit to near-white. No shadows, gradients, or visible texture. Subject should appear to exist in a bright, clean space. Background brightness should match or slightly exceed subject lighting.
-
-SHADOW TREATMENT: Minimal shadows - fill all shadow areas with soft light. What shadows exist should be gentle, subtle, and never dark. Under-chin and under-nose shadows should be barely perceptible. Overall feeling of light everywhere.
-
-MOOD: Fresh, clean, optimistic, youthful, pure, hopeful, or angelic. The abundance of light creates a positive, uplifting feeling. Image should feel open and inviting.
-
-SKIN & COMPLEXION: Even, luminous skin with soft, glowing quality. Light wrapping around features. Subtle gradation in skin tones. Fresh, healthy appearance. Bright catchlights in eyes.
-
-TECHNICAL: Careful exposure to retain detail in bright areas. White background should be white but subject should not be overexposed. Soft, flattering light on skin. No harsh shadows or contrast. Professional quality with intentional brightness.
-
-COLOR PALETTE: Clean, fresh colors. Can be neutral/white dominant, soft pastels, or bright clean colors. Avoid muddy or dark tones. Whites should be true white, not gray or cream.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Bright, airy high-key portrait studio",
+                "subjects": [{
+                    "type": "high-key portrait subject",
+                    "description": "Person from input image in bright, clean light",
+                    "pose": "open, inviting positioning",
+                    "expression": "fresh, optimistic, youthful",
+                    "skin": "luminous, soft glowing quality"
+                }],
+                "style": "High-key portrait photography, bright and airy",
+                "background": {
+                    "color": "hex #FFFFFF pure white or very light gray",
+                    "lighting": "evenly lit to near-white",
+                    "qualities": "no shadows, gradients, or visible texture"
+                },
+                "lighting": {
+                    "type": "multiple soft sources, wrap-around illumination",
+                    "contrast": "low with lifted shadows",
+                    "feel": "abundant and uplifting",
+                    "shadows": "minimal, fill all shadow areas with soft light"
+                },
+                "shadows": {
+                    "treatment": "gentle, subtle, never dark",
+                    "under_chin": "barely perceptible",
+                    "under_nose": "barely perceptible",
+                    "overall": "feeling of light everywhere"
+                },
+                "mood": "fresh, clean, optimistic, youthful, pure, hopeful",
+                "composition": {
+                    "style": "open, bright framing",
+                    "feel": "inviting"
+                },
+                "camera": {
+                    "angle": "eye level or slightly above",
+                    "distance": "medium close-up",
+                    "lens": "85mm portrait"
+                },
+                "skin": {
+                    "quality": "even, luminous, soft glowing",
+                    "light": "wrapping around features",
+                    "gradation": "subtle in skin tones",
+                    "appearance": "fresh, healthy",
+                    "catchlights": "bright in eyes"
+                },
+                "color_palette": {
+                    "style": "clean, fresh colors",
+                    "options": ["neutral white dominant", "soft pastels", "bright clean colors"],
+                    "avoid": "muddy or dark tones",
+                    "whites": "true white hex #FFFFFF, not gray or cream"
+                },
+                "technical": {
+                    "exposure": "careful to retain detail in bright areas",
+                    "subject": "not overexposed",
+                    "light_quality": "soft, flattering on skin",
+                    "contrast": "no harsh shadows"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'black_white':
-            arguments['prompt'] = f"""Transform this image into a timeless black and white portrait:
-
-TONAL RANGE: Rich, full range of tones from deep blacks to bright whites with smooth gradation between. Ansel Adams Zone System sensibility - detail in shadows, detail in highlights, with full midtone range. The image should demonstrate mastery of monochromatic tonal values.
-
-CONTRAST & MOOD: Consider the emotional intent - high contrast for drama and intensity, lower contrast for softness and intimacy, or full range for classic portraiture. Contrast should be a creative choice that supports the portrait's mood.
-
-TEXTURE & DETAIL: Black and white emphasizes texture - skin texture, fabric, hair, environmental details. Ensure rich detail and texture throughout. The absence of color makes form, shape, and texture more prominent.
-
-LIGHTING FOR B&W: Lighting should be considered specifically for how it translates to grayscale. Strong directional light often works beautifully. Consider how shadows will define features. Lighting that might seem harsh in color can be stunning in B&W.
-
-SKIN TONES: Beautiful, luminous skin that translates well to grayscale. Even tonal rendering across different skin tones. Classic portraiture look with smooth gradation.
-
-EMOTIONAL DEPTH: Black and white has timeless, emotional quality. The image should feel classic, artistic, and emotionally resonant. Strip away color distractions to focus on expression, form, and human connection.
-
-STYLE OPTIONS: Could range from classic Karsh/Avedon portraiture to contemporary editorial B&W, from high-fashion contrast to soft romantic. The style should be intentional and consistent.
-
-POST-PROCESSING: Professional black and white conversion with attention to how each color channel translates. Possible subtle film grain for texture. Dodging and burning to guide the eye. Classic darkroom quality.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Timeless black and white portrait setting",
+                "subjects": [{
+                    "type": "monochrome portrait subject",
+                    "description": "Person from input image in classic B&W aesthetic",
+                    "pose": "classic portraiture positioning",
+                    "expression": "emotionally resonant, timeless quality",
+                    "skin": "luminous, beautiful grayscale translation"
+                }],
+                "style": "Timeless black and white portrait photography",
+                "color_mode": "monochrome, no color",
+                "tonal_range": {
+                    "blacks": "deep and rich",
+                    "whites": "bright with detail",
+                    "midtones": "full range with smooth gradation",
+                    "approach": "Ansel Adams Zone System sensibility"
+                },
+                "contrast": {
+                    "options": ["high for drama", "lower for softness", "full range for classic"],
+                    "purpose": "creative choice supporting portrait mood"
+                },
+                "texture": {
+                    "emphasis": ["skin texture", "fabric", "hair", "environmental details"],
+                    "quality": "rich detail throughout",
+                    "note": "absence of color makes form and texture prominent"
+                },
+                "lighting": {
+                    "consideration": "specifically for grayscale translation",
+                    "type": "strong directional often works beautifully",
+                    "shadows": "define features",
+                    "note": "harsh color lighting can be stunning in B&W"
+                },
+                "mood": "timeless, emotional, classic, artistic, resonant",
+                "composition": {
+                    "style": "classic portraiture",
+                    "focus": "expression, form, human connection"
+                },
+                "camera": {
+                    "angle": "classic portrait angles",
+                    "distance": "medium shot",
+                    "lens": "85mm or 105mm"
+                },
+                "post_processing": {
+                    "conversion": "professional B&W with attention to color channel translation",
+                    "grain": "possible subtle film grain for texture",
+                    "technique": "dodging and burning to guide eye",
+                    "quality": "classic darkroom standards"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'beauty_closeup':
-            arguments['prompt'] = f"""Transform this image into a professional beauty close-up portrait:
-
-FRAMING: Tight close-up focusing on face - from mid-forehead to chin, or even tighter cropping for specific features. Fill the frame with the subject's face. This is about showcasing facial features and beauty.
-
-LIGHTING: Classic beauty lighting - butterfly/paramount light creating subtle shadow under nose, or beauty dish for glamorous wrap-around illumination. Soft, even lighting that minimizes texture while maintaining dimension. Ring light or similar for signature catchlights. Fill shadows adequately for beauty standard.
-
-SKIN QUALITY: Flawless, luminous skin that still appears natural and has subtle texture. Professional beauty retouching - even tone, smooth but not plastic, healthy glow. Pores visible but minimized. The goal is best-possible skin while remaining believable.
-
-FEATURES: Eyes should be sharp, bright, and captivating - enhanced but natural. Lips defined and beautiful. Eyebrows groomed and shaped. Each facial feature should be presented at its best while remaining true to the person.
-
-MAKEUP & STYLING: Beauty-ready presentation - clean, polished, intentional. If makeup is present, it should be flawlessly applied. Hair styled and positioned deliberately. Everything should appear camera-ready for a beauty campaign.
-
-SYMMETRY & COMPOSITION: Centered or near-centered composition typical of beauty photography. Attention to facial symmetry while embracing natural asymmetries that add character. Head angle and tilt chosen to present features optimally.
-
-TECHNICAL: Extreme sharpness on eyes and key features. Highest quality capture with no noise. Colors accurate and beautiful. Professional beauty photography standard.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Professional beauty photography studio",
+                "subjects": [{
+                    "type": "beauty portrait subject",
+                    "description": "Person from input image in beauty close-up",
+                    "framing": "tight close-up, mid-forehead to chin, face fills frame",
+                    "features": {
+                        "eyes": "sharp, bright, captivating, enhanced but natural",
+                        "lips": "defined and beautiful",
+                        "eyebrows": "groomed and shaped",
+                        "skin": "flawless, luminous, natural texture retained"
+                    },
+                    "presentation": "beauty-ready, camera-ready for beauty campaign"
+                }],
+                "style": "Professional beauty close-up photography",
+                "lighting": {
+                    "type": "classic beauty lighting",
+                    "setup": ["butterfly/paramount light", "beauty dish for glamorous wrap-around"],
+                    "quality": "soft, even, minimizes texture while maintaining dimension",
+                    "catchlights": "ring light or similar for signature catchlights",
+                    "shadows": "filled adequately for beauty standard"
+                },
+                "skin": {
+                    "quality": "flawless, luminous, still appears natural",
+                    "texture": "subtle, pores visible but minimized",
+                    "tone": "even, smooth but not plastic",
+                    "glow": "healthy",
+                    "goal": "best-possible while remaining believable"
+                },
+                "mood": "beautiful, glamorous, polished",
+                "composition": {
+                    "style": "centered or near-centered typical of beauty",
+                    "symmetry": "attention to facial symmetry, embrace natural asymmetries",
+                    "angle": "head angle chosen to present features optimally"
+                },
+                "camera": {
+                    "angle": "eye level or slightly above",
+                    "distance": "extreme close-up",
+                    "lens": "100mm macro or 85mm",
+                    "focus": "extreme sharpness on eyes and key features"
+                },
+                "technical": {
+                    "quality": "highest, no noise",
+                    "colors": "accurate and beautiful",
+                    "standard": "professional beauty photography"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'athletic':
-            arguments['prompt'] = f"""Transform this image into a dynamic athletic portrait showcasing strength and power:
-
-POSE & ENERGY: Powerful stance conveying strength, athleticism, and confidence. Dynamic body positioning - flexed muscles, action poses, or powerful stillness. Body language should communicate physical capability and athletic prowess. Even in stillness, there should be implied motion and energy.
-
-LIGHTING: Dramatic lighting that sculpts musculature and emphasizes physical form. Hard, directional light for defined muscles and dramatic shadows. Rim lighting to separate subject and add dimension. Consider dramatic single-source or motivated sport lighting. Lighting should enhance physicality.
-
-MOOD & INTENSITY: Powerful, determined, focused, intense. The portrait should convey athletic mindset - concentration, determination, or competitive fire. Sweat and exertion are authentic elements. Raw, powerful energy.
-
-ENVIRONMENT: Options include - clean dark background for focus on physique, gym/training environment for context, outdoor athletic setting, or sport-specific location. Environment should enhance athletic narrative.
-
-MOVEMENT & DYNAMICS: Even in a still image, convey sense of motion and capability. Frozen action, implied movement, or powerful stillness. The body should look capable and trained. Consider motion blur or dynamic elements if appropriate.
-
-TECHNICAL: Sharp focus on subject with possible motion elements. High contrast for muscle definition. Colors can be bold and energetic or dramatic and moody. Professional sports photography quality.
-
-STYLING: Athletic wear, sport-specific attire, or minimal clothing to showcase physique. Everything should be intentional and enhance the athletic narrative.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Dynamic athletic portrait environment",
+                "subjects": [{
+                    "type": "athletic portrait subject",
+                    "description": "Person from input image as athlete",
+                    "pose": "powerful stance, dynamic body positioning, flexed muscles or action pose",
+                    "expression": "determined, focused, intense, competitive fire",
+                    "body_language": "communicates physical capability and athletic prowess",
+                    "energy": "implied motion even in stillness"
+                }],
+                "style": "Dynamic athletic portrait photography, sports photography quality",
+                "environment": {
+                    "options": ["clean dark background hex #1A1A1A", "gym/training environment", "outdoor athletic setting", "sport-specific location"],
+                    "purpose": "enhance athletic narrative"
+                },
+                "lighting": {
+                    "type": "dramatic, sculpts musculature",
+                    "quality": "hard, directional for defined muscles",
+                    "shadows": "dramatic",
+                    "rim_light": "separates subject, adds dimension",
+                    "purpose": "enhance physicality"
+                },
+                "mood": "powerful, determined, focused, intense, raw energy",
+                "movement": {
+                    "feel": "convey motion and capability",
+                    "options": ["frozen action", "implied movement", "powerful stillness"],
+                    "body": "looks capable and trained"
+                },
+                "composition": {
+                    "focus": "on physique and form",
+                    "style": "dynamic sports photography"
+                },
+                "camera": {
+                    "angle": "dynamic, possibly low angle for power",
+                    "distance": "full body or upper body",
+                    "lens": "70-200mm sports lens"
+                },
+                "color_palette": {
+                    "options": ["bold and energetic", "dramatic and moody"],
+                    "contrast": "high for muscle definition"
+                },
+                "styling": "athletic wear, sport-specific attire, intentional and narrative-enhancing",
+                "technical": {
+                    "focus": "sharp on subject",
+                    "motion": "possible motion elements if appropriate",
+                    "quality": "professional sports photography"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'creative_color':
-            arguments['prompt'] = f"""Transform this image into a creative color portrait with bold, artistic lighting:
-
-COLOR PALETTE: Bold, intentional use of color - neon gels, colored lighting, creative color grading. Colors should be a primary creative element, not just accurate reproduction. Consider complementary color schemes (cyan/red, magenta/green), analogous harmonies, or bold single-color dominance.
-
-LIGHTING: Creative colored lighting - gel lights, neon sources, LED color mixing. Multiple colored light sources creating interplay of hues on skin and environment. Embrace color casts as creative elements. Lighting becomes a painterly tool.
-
-MOOD: Artistic, contemporary, edgy, creative, or futuristic. The bold colors create immediate visual impact and emotional response. Modern, fashion-forward, or experimental sensibility.
-
-TECHNICAL APPROACH: Understand how colored light interacts with skin tones. Balance creative color with flattering subject representation. Colors should be vibrant and intentional, not muddy or accidental. High color saturation where appropriate.
-
-COMPOSITION: Contemporary, artistic composition that complements the creative color approach. Use of negative space, unconventional framing, or graphic elements that enhance the color story.
-
-STYLE REFERENCE: Think music video stills, contemporary fashion editorials, artistic portraits, or creative advertising. The image should feel current, creative, and visually striking.
-
-BACKGROUND: Could be dark to make colors pop, or colored to complement/contrast with lighting. Background should support the overall color concept.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Creative color portrait studio with colored lighting",
+                "subjects": [{
+                    "type": "creative color portrait subject",
+                    "description": "Person from input image with bold colored lighting",
+                    "pose": "contemporary, artistic positioning",
+                    "expression": "edgy, creative, modern"
+                }],
+                "style": "Creative color portrait photography, artistic, contemporary",
+                "color_palette": {
+                    "approach": "bold, intentional, primary creative element",
+                    "schemes": ["complementary cyan hex #00FFFF and red hex #FF0000", "magenta hex #FF00FF and green hex #00FF00", "analogous harmonies", "bold single-color dominance"],
+                    "sources": ["neon gels", "colored lighting", "creative grading"],
+                    "saturation": "high and vibrant where appropriate"
+                },
+                "lighting": {
+                    "type": "creative colored lighting",
+                    "sources": ["gel lights", "neon sources", "LED color mixing"],
+                    "effect": "multiple colored sources creating interplay of hues",
+                    "approach": "embrace color casts as creative elements, lighting as painterly tool"
+                },
+                "mood": "artistic, contemporary, edgy, creative, futuristic",
+                "composition": {
+                    "style": "contemporary, artistic",
+                    "elements": ["negative space", "unconventional framing", "graphic elements"],
+                    "purpose": "complement creative color approach"
+                },
+                "camera": {
+                    "angle": "creative, unconventional",
+                    "distance": "varies for impact",
+                    "lens": "35mm or 85mm"
+                },
+                "background": {
+                    "options": ["dark hex #0A0A0A to make colors pop", "colored to complement lighting"],
+                    "purpose": "support overall color concept"
+                },
+                "reference": "music video stills, contemporary fashion editorials, creative advertising",
+                "technical": {
+                    "skin": "colored light flattering on skin tones",
+                    "colors": "vibrant and intentional, not muddy",
+                    "quality": "visually striking and current"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'vintage_retro':
-            arguments['prompt'] = f"""Transform this image into a vintage/retro portrait with classic film aesthetics:
-
-FILM AESTHETIC: Authentic film photography look - could be 1970s warm tones, 1980s bold colors, Polaroid instant film, Kodachrome saturation, or Fuji film greens. The specific era or film stock should inform the entire aesthetic approach.
-
-COLOR GRADING: Period-appropriate color science - lifted blacks, rolled-off highlights, specific color casts depending on era. Faded shadows, vintage color crossovers, film-specific color rendering. Colors should feel nostalgic and era-authentic.
-
-GRAIN & TEXTURE: Appropriate film grain - subtle or prominent depending on the film stock being emulated. Grain should look organic and film-like, not digital noise. Consider halation, light leaks, or other film artifacts if appropriate.
-
-LIGHTING STYLE: Lighting that feels period-appropriate - could be natural light photography style of the era, studio lighting techniques of the time, or flash photography aesthetic. Consider how photographers of the chosen era would have lit their subjects.
-
-STYLING & MOOD: Nostalgic, timeless, romantic, or era-specific mood. The image should transport viewers to another time. Warmth and humanity of film photography. Connection to photographic history.
-
-TECHNICAL APPROACH: Emulate limitations and characteristics of vintage processes - specific dynamic range, color rendering, depth of field characteristics. The "imperfections" of film become aesthetic choices.
-
-POST-PROCESSING: Film emulation that's authentic and consistent. Consider the complete vintage photography workflow from capture to print.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Vintage/retro portrait with classic film aesthetic",
+                "subjects": [{
+                    "type": "vintage portrait subject",
+                    "description": "Person from input image in nostalgic film style",
+                    "pose": "period-appropriate, classic",
+                    "expression": "timeless, romantic, era-authentic"
+                }],
+                "style": "Vintage/retro portrait photography, classic film aesthetics",
+                "film_aesthetic": {
+                    "options": ["1970s warm tones", "1980s bold colors", "Polaroid instant film", "Kodachrome saturation", "Fuji film greens"],
+                    "approach": "specific era or film stock informs entire aesthetic"
+                },
+                "color_grading": {
+                    "style": "period-appropriate color science",
+                    "blacks": "lifted",
+                    "highlights": "rolled-off",
+                    "color_casts": "era-specific",
+                    "shadows": "faded, vintage crossovers",
+                    "feel": "nostalgic and era-authentic"
+                },
+                "grain": {
+                    "type": "film grain, organic, not digital noise",
+                    "intensity": "subtle or prominent based on film stock",
+                    "artifacts": ["possible halation", "light leaks if appropriate"]
+                },
+                "lighting": {
+                    "style": "period-appropriate",
+                    "options": ["natural light of the era", "studio techniques of the time", "flash photography aesthetic"],
+                    "approach": "how photographers of chosen era would light subjects"
+                },
+                "mood": "nostalgic, timeless, romantic, era-specific, warm",
+                "composition": {
+                    "style": "classic film photography",
+                    "feel": "transport viewers to another time"
+                },
+                "camera": {
+                    "emulation": "vintage process characteristics",
+                    "dynamic_range": "era-specific",
+                    "depth_of_field": "period-appropriate"
+                },
+                "post_processing": {
+                    "style": "authentic film emulation",
+                    "consistency": "complete vintage workflow feel",
+                    "imperfections": "become aesthetic choices"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'minimalist':
-            arguments['prompt'] = f"""Transform this image into a minimalist portrait with refined simplicity:
-
-COMPOSITION: Maximum impact through minimal elements. Generous negative space - 60-80% of frame can be empty. Subject positioned with intentional use of space. Every element in frame must earn its place. Clean, uncluttered composition.
-
-BACKGROUND: Simple, clean, undistracting - solid color, subtle gradient, or very minimal texture. The background should not compete with the subject but provide breathing room. Consider white, soft gray, or single muted color.
-
-LIGHTING: Simple, clean lighting that creates form without complexity. Single soft source or very simple two-light setup. Avoid complex shadows or dramatic effects unless very intentional. Light should be a quiet element, not a statement.
-
-POSE: Simple, elegant, unforced pose. Natural and relaxed without elaborate positioning. The subject's presence itself becomes the focus. Quiet strength rather than dynamic action.
-
-COLOR PALETTE: Restricted, harmonious colors. Monochromatic or very limited palette. No visual noise or competing color elements. Colors should feel intentional and curated.
-
-MOOD: Calm, serene, contemplative, peaceful. The simplicity should create a meditative quality. Space to breathe and reflect. Quiet sophistication.
-
-STYLING: Simple, minimal wardrobe - solid colors, clean lines. No busy patterns or distracting accessories. Everything supporting the minimal aesthetic.
-
-PHILOSOPHY: Less is more. Every choice should be deliberate. The image should achieve impact through restraint and refinement, not addition or complexity.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Minimalist portrait setting with refined simplicity",
+                "subjects": [{
+                    "type": "minimalist portrait subject",
+                    "description": "Person from input image in simple, elegant presentation",
+                    "pose": "simple, elegant, unforced, natural and relaxed",
+                    "expression": "quiet strength, calm, contemplative",
+                    "styling": "simple, minimal wardrobe, solid colors, clean lines, no busy patterns"
+                }],
+                "style": "Minimalist portrait photography, maximum impact through minimal elements",
+                "background": {
+                    "type": "simple, clean, undistracting",
+                    "options": ["solid color hex #F5F5F5", "subtle gradient", "very minimal texture"],
+                    "colors": ["white", "soft gray hex #E0E0E0", "single muted color"],
+                    "purpose": "provide breathing room, not compete with subject"
+                },
+                "negative_space": {
+                    "amount": "generous, 60-80% of frame can be empty",
+                    "purpose": "intentional use of space, every element earns its place"
+                },
+                "lighting": {
+                    "type": "simple, clean, creates form without complexity",
+                    "setup": "single soft source or simple two-light",
+                    "shadows": "avoid complex or dramatic unless very intentional",
+                    "role": "quiet element, not a statement"
+                },
+                "mood": "calm, serene, contemplative, peaceful, quiet sophistication",
+                "composition": {
+                    "style": "clean, uncluttered",
+                    "approach": "subject positioned with intentional space use",
+                    "quality": "meditative, space to breathe"
+                },
+                "camera": {
+                    "angle": "simple, direct",
+                    "distance": "medium shot with space",
+                    "lens": "85mm"
+                },
+                "color_palette": {
+                    "approach": "restricted, harmonious",
+                    "style": "monochromatic or very limited palette",
+                    "quality": "no visual noise, intentional and curated"
+                },
+                "philosophy": "less is more, every choice deliberate, impact through restraint and refinement",
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'cultural':
-            arguments['prompt'] = f"""Transform this image into a cultural portrait celebrating heritage and tradition:
-
-CULTURAL AUTHENTICITY: Respectful, authentic representation of cultural heritage. Traditional attire, accessories, or styling that's meaningful and accurate. Avoid stereotypes or superficial representation. The portrait should honor and celebrate cultural identity.
-
-WARDROBE & STYLING: Traditional clothing, textiles, jewelry, or accessories appropriate to the culture being represented. Attention to detail and authenticity in every element. Styling should be respectful and accurately represent the culture.
-
-LIGHTING: Lighting that complements the cultural aesthetic and enhances traditional elements. Could be natural light for authenticity, or studio lighting that showcases textile details and accessories. Warm, respectful illumination.
-
-BACKGROUND & SETTING: Context-appropriate setting - could be simple to focus on the person, or environmental to provide cultural context. Colors and elements should harmonize with cultural aesthetic.
-
-EXPRESSION & PRESENCE: Dignified, proud representation of cultural identity. The subject should embody the strength and beauty of their heritage. Expression should feel authentic and meaningful.
-
-COLOR & MOOD: Colors should feel authentic to the cultural palette - traditional colors, natural dyes, cultural color symbolism. Mood should be celebratory and respectful.
-
-TECHNICAL: High quality that honors the subject and their cultural representation. Sharp detail on traditional elements. Rich colors that accurately represent textiles and materials.
-
-SENSITIVITY: This portrait should be created with cultural sensitivity, celebrating rather than appropriating, honoring rather than othering.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Cultural portrait setting celebrating heritage and tradition",
+                "subjects": [{
+                    "type": "cultural portrait subject",
+                    "description": "Person from input image in authentic cultural presentation",
+                    "styling": "traditional clothing, textiles, jewelry, accessories authentic to culture",
+                    "expression": "dignified, proud, embodying strength and beauty of heritage",
+                    "presence": "authentic and meaningful representation"
+                }],
+                "style": "Cultural portrait photography, respectful and celebratory",
+                "cultural_authenticity": {
+                    "approach": "respectful, authentic representation of heritage",
+                    "avoid": "stereotypes or superficial representation",
+                    "goal": "honor and celebrate cultural identity"
+                },
+                "wardrobe": {
+                    "elements": ["traditional clothing", "textiles", "jewelry", "cultural accessories"],
+                    "quality": "attention to detail and authenticity",
+                    "representation": "respectful and accurate"
+                },
+                "lighting": {
+                    "style": "complements cultural aesthetic, enhances traditional elements",
+                    "options": ["natural light for authenticity", "studio lighting for textile details"],
+                    "quality": "warm, respectful illumination"
+                },
+                "background": {
+                    "options": ["simple to focus on person", "environmental for cultural context"],
+                    "colors": "harmonize with cultural aesthetic"
+                },
+                "mood": "celebratory, respectful, dignified, proud",
+                "composition": {
+                    "style": "cultural portrait",
+                    "focus": "subject and traditional elements"
+                },
+                "camera": {
+                    "angle": "respectful, dignified",
+                    "distance": "medium shot showing cultural attire",
+                    "lens": "85mm portrait"
+                },
+                "color_palette": {
+                    "approach": "authentic to cultural palette",
+                    "elements": ["traditional colors", "natural dyes", "cultural color symbolism"]
+                },
+                "technical": {
+                    "quality": "high, honors subject and representation",
+                    "detail": "sharp on traditional elements",
+                    "colors": "rich, accurate representation of textiles"
+                },
+                "sensitivity": "celebrating rather than appropriating, honoring rather than othering",
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'conceptual':
-            arguments['prompt'] = f"""Transform this image into a conceptual portrait with artistic symbolism and creative vision:
-
-CONCEPT & MEANING: The portrait should convey an idea, emotion, or narrative beyond simple representation. Symbolic elements, surreal touches, or visual metaphors that communicate deeper meaning. The image tells a story or expresses a concept.
-
-CREATIVE ELEMENTS: Incorporation of symbolic props, unusual compositions, surreal elements, or creative techniques. These elements should support and express the conceptual intent. Balance between portrait and artistic expression.
-
-ARTISTIC VISION: Fine art sensibility - the image as creative expression rather than documentation. Consider influences from art history, contemporary art, or conceptual photography. The portrait becomes a vehicle for artistic ideas.
-
-VISUAL STORYTELLING: Every element contributes to the narrative or concept. Composition, lighting, color, and styling all support the conceptual intent. The viewer should be engaged in interpretation and meaning-making.
-
-TECHNICAL EXECUTION: High-quality execution of creative concepts. Technical excellence in service of artistic vision. Complex concepts require flawless execution.
-
-MOOD & ATMOSPHERE: The mood should support the concept - could be surreal, dreamlike, challenging, provocative, peaceful, or transformative. Emotional resonance beyond surface beauty.
-
-COMPOSITION: Creative, possibly unconventional composition that serves the concept. Break rules intentionally when it supports the artistic vision.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Conceptual portrait with artistic symbolism and creative vision",
+                "subjects": [{
+                    "type": "conceptual portrait subject",
+                    "description": "Person from input image in artistic conceptual presentation",
+                    "role": "vehicle for artistic ideas",
+                    "interaction": "with symbolic props, surreal elements, or creative techniques"
+                }],
+                "style": "Conceptual portrait photography, fine art sensibility",
+                "concept": {
+                    "approach": "convey idea, emotion, or narrative beyond simple representation",
+                    "elements": ["symbolic props", "visual metaphors", "surreal touches"],
+                    "purpose": "image tells a story or expresses a concept"
+                },
+                "creative_elements": {
+                    "types": ["symbolic props", "unusual compositions", "surreal elements", "creative techniques"],
+                    "purpose": "support and express conceptual intent",
+                    "balance": "between portrait and artistic expression"
+                },
+                "artistic_vision": {
+                    "sensibility": "fine art, creative expression not documentation",
+                    "influences": ["art history", "contemporary art", "conceptual photography"]
+                },
+                "visual_storytelling": {
+                    "approach": "every element contributes to narrative",
+                    "elements": ["composition", "lighting", "color", "styling"],
+                    "goal": "engage viewer in interpretation and meaning-making"
+                },
+                "mood": "surreal, dreamlike, provocative, peaceful, or transformative as concept requires",
+                "composition": {
+                    "style": "creative, possibly unconventional",
+                    "approach": "serves the concept, break rules intentionally when supporting vision"
+                },
+                "camera": {
+                    "angle": "serves conceptual intent",
+                    "distance": "varies for artistic impact",
+                    "lens": "varies for creative effect"
+                },
+                "technical": {
+                    "execution": "high-quality, flawless execution of creative concepts",
+                    "quality": "technical excellence in service of artistic vision"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'dating':
             vibe = data.get('dating_vibe', 'confident_authentic')
-            arguments['prompt'] = f"""Transform this image into an attractive dating profile photo with {vibe.replace('_', ' ')} energy:
-
-DATING PROFILE OPTIMIZATION: Create a photo that makes an immediate positive impression on dating apps like Tinder, Bumble, and Hinge. The image should be scroll-stopping, approachable, and convey genuine personality.
-
-EXPRESSION & ENERGY: Capture authentic, warm expression that invites connection. Genuine smile that reaches the eyes, approachable body language, confident but not arrogant. The expression should say "I'm fun to be around" and "I'm genuinely interested in meeting you." Avoid stiff posed looks - aim for natural, candid-feeling moments.
-
-LIGHTING & COLOR: Warm, flattering lighting that enhances natural features. Vibrant but natural colors that pop on mobile screens. Golden hour warmth or soft natural light preferred. Colors should be eye-catching without being oversaturated. The photo should stand out in a sea of other profiles.
-
-POSES & FRAMING: Natural, relaxed poses that show personality. Slight angle (not straight-on) for dimension. Head and shoulders or upper body framing works best. Show genuine personality through body language - whether that's playful, confident, adventurous, or warm.
-
-BACKGROUND: Clean, uncluttered background that doesn't distract. Can suggest lifestyle (café, outdoors, travel) but subject is clearly the focus. Blurred backgrounds work well to keep attention on you.
-
-AUTHENTICITY: Look like yourself on your best day - enhanced but not transformed beyond recognition. The person you meet should recognize you from your photo. Enhance natural attractiveness while maintaining authentic appearance.
-
-APPEAL FACTORS: Studies show dating photos perform best with: genuine smiles, eye contact with camera, warm lighting, clean backgrounds, and confident body language. This photo should incorporate these proven elements.
-
-TECHNICAL: Sharp focus on face, pleasing bokeh if background visible, professional quality but not overly produced. Should feel like a great candid photo, not a formal portrait.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            vibe_descriptions = {
+                "confident_authentic": "confident and genuinely authentic",
+                "playful_fun": "playful and fun-loving",
+                "warm_approachable": "warm and approachable",
+                "adventurous": "adventurous and exciting",
+                "sophisticated": "sophisticated and classy",
+                "casual_relaxed": "casual and relaxed"
+            }
+            prompt_json = {
+                "scene": "Dating profile photo setting optimized for dating apps",
+                "subjects": [{
+                    "type": "dating profile subject",
+                    "description": "Person from input image looking attractive and approachable",
+                    "vibe": vibe_descriptions.get(vibe, "confident and authentic"),
+                    "expression": "genuine smile reaching eyes, warm, inviting connection",
+                    "body_language": "approachable, confident but not arrogant, natural",
+                    "pose": "natural, relaxed, shows personality, slight angle for dimension"
+                }],
+                "style": "Dating profile photography, scroll-stopping, genuine personality",
+                "optimization": {
+                    "platforms": ["Tinder", "Bumble", "Hinge"],
+                    "goal": "immediate positive impression, scroll-stopping",
+                    "appeal": ["genuine smiles", "eye contact with camera", "warm lighting", "clean backgrounds", "confident body language"]
+                },
+                "lighting": {
+                    "type": "warm, flattering, enhances natural features",
+                    "options": ["golden hour warmth hex #FFB347", "soft natural light"],
+                    "colors": "vibrant but natural, pop on mobile screens",
+                    "quality": "eye-catching without oversaturation"
+                },
+                "background": {
+                    "style": "clean, uncluttered, doesn't distract",
+                    "options": ["suggests lifestyle - café, outdoors, travel", "blurred for focus on subject"],
+                    "focus": "subject is clearly the focus"
+                },
+                "mood": vibe_descriptions.get(vibe, "confident and authentic"),
+                "composition": {
+                    "framing": "head and shoulders or upper body",
+                    "angle": "slight angle not straight-on for dimension",
+                    "feel": "great candid photo, not formal portrait"
+                },
+                "camera": {
+                    "angle": "eye level or slightly above",
+                    "distance": "medium close-up",
+                    "lens": "50mm or 85mm",
+                    "focus": "sharp on face",
+                    "bokeh": "pleasing if background visible"
+                },
+                "authenticity": {
+                    "goal": "look like yourself on your best day",
+                    "approach": "enhanced but not transformed beyond recognition",
+                    "test": "the person you meet should recognize you"
+                },
+                "technical": {
+                    "quality": "professional but not overly produced",
+                    "feel": "natural, candid-feeling moment"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'influencer':
             aesthetic = data.get('aesthetic', 'glamorous')
-            arguments['prompt'] = f"""Transform this image into a social media influencer portrait with {aesthetic} aesthetic:
-
-PLATFORM OPTIMIZATION: Instagram-ready composition and quality. Square or 4:5 format friendly. Eye-catching for scroll-stopping impact. The image should perform well in the social media context - high engagement potential.
-
-AESTHETIC DIRECTION ({aesthetic}):
-- If glamorous: luxury feel, perfect lighting, aspirational quality, high-end styling
-- If natural: authentic, relatable, effortlessly beautiful, approachable
-- If golden_hour: warm, dreamy, sun-kissed, romantic lighting
-- If urban_chic: street style, city backdrop, trendy, fashion-forward
-- If soft_dreamy: ethereal, soft focus elements, pastel tones, romantic
-- If vibrant_bold: saturated colors, high impact, energetic, dynamic
-
-LIGHTING: Flattering, consistent with the chosen aesthetic. Usually soft, beautiful light that makes subject look their best. Golden hour warmth, ring light glamour, or natural window light depending on aesthetic. Always flattering.
-
-POSE & EXPRESSION: Natural yet photogenic - the practiced casualness of influencer photography. Confident, engaging, relatable. Body language that works for the chosen aesthetic. Expression that connects with the audience.
-
-STYLING: Trend-aware, aesthetically consistent wardrobe and accessories. Hair and makeup camera-ready. Overall look that fits the influencer brand and aesthetic.
-
-POST-PROCESSING: Clean, consistent color grading that matches the aesthetic. Skin retouching that's flattering but not obviously filtered. The editing style should feel like a cohesive feed aesthetic.
-
-ENGAGEMENT FACTOR: The image should make viewers stop scrolling, engage, and want to follow. Aspirational yet achievable. Beautiful but relatable.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            aesthetic_specs = {
+                "glamorous": {"feel": "luxury, aspirational", "lighting": "perfect, high-end", "colors": "rich, polished"},
+                "natural_beauty": {"feel": "authentic, relatable", "lighting": "soft, effortless", "colors": "natural, approachable"},
+                "golden_hour": {"feel": "warm, dreamy, romantic", "lighting": "sun-kissed hex #FFD700", "colors": "golden, warm tones"},
+                "urban_chic": {"feel": "street style, trendy", "lighting": "city environment", "colors": "fashion-forward"},
+                "soft_dreamy": {"feel": "ethereal, romantic", "lighting": "soft focus elements", "colors": "pastel tones"},
+                "vibrant_bold": {"feel": "energetic, dynamic", "lighting": "high impact", "colors": "saturated, vibrant"}
+            }
+            current_aesthetic = aesthetic_specs.get(aesthetic, aesthetic_specs["glamorous"])
+            prompt_json = {
+                "scene": f"Social media influencer portrait with {aesthetic.replace('_', ' ')} aesthetic",
+                "subjects": [{
+                    "type": "influencer portrait subject",
+                    "description": "Person from input image as social media influencer",
+                    "pose": "natural yet photogenic, practiced casualness",
+                    "expression": "confident, engaging, relatable, connects with audience",
+                    "styling": "trend-aware, aesthetically consistent, camera-ready hair and makeup"
+                }],
+                "style": "Social media influencer photography, Instagram-ready",
+                "aesthetic": {
+                    "name": aesthetic.replace('_', ' '),
+                    "feel": current_aesthetic["feel"],
+                    "lighting_style": current_aesthetic["lighting"],
+                    "color_approach": current_aesthetic["colors"]
+                },
+                "platform_optimization": {
+                    "format": "Instagram-ready, square or 4:5 format friendly",
+                    "goal": "scroll-stopping, high engagement potential",
+                    "quality": "eye-catching for social media context"
+                },
+                "lighting": {
+                    "type": "flattering, consistent with aesthetic",
+                    "quality": "soft, beautiful light, makes subject look best",
+                    "options": ["golden hour warmth", "ring light glamour", "natural window light"]
+                },
+                "mood": current_aesthetic["feel"],
+                "composition": {
+                    "style": "influencer photography",
+                    "body_language": "works for chosen aesthetic"
+                },
+                "camera": {
+                    "angle": "flattering social media angles",
+                    "distance": "medium shot",
+                    "lens": "35mm or 50mm"
+                },
+                "post_processing": {
+                    "color_grading": "clean, consistent, matches aesthetic",
+                    "retouching": "flattering but not obviously filtered",
+                    "feel": "cohesive feed aesthetic"
+                },
+                "engagement": {
+                    "goal": "make viewers stop scrolling and want to follow",
+                    "quality": "aspirational yet achievable, beautiful but relatable"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'luxury':
-            arguments['prompt'] = f"""Transform this image into a luxury portrait exuding wealth, power, and sophistication:
-
-LIGHTING: Rich, sophisticated illumination that suggests premium quality. Dramatic but controlled - think luxury brand advertising. Beautiful light that enhances without being obvious. Professional, refined, expensive-looking light quality.
-
-STYLING & FASHION: High-end, premium fashion aesthetic. Designer or designer-quality attire. Impeccable grooming. Attention to every detail of personal presentation. Luxury accessories if present. Everything should suggest wealth and refinement.
-
-SETTING & BACKGROUND: Context suggesting affluence - could be clean dark/light background for timeless luxury, or sophisticated environmental setting. If environmental, every visible element should suggest quality and wealth.
-
-MOOD & EXPRESSION: Confident, powerful, sophisticated, perhaps slightly aloof. The expression of someone accustomed to success. Not arrogant, but assured. Authority and elegance.
-
-COLOR PALETTE: Rich, sophisticated colors - deep blacks, clean whites, gold accents, jewel tones, or refined neutral palette. Colors should feel expensive and intentional.
-
-COMPOSITION: Elegant, refined composition. Strong but not aggressive. Classical proportions with contemporary edge. Every element precisely placed.
-
-POST-PROCESSING: Premium quality - flawless execution, refined retouching, rich tones. The technical quality should match the luxury positioning. Think luxury brand campaign or premium magazine.
-
-ASPIRATIONAL QUALITY: The image should represent the pinnacle of success and sophistication. Viewers should aspire to this level of presentation.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Luxury portrait setting exuding wealth, power, sophistication",
+                "subjects": [{
+                    "type": "luxury portrait subject",
+                    "description": "Person from input image in premium, high-end presentation",
+                    "styling": "designer attire, impeccable grooming, luxury accessories",
+                    "expression": "confident, powerful, sophisticated, assured authority",
+                    "presence": "someone accustomed to success, elegant not arrogant"
+                }],
+                "style": "Luxury portrait photography, premium brand quality",
+                "background": {
+                    "options": ["clean dark hex #0A0A0A for timeless luxury", "clean light hex #F8F8F8", "sophisticated environmental"],
+                    "quality": "every element suggests quality and wealth"
+                },
+                "lighting": {
+                    "type": "rich, sophisticated, suggests premium quality",
+                    "quality": "dramatic but controlled, luxury brand advertising feel",
+                    "description": "beautiful light that enhances without being obvious",
+                    "feel": "professional, refined, expensive-looking"
+                },
+                "mood": "confident, powerful, sophisticated, elegant",
+                "composition": {
+                    "style": "elegant, refined",
+                    "approach": "strong but not aggressive, classical with contemporary edge",
+                    "precision": "every element precisely placed"
+                },
+                "camera": {
+                    "angle": "powerful, sophisticated",
+                    "distance": "medium shot",
+                    "lens": "85mm or 105mm"
+                },
+                "color_palette": {
+                    "style": "rich, sophisticated",
+                    "colors": ["deep black hex #0A0A0A", "clean white hex #FAFAFA", "gold accents hex #D4AF37", "jewel tones"],
+                    "feel": "expensive and intentional"
+                },
+                "post_processing": {
+                    "quality": "premium, flawless execution",
+                    "retouching": "refined",
+                    "tones": "rich",
+                    "reference": "luxury brand campaign or premium magazine"
+                },
+                "aspirational": "represent pinnacle of success and sophistication",
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'avatar':
             style = data.get('style', 'semi_realistic')
-            arguments['prompt'] = f"""Transform this image into a stylized avatar portrait with {style.replace('_', ' ')} aesthetic:
-
-STYLE DIRECTION ({style}):
-- If semi_realistic: Painterly quality while maintaining likeness, slightly idealized features, artistic interpretation of reality
-- If 3d_pixar: Pixar/Disney animation style, expressive features, appealing character design, 3D rendered look
-- If anime: Japanese animation aesthetic, large expressive eyes, anime hair styling, cel-shaded appearance
-- If comic_book: Comic/graphic novel illustration style, bold lines, dynamic rendering, superhero aesthetic potential
-- If digital_art: Contemporary digital painting, vibrant colors, artistic brushwork visible, modern illustration
-- If fantasy: Fantasy character aesthetic, ethereal or heroic qualities, fantastical elements integrated
-
-LIKENESS PRESERVATION: Despite stylization, the avatar must be recognizably the same person. Key identifying features (face shape, eye configuration, notable features) must be preserved within the chosen art style. The person should look at their avatar and see themselves.
-
-ARTISTIC QUALITY: High-quality digital art execution. The style should be consistent and well-executed, not a cheap filter effect. Professional illustration quality.
-
-CHARACTER APPEAL: The avatar should be appealing and engaging in its chosen style. Character design principles applied - readable silhouette, expressive features, visual appeal.
-
-TECHNICAL EXECUTION: Clean, professional digital art. Appropriate for the chosen style - could be cel-shaded, painterly, 3D rendered, etc. Consistent styling throughout the image.
-
-USE CASE: Suitable for social media profile pictures, gaming avatars, personal branding, or digital identity. Should work at various sizes.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            style_specs = {
+                "semi_realistic": {"approach": "painterly quality, slightly idealized", "technique": "artistic interpretation of reality"},
+                "3d_pixar": {"approach": "Pixar/Disney animation style", "technique": "3D rendered, expressive features, appealing character design"},
+                "anime": {"approach": "Japanese animation aesthetic", "technique": "large expressive eyes, anime hair, cel-shaded"},
+                "comic_book": {"approach": "comic/graphic novel style", "technique": "bold lines, dynamic rendering, superhero aesthetic"},
+                "digital_art": {"approach": "contemporary digital painting", "technique": "vibrant colors, visible brushwork, modern illustration"},
+                "fantasy": {"approach": "fantasy character aesthetic", "technique": "ethereal or heroic qualities, fantastical elements"}
+            }
+            current_style = style_specs.get(style, style_specs["semi_realistic"])
+            prompt_json = {
+                "scene": f"Stylized avatar portrait with {style.replace('_', ' ')} aesthetic",
+                "subjects": [{
+                    "type": "avatar subject",
+                    "description": "Person from input image transformed into stylized avatar",
+                    "likeness": "recognizably the same person despite stylization",
+                    "features_preserved": ["face shape", "eye configuration", "notable features"],
+                    "result": "person should see themselves in the avatar"
+                }],
+                "style": f"{current_style['approach']}, professional digital art",
+                "style_direction": {
+                    "name": style.replace('_', ' '),
+                    "approach": current_style["approach"],
+                    "technique": current_style["technique"]
+                },
+                "artistic_quality": {
+                    "execution": "high-quality digital art, not cheap filter effect",
+                    "consistency": "style consistent throughout image",
+                    "level": "professional illustration quality"
+                },
+                "character_design": {
+                    "appeal": "engaging in chosen style",
+                    "principles": ["readable silhouette", "expressive features", "visual appeal"]
+                },
+                "technical": {
+                    "execution": "clean, professional digital art",
+                    "rendering": "appropriate for style - cel-shaded, painterly, 3D, etc.",
+                    "consistency": "styling consistent throughout"
+                },
+                "use_case": {
+                    "applications": ["social media profile pictures", "gaming avatars", "personal branding", "digital identity"],
+                    "sizes": "works at various sizes"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'founder_headshot':
             vibe = data.get('vibe', 'visionary')
-            arguments['prompt'] = f"""Transform this image into a startup founder headshot with {vibe} leadership presence:
-
-LEADERSHIP VIBE ({vibe}):
-- If visionary: Forward-looking, innovative, seeing possibilities others don't, Steve Jobs energy
-- If approachable_ceo: Warm, accessible, team-builder, servant leadership feel
-- If tech_innovator: Modern, technical credibility, Silicon Valley aesthetic
-- If disruptor: Bold, challenging status quo, confident rule-breaker energy
-- If thought_leader: Intellectual, authoritative, expert presence
-- If creative_founder: Artistic, innovative, design-forward sensibility
-
-CONTEXT: This image is for pitch decks, investor meetings, company about pages, speaking engagements, and press features. It needs to convey leadership credibility and the specific founder archetype.
-
-LIGHTING: Professional but not corporate-stiff. Modern, confident lighting that suggests innovation while maintaining professionalism. Slightly dramatic acceptable for founder context.
-
-EXPRESSION: Confident, visionary, determined - someone you'd trust with investment. Approachable enough to work with but authoritative enough to lead. The specific expression should match the chosen vibe.
-
-BACKGROUND: Clean, modern - could be simple backdrop, modern office blur, or tech-appropriate environment. Should feel contemporary and founder-appropriate, not traditional corporate.
-
-STYLING: Smart casual or dressed-up startup appropriate. The founder uniform that matches their brand and industry. Contemporary, confident, successful but not stuffy.
-
-TECHNICAL: High quality suitable for large format printing and digital use. Sharp, professional, confidence-inspiring.
-
-NARRATIVE: The image should tell the story of someone building something important, leading a team, and ready to change their industry.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            vibe_specs = {
+                "visionary": {"energy": "forward-looking, innovative, seeing possibilities", "reference": "Steve Jobs energy"},
+                "approachable_ceo": {"energy": "warm, accessible, team-builder", "reference": "servant leadership feel"},
+                "tech_innovator": {"energy": "modern, technical credibility", "reference": "Silicon Valley aesthetic"},
+                "disruptor": {"energy": "bold, challenging status quo", "reference": "confident rule-breaker"},
+                "thought_leader": {"energy": "intellectual, authoritative", "reference": "expert presence"},
+                "creative_founder": {"energy": "artistic, innovative", "reference": "design-forward sensibility"}
+            }
+            current_vibe = vibe_specs.get(vibe, vibe_specs["visionary"])
+            prompt_json = {
+                "scene": f"Startup founder headshot with {vibe.replace('_', ' ')} leadership presence",
+                "subjects": [{
+                    "type": "founder headshot subject",
+                    "description": "Person from input image as startup founder/CEO",
+                    "vibe": current_vibe["energy"],
+                    "expression": "confident, visionary, determined, trustworthy for investment",
+                    "presence": "approachable yet authoritative, ready to lead",
+                    "styling": "smart casual or startup appropriate, contemporary, confident"
+                }],
+                "style": "Startup founder headshot, pitch-deck ready",
+                "leadership_vibe": {
+                    "name": vibe.replace('_', ' '),
+                    "energy": current_vibe["energy"],
+                    "reference": current_vibe["reference"]
+                },
+                "context": {
+                    "use_cases": ["pitch decks", "investor meetings", "company about pages", "speaking engagements", "press features"],
+                    "goal": "convey leadership credibility and founder archetype"
+                },
+                "background": {
+                    "style": "clean, modern",
+                    "options": ["simple backdrop hex #2D2D2D", "modern office blur", "tech-appropriate environment"],
+                    "feel": "contemporary, founder-appropriate, not traditional corporate"
+                },
+                "lighting": {
+                    "style": "professional but not corporate-stiff",
+                    "quality": "modern, confident, suggests innovation",
+                    "drama": "slightly dramatic acceptable for founder context"
+                },
+                "mood": current_vibe["energy"],
+                "composition": {
+                    "framing": "head and shoulders, founder portrait",
+                    "style": "professional yet approachable"
+                },
+                "camera": {
+                    "angle": "confident, eye level or slightly below",
+                    "distance": "close-up to medium",
+                    "lens": "85mm portrait"
+                },
+                "narrative": "building something important, leading a team, ready to change industry",
+                "technical": {
+                    "quality": "high, suitable for large format print and digital",
+                    "sharpness": "professional",
+                    "impact": "confidence-inspiring"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'restoration':
-            arguments['prompt'] = f"""Restore and enhance this image with professional quality improvements:
-
-RESTORATION GOALS: Fix any visible damage, imperfections, or quality issues while maintaining the authentic character of the image. Improve without over-processing or making the image look artificial.
-
-QUALITY ENHANCEMENT: Improve resolution and sharpness, reduce noise and artifacts, enhance detail and clarity. Professional-grade image quality improvement.
-
-SKIN & FEATURES: Natural enhancement of skin - even tone, reduce blemishes, subtle improvement while maintaining natural texture and character. Brighten eyes, enhance features naturally.
-
-COLOR CORRECTION: Accurate, pleasing color balance. Fix any color casts or inconsistencies. Rich, natural colors. Proper white balance and exposure optimization.
-
-TECHNICAL FIXES: Address any technical issues - fix lighting problems, improve contrast and dynamic range, sharpen appropriately, reduce any blur or softness.
-
-AUTHENTICITY: Maintain the essential character and authenticity of the original image. Enhancement should be invisible - the image should look like it was simply captured well, not obviously processed.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": "Photo restoration and enhancement",
+                "subjects": [{
+                    "type": "restoration subject",
+                    "description": "Person from input image with quality improvements",
+                    "skin": "natural enhancement, even tone, reduced blemishes, natural texture maintained",
+                    "eyes": "brightened naturally",
+                    "features": "enhanced naturally while preserving character"
+                }],
+                "style": "Professional photo restoration and enhancement",
+                "restoration_goals": {
+                    "approach": "fix damage and imperfections while maintaining authentic character",
+                    "philosophy": "improve without over-processing or artificial appearance"
+                },
+                "quality_enhancement": {
+                    "resolution": "improved",
+                    "sharpness": "enhanced appropriately",
+                    "noise": "reduced",
+                    "artifacts": "removed",
+                    "detail": "enhanced clarity",
+                    "level": "professional-grade improvement"
+                },
+                "color_correction": {
+                    "balance": "accurate, pleasing",
+                    "color_casts": "fixed",
+                    "consistency": "improved",
+                    "colors": "rich, natural",
+                    "white_balance": "proper",
+                    "exposure": "optimized"
+                },
+                "technical_fixes": {
+                    "lighting": "problems addressed",
+                    "contrast": "improved",
+                    "dynamic_range": "enhanced",
+                    "sharpness": "appropriate level",
+                    "blur": "reduced if present"
+                },
+                "authenticity": {
+                    "goal": "maintain essential character of original",
+                    "enhancement": "invisible - looks like well-captured image",
+                    "processing": "not obviously processed"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         elif mode == 'style_transfer':
             style = data.get('style', 'artistic')
-            arguments['prompt'] = f"""Transform this image with {style.replace('_', ' ')} artistic styling:
-
-STYLE APPLICATION: Apply {style} visual style to the portrait while maintaining clear likeness and recognition of the subject. The style should transform the aesthetic while preserving identity.
-
-ARTISTIC QUALITY: High-quality artistic transformation - not a simple filter but a thoughtful application of artistic style. Professional quality output.
-
-CONSISTENCY: Style should be applied consistently across the entire image. Unified aesthetic approach throughout.
-
-BALANCE: Find the right balance between artistic style transformation and portrait integrity. The subject should remain the clear focus and be immediately recognizable.
-
-{face_preserve}
-
-Additional instructions: {prompt}"""
+            prompt_json = {
+                "scene": f"Artistic style transfer with {style.replace('_', ' ')} styling",
+                "subjects": [{
+                    "type": "style transfer subject",
+                    "description": "Person from input image with artistic style applied",
+                    "likeness": "clear, immediately recognizable",
+                    "focus": "subject remains the clear focus"
+                }],
+                "style": f"{style.replace('_', ' ')} artistic styling",
+                "style_application": {
+                    "approach": f"apply {style.replace('_', ' ')} visual style to portrait",
+                    "goal": "transform aesthetic while preserving identity",
+                    "quality": "thoughtful application, not simple filter"
+                },
+                "artistic_quality": {
+                    "level": "high-quality artistic transformation",
+                    "execution": "professional quality output"
+                },
+                "consistency": {
+                    "application": "style applied consistently across entire image",
+                    "approach": "unified aesthetic throughout"
+                },
+                "balance": {
+                    "goal": "right balance between style transformation and portrait integrity",
+                    "subject": "clear focus, immediately recognizable"
+                },
+                "face_preservation": face_preserve_obj,
+                "additional_instructions": prompt
+            }
+            arguments['prompt'] = json.dumps(prompt_json, indent=2)
 
         # Advanced parameters
         if 'temperature' in data:
