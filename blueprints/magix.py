@@ -1410,12 +1410,12 @@ def generate_magix():
                 for img in result['images']:
                     if img.get('url'):
                         local_url, filename, width, height = save_result_image(img['url'])
-                        
-                        # Save to gallery
+
+                        # Save to gallery with the actual JSON prompt sent to API
                         try:
                             gallery_image = Image(
                                 filename=filename,
-                                prompt=prompt,
+                                prompt=arguments['prompt'],  # Save the full JSON prompt
                                 art_style=f'nano_{mode}',
                                 width=width,
                                 height=height,
@@ -1442,11 +1442,11 @@ def generate_magix():
                 # Single image result (fallback)
                 if result['image'].get('url'):
                     local_url, filename, width, height = save_result_image(result['image']['url'])
-                    
+
                     try:
                         gallery_image = Image(
                             filename=filename,
-                            prompt=prompt,
+                            prompt=arguments['prompt'],  # Save the full JSON prompt
                             art_style=f'nano_{mode}',
                             width=width,
                             height=height,
