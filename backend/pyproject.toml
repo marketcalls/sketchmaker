@@ -1,0 +1,79 @@
+[project]
+name = "sketchmaker-backend"
+version = "3.0.0"
+description = "Sketchmaker: self-hosted AI creative studio (FastAPI + SQLite)"
+requires-python = ">=3.11"
+dependencies = [
+    # FastAPI and server
+    "fastapi>=0.133.0",  # first release that accepts Starlette 1.x
+    "uvicorn[standard]>=0.32.0",
+    "python-multipart>=0.0.31",
+    # Database
+    "sqlalchemy>=2.0.36",
+    "alembic>=1.14.0",
+    # Pydantic
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.14.2",
+    # Authentication
+    "PyJWT>=2.15.0",
+    "bcrypt>=4.0.0",
+    # Rate limiting (login, setup, change password)
+    "slowapi>=0.1.9",
+    # Background tasks
+    "apscheduler>=3.10.4",
+    # HTTP client
+    "httpx>=0.28.0",
+    # AI/LLM
+    # 1.107.0 was a malicious release (MAL-2026-2144, 2026-10-21)
+    "litellm>=1.106.3,!=1.107.0",
+    "fal-client>=0.5.6",
+    # Encryption
+    "cryptography>=50.0.0",
+    # Image processing
+    "Pillow>=13.0.0",
+    # SVG sanitising for the logo generator (app/utils/svg_sanitize.py)
+    "lxml>=6.1.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-asyncio>=0.24.0",
+]
+
+[tool.uv]
+# litellm pins filelock<4.0 with no technical need (only its proxy CLI imports it,
+# and huggingface-hub accepts 4.x). 4.2.1 fixes the local-attacker advisories that
+# pip-audit reports. Drop this override once litellm allows 4.x.
+override-dependencies = ["filelock>=4.2.1"]
+# Security floors for transitive dependencies (pip-audit fix versions). These
+# only steer `uv lock`. Run `uv lock` without --upgrade so existing pins stay.
+constraint-dependencies = [
+    "aiohttp>=3.14.4",
+    "anyio>=4.14.2",
+    "brotli>=1.2.1",
+    "brotlicffi>=1.2.1.0",
+    "certifi>=2026.10.19",
+    "fsspec>=2026.6.0",
+    "idna>=3.15",
+    "mako>=1.3.12",
+    "msgpack>=1.2.1",
+    "multidict>=6.9.1",
+    "pygments>=2.20.0",
+    "requests>=2.33.0",
+    "starlette>=1.3.1",
+    "urllib3>=2.8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+# The app stores naive UTC throughout.
+filterwarnings = ["ignore:datetime.datetime.utc.*:DeprecationWarning"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]

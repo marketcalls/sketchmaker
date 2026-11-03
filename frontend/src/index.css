@@ -1,0 +1,244 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  SketchMaker — "Cinematic Studio Dark" design system
+  Dark is the default theme; `.light` overrides for the editorial light mode.
+  Tailwind v4: tokens here drive the generated utilities (tailwind.config.js is unused).
+*/
+@theme {
+  /* Typography */
+  --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Canvas */
+  --color-background: hsl(240 21% 5%);
+  --color-foreground: hsl(40 25% 96%);
+
+  /* Surfaces */
+  --color-card: hsl(240 16% 8%);
+  --color-card-foreground: hsl(40 25% 96%);
+  --color-popover: hsl(240 15% 9%);
+  --color-popover-foreground: hsl(40 25% 96%);
+  --color-elevated: hsl(240 13% 11%);
+
+  /* Brand: lime, calmed so it reads as an accent rather than a light source */
+  --color-primary: hsl(73 72% 58%);
+  --color-primary-foreground: hsl(240 25% 6%);
+  --color-secondary: hsl(240 12% 14%);
+  --color-secondary-foreground: hsl(40 20% 92%);
+  --color-accent: hsl(240 12% 15%);
+  --color-accent-foreground: hsl(40 25% 96%);
+
+  /* Support */
+  --color-muted: hsl(240 12% 12%);
+  --color-muted-foreground: hsl(240 9% 64%);
+  --color-destructive: hsl(0 78% 60%);
+  --color-destructive-foreground: hsl(40 25% 98%);
+  --color-success: hsl(152 65% 48%);
+  --color-success-foreground: hsl(240 25% 6%);
+  --color-warning: hsl(38 95% 56%);
+  --color-warning-foreground: hsl(240 25% 6%);
+
+  /* Lines and focus */
+  --color-border: hsl(240 12% 16%);
+  --color-input: hsl(240 12% 17%);
+  --color-ring: hsl(73 72% 58%);
+
+  /* Radii: tight on controls, softer on containers */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+
+  /* Shadows. Nothing glows: the old glow tokens are now quiet elevation so
+     any leftover shadow-glow class renders as a plain, soft shadow. */
+  --shadow-glow: 0 1px 2px hsl(240 30% 2% / 0.35);
+  --shadow-glow-sm: 0 1px 2px hsl(240 30% 2% / 0.25);
+  --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 1px 3px hsl(240 30% 2% / 0.35);
+
+  /* Motion: short, gentle and functional. Decorative loops (float, aurora,
+     pulse-glow, border-beam) are retired and resolve to no animation. */
+  --animate-shimmer: shimmer 2.8s ease-in-out infinite;
+  --animate-float: none;
+  --animate-float-slow: none;
+  --animate-marquee: marquee 60s linear infinite;
+  --animate-pulse-glow: none;
+  --animate-fade-up: fade-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-aurora: none;
+  --animate-spin-slow: spin 5s linear infinite;
+  --animate-border-beam: none;
+
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Editorial light mode — warm paper, ink text, deepened lime for contrast */
+.light {
+  --color-background: hsl(40 33% 97%);
+  --color-foreground: hsl(240 22% 9%);
+  --color-card: hsl(40 30% 99%);
+  --color-card-foreground: hsl(240 22% 9%);
+  --color-popover: hsl(40 30% 99%);
+  --color-popover-foreground: hsl(240 22% 9%);
+  --color-elevated: hsl(40 25% 94%);
+  --color-primary: hsl(75 95% 30%);
+  --color-primary-foreground: hsl(40 33% 98%);
+  --color-secondary: hsl(40 18% 91%);
+  --color-secondary-foreground: hsl(240 22% 12%);
+  --color-accent: hsl(40 20% 90%);
+  --color-accent-foreground: hsl(240 22% 9%);
+  --color-muted: hsl(40 18% 92%);
+  --color-muted-foreground: hsl(240 8% 42%);
+  --color-destructive: hsl(0 74% 48%);
+  --color-destructive-foreground: hsl(40 33% 98%);
+  --color-success: hsl(152 70% 32%);
+  --color-success-foreground: hsl(40 33% 98%);
+  --color-warning: hsl(34 95% 42%);
+  --color-warning-foreground: hsl(40 33% 98%);
+  --color-border: hsl(40 12% 86%);
+  --color-input: hsl(40 12% 84%);
+  --color-ring: hsl(75 95% 30%);
+  --shadow-glow: 0 1px 2px hsl(240 20% 10% / 0.08);
+  --shadow-glow-sm: 0 1px 2px hsl(240 20% 10% / 0.06);
+  --shadow-card: 0 1px 2px hsl(240 20% 10% / 0.06), 0 1px 3px hsl(240 20% 10% / 0.05);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
+  html.light {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01" on;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+
+  /* Thin, quiet scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-foreground) 18%, transparent) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-foreground) 16%, transparent);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--color-foreground) 28%, transparent);
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  /* Quiet translucent panel (sticky bars, overlays on imagery). A light
+     blur only; no colour boost. */
+  .glass {
+    background: color-mix(in srgb, var(--color-card) 90%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--color-border);
+  }
+
+  /* Hairline top highlight that makes dark panels read as lit */
+  .panel {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Display headline helper */
+  .headline {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+
+  /* Accent ink for a word of emphasis. No text shadow. */
+  .text-glow {
+    color: var(--color-primary);
+  }
+
+  /* Placeholder surface for loading and generating states: a slow, low
+     contrast sweep. */
+  .shimmer {
+    background: linear-gradient(
+      105deg,
+      color-mix(in srgb, var(--color-foreground) 3%, transparent) 40%,
+      color-mix(in srgb, var(--color-foreground) 6%, transparent) 50%,
+      color-mix(in srgb, var(--color-foreground) 3%, transparent) 60%
+    );
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  /* Marks a surface that is working (generating, rendering): a steady
+     accent outline, no movement. */
+  .beam-border {
+    position: relative;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  }
+
+  /* Retired decorative background blob; kept so old markup renders nothing. */
+  .glow-blob {
+    display: none;
+  }
+
+  /* Tabular figures for prices, counts and timers. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Respect reduced motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,26 @@
+# Allow-list: only what the image needs reaches the builder, so a secret, a database or
+# anything added later cannot end up in an image by accident.
+*
+!backend/alembic
+!backend/alembic.ini
+!backend/app
+!backend/pyproject.toml
+!backend/uv.lock
+!docker/entrypoint.sh
+!frontend/index.html
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/postcss.config.js
+!frontend/public
+!frontend/src
+!frontend/tailwind.config.js
+!frontend/tsconfig.app.json
+!frontend/tsconfig.json
+!frontend/tsconfig.node.json
+!frontend/vite.config.ts
+
+**/__pycache__
+**/*.pyc
+**/.env
+**/.env.*
+**/.DS_Store

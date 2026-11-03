@@ -1,0 +1,65 @@
+# Sketchmaker web service (FastAPI/uvicorn).
+# Installed by server/common.sh to /etc/systemd/system/sketchmaker.service. Edit this
+# file, not the installed copy.
+#
+# No secrets here: the app reads backend/.env (root:www-data 0640) itself.
+# One worker on purpose: SQLite has one writer, and the scheduler and the rate limit
+# counters live in this process.
+#
+# Sandbox notes (keep in sync with the backend):
+#   writes   /var/lib/sketchmaker (database, media, backups, logs, render cache), /tmp
+#   runs     ffmpeg, ffprobe
+#   network  outbound HTTPS, the nginx unix socket (AF_UNIX), AF_NETLINK for getaddrinfo
+# MemoryDenyWriteExecute and SystemCallFilter are deliberately not set: cffi and ffmpeg
+# are not verified under them.
+
+[Unit]
+Description=Sketchmaker (FastAPI/Uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/sketchmaker/backend
+Environment="PATH=/var/www/sketchmaker/backend/.venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONDONTWRITEBYTECODE=1"
+Environment="HOME=/var/lib/sketchmaker"
+# Over a unix socket uvicorn sees no client address, so only "*" makes it apply
+# X-Forwarded-For and -Proto. That is safe because only nginx and root can reach the
+# socket (RuntimeDirectoryMode=0750, owner www-data), and nginx overwrites
+# X-Forwarded-For with the real client address.
+ExecStart=/var/www/sketchmaker/backend/.venv/bin/uvicorn app.main:app --uds /run/sketchmaker/sketchmaker.sock --workers 1 --proxy-headers --forwarded-allow-ips=* --no-server-header
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+RuntimeDirectory=sketchmaker
+RuntimeDirectoryMode=0750
+StateDirectory=sketchmaker
+StateDirectoryMode=0700
+UMask=0077
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target

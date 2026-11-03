@@ -1,0 +1,50 @@
+# docker compose up -d --build
+# Then open http://127.0.0.1:8000 and create your account. See docs/DEPLOYMENT.md.
+#
+# Optional settings go in a .env file next to this one (not backend/.env):
+#   SKETCHMAKER_PORT   port on this machine (default 8000)
+#   TRUSTED_PROXIES    the address of your HTTPS proxy, as the container sees it
+
+name: sketchmaker
+
+services:
+  sketchmaker:
+    build: .
+    image: sketchmaker:local
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+
+    # Published on this machine only. Sessions and API keys must not cross a network
+    # unencrypted, and the app refuses other host names unless a proxy is configured.
+    ports:
+      - "127.0.0.1:${SKETCHMAKER_PORT:-8000}:8000"
+
+    environment:
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-}
+
+    # Named volumes: SQLite's WAL needs a real local filesystem, which a bind mount
+    # through Docker Desktop is not. Secrets stay apart from the data and its backups.
+    volumes:
+      - data:/data
+      - config:/config
+
+    # The sandbox. The image already runs as uid 10001.
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=1g,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 1024
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  data:
+  config:
