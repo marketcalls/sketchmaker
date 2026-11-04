@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useEffect, Suspense, lazy } from 'react';
 import { Loader2 } from 'lucide-react';
 
@@ -6,12 +6,14 @@ import { Loader2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 
-// Auth pages - eager load for fast initial experience
+// Home & auth pages - eager load for fast initial experience
+import { LandingPage } from '@/pages/LandingPage';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { SetupPage } from '@/pages/auth/SetupPage';
 
 // Components
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { UnknownPathRedirect } from '@/components/landing/UnknownPathRedirect';
 
 // Stores
 import { useAuthStore } from '@/stores/authStore';
@@ -39,6 +41,13 @@ const SettingsPage = lazy(() => import('@/pages/user/SettingsPage').then(m => ({
 const UsagePage = lazy(() => import('@/pages/user/UsagePage').then(m => ({ default: m.UsagePage })));
 const MyJobsPage = lazy(() => import('@/pages/user/MyJobsPage').then(m => ({ default: m.MyJobsPage })));
 const NotificationsPage = lazy(() => import('@/pages/user/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
+
+// Faceless Studio
+const FacelessHomePage = lazy(() => import('@/pages/user/faceless/FacelessHomePage').then(m => ({ default: m.FacelessHomePage })));
+const FacelessNewPage = lazy(() => import('@/pages/user/faceless/FacelessNewPage').then(m => ({ default: m.FacelessNewPage })));
+const FacelessStudioPage = lazy(() => import('@/pages/user/faceless/FacelessStudioPage').then(m => ({ default: m.FacelessStudioPage })));
+const FacelessCharactersPage = lazy(() => import('@/pages/user/faceless/FacelessCharactersPage').then(m => ({ default: m.FacelessCharactersPage })));
+const FacelessSeriesPage = lazy(() => import('@/pages/user/faceless/FacelessSeriesPage').then(m => ({ default: m.FacelessSeriesPage })));
 
 // Motion Graphics Studio
 const MotionGraphicsHomePage = lazy(() => import('@/pages/user/motion-graphics/MotionGraphicsHomePage').then(m => ({ default: m.MotionGraphicsHomePage })));
@@ -87,7 +96,7 @@ function App() {
     <BrowserRouter>
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path="/" element={<Navigate to="/generate" replace />} />
+          <Route path="/" element={<LandingPage />} />
 
           {/* Auth routes */}
           <Route element={<AuthLayout />}>
@@ -105,6 +114,11 @@ function App() {
           >
             <Route path="/generate" element={<GeneratePage />} />
             <Route path="/stories" element={<StoriesPage />} />
+            <Route path="/faceless" element={<FacelessHomePage />} />
+            <Route path="/faceless/new" element={<FacelessNewPage />} />
+            <Route path="/faceless/projects/:id" element={<FacelessStudioPage />} />
+            <Route path="/faceless/characters" element={<FacelessCharactersPage />} />
+            <Route path="/faceless/series/:id" element={<FacelessSeriesPage />} />
             <Route path="/motion-graphics" element={<MotionGraphicsHomePage />} />
             <Route path="/motion-graphics/:id" element={<MotionGraphicsStudioPage />} />
             <Route path="/subtitles" element={<SubtitlesPage />} />
@@ -125,7 +139,7 @@ function App() {
           </Route>
 
           {/* Catch all */}
-          <Route path="*" element={<Navigate to="/generate" replace />} />
+          <Route path="*" element={<UnknownPathRedirect />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

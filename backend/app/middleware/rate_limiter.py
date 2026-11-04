@@ -34,8 +34,9 @@ AUTH_LIMIT = "5/minute"
 
 API_READ_LIMIT = parse("1200/minute")
 API_WRITE_LIMIT = parse("240/minute")
-# Requests that can spend money with a provider. Motion Graphics and Story Room are not
-# here: they set their own limits on each route.
+# Requests that can spend money with a provider. Motion Graphics, Story Room and Faceless
+# are not here: they set their own limits on each route, because most of their writes are
+# autosaves, which must not use up what starting paid work is allowed.
 API_PAID_LIMIT = parse("60/minute")
 PAID_ROUTERS = frozenset({
     "generate", "magix", "virtual", "explainer", "logo", "remove-bg", "video", "lip-sync", "story", "subtitle",

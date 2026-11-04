@@ -1,12 +1,17 @@
-import { useState } from 'react';
-import { Check, Clapperboard, Scissors } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Check, Clapperboard, Film, Loader2, Scissors } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useStoryRoomStore } from '@/stores/storyRoomStore';
+import { useFacelessStore } from '@/stores/facelessStore';
 import {
-  enumLabel, formatRuntime, imageProgress, storyRuntime, ONE_TAKE_MAX_SECONDS,
-  type StoryDoc,
+  storyRoomApi, enumLabel, formatRuntime, imageProgress, storyRuntime, ONE_TAKE_MAX_SECONDS,
+  type StoryDoc, type StoryThread,
 } from '@/api/storyRoom';
 import { cn } from '@/lib/utils';
+import { getErrorMessage } from '@/utils/errors';
 import { Chip } from './fields';
 
 export type ClipSource = { kind: 'treatment' } | { kind: 'shot'; shotId: string };
@@ -34,15 +39,22 @@ function Step({
   );
 }
 
-/** Make video: treatment, approved images, then one take or scene clips. */
+/** Make video: treatment, approved images, then one take, scene clips or the full video. */
 export function MakeVideoTab({
-  story, disabled, onOpenClip, onOpenCast,
+  thread, story, disabled, onOpenClip, onOpenCast,
 }: {
+  thread: StoryThread;
   story: StoryDoc;
   disabled: boolean;
   onOpenClip: (source: ClipSource) => void;
   onOpenCast: () => void;
 }) {
+  const navigate = useNavigate();
+  const flushSave = useStoryRoomStore((s) => s.flushSave);
+  const { templates, catalogLoaded, loadCatalog } = useFacelessStore();
+  const [templateId, setTemplateId] = useState<string>('default');
+  const [handing, setHanding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<{ label: string; run: () => void | Promise<void> } | null>(null);
 
   const treatmentReady = !!(story.treatment ?? '').trim();
@@ -53,10 +65,28 @@ export function MakeVideoTab({
   const oneTakeFits = length <= ONE_TAKE_MAX_SECONDS;
   const hasShots = story.scenes.some((s) => s.shots.length > 0);
 
+  useEffect(() => {
+    if (!catalogLoaded) loadCatalog();
+  }, [catalogLoaded, loadCatalog]);
+
   // Video made before every image is approved loses its references: ask first.
   const guarded = (label: string, run: () => void | Promise<void>) => {
     if (imagesReady || progress.total === 0) run();
     else setConfirm({ label, run });
+  };
+
+  const toFaceless = async () => {
+    setHanding(true);
+    setError(null);
+    try {
+      await flushSave();
+      const { projectId } = await storyRoomApi.toFaceless(thread.id, templateId === 'default' ? undefined : templateId);
+      navigate(`/faceless/projects/${projectId}`);
+    } catch (err) {
+      setError(getErrorMessage(err, 'The story could not be sent to Faceless Studio. Please try again.'));
+    } finally {
+      setHanding(false);
+    }
   };
 
   return (
@@ -85,6 +115,7 @@ export function MakeVideoTab({
       </Step>
 
       <Step n={3} title="Video" done={false} current={treatmentReady && (imagesReady || progress.total === 0)}>
+        {error && <p className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
         <div className="space-y-3">
           {/* One take */}
           <div className="rounded-xl border border-border p-3">
@@ -101,7 +132,7 @@ export function MakeVideoTab({
                 variant="outline"
                 disabled={disabled || !treatmentReady || !oneTakeFits}
                 onClick={() => guarded('one take', () => onOpenClip({ kind: 'treatment' }))}
-                title={!oneTakeFits ? `This cut runs ${formatRuntime(length)}. Use scene clips.` : undefined}
+                title={!oneTakeFits ? `This cut runs ${formatRuntime(length)}. Use scene clips or the full video.` : undefined}
               >
                 Open in Quick clip
               </Button>
@@ -153,6 +184,36 @@ export function MakeVideoTab({
             ) : (
               <p className="mt-2 pl-7 text-xs text-muted-foreground">No shots yet.</p>
             )}
+          </div>
+
+          {/* Full video */}
+          <div className="rounded-xl border border-border p-3">
+            <div className="flex items-start gap-3">
+              <Film className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">Full video</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Faceless Studio turns the story into a finished video with narration, voices, music and captions. Unsaved characters are saved to your library first. Sending is free; each production step is priced in the studio.
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2 pl-7">
+              {templates.length > 0 && (
+                <Select value={templateId} onValueChange={setTemplateId}>
+                  <SelectTrigger className="h-8 w-[200px] text-xs" aria-label="Faceless template">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Default template</SelectItem>
+                    {templates.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
+              <Button size="sm" disabled={disabled || handing || !hasShots} onClick={() => guarded('the full video', toFaceless)}>
+                {handing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                {handing ? 'Opening Faceless Studio' : 'Open in Faceless Studio'}
+              </Button>
+            </div>
           </div>
         </div>
       </Step>

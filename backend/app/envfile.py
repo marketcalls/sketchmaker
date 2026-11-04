@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import secrets
+import subprocess
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
@@ -91,3 +92,17 @@ def write_new_env_file(path: Path, secrets_only: bool = False) -> None:
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8") as fh:
         fh.write(text)
+    _private_on_windows(path)
+
+
+def _private_on_windows(path: Path) -> None:
+    """Windows ignores the mode above, so limit the file to this user with its own tool.
+    Best effort: a failure leaves the permissions of the folder it is in."""
+    user = os.environ.get("USERNAME")
+    if os.name != "nt" or not user:
+        return
+    try:
+        subprocess.run(["icacls", str(path), "/inheritance:r", "/grant:r", f"{user}:F"],
+                       capture_output=True, check=False, timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        pass

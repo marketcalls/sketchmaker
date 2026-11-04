@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Film,
+  Clapperboard,
   Subtitles,
   PenTool,
   AudioLines,
@@ -36,6 +37,7 @@ interface NavItem {
 const createItems: NavItem[] = [
   { href: '/generate', label: 'Generate', icon: Image },
   { href: '/stories', label: 'Stories', icon: Film, badge: 'New' },
+  { href: '/faceless', label: 'Faceless Studio', icon: Clapperboard, badge: 'New' },
   { href: '/motion-graphics', label: 'Motion Graphics', icon: Type, badge: 'New' },
   { href: '/subtitles', label: 'Subtitles', icon: Subtitles },
   { href: '/magix', label: 'Magix', icon: Wand2 },

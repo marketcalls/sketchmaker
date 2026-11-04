@@ -50,6 +50,24 @@ export type AIModelUpdate = Partial<
   Pick<AIModel, 'name' | 'display_name' | 'description' | 'is_active' | 'is_latest'>
 >;
 
+// A model a provider offers that is not in the app yet (Refresh models).
+export interface OfferedModel {
+  name: string;
+  display_name: string;
+  description: string | null;
+  context_window: number | null;
+  released: string | null;
+  recommended: boolean;
+}
+
+export interface ProviderOffer {
+  provider_id: number;
+  provider: string;
+  status: 'ok' | 'key_rejected' | 'unavailable';
+  new_models: OfferedModel[];
+  no_longer_listed: string[];
+}
+
 // One of the models offered for the owner's own choice (/users/models).
 export interface ModelOption {
   id: number;
@@ -98,6 +116,19 @@ export const settingsApi = {
 
   createModel: async (data: AIModelCreate): Promise<AIModel> => {
     const response = await apiClient.post('/settings/models', data);
+    return response.data;
+  },
+
+  // Asks every provider with a key, so it can take a few seconds. Adds nothing.
+  refreshModels: async (): Promise<ProviderOffer[]> => {
+    const response = await apiClient.post('/settings/models/refresh');
+    return response.data.providers;
+  },
+
+  addOfferedModels: async (
+    models: Array<Pick<OfferedModel, 'name' | 'display_name' | 'description' | 'context_window'> & { provider_id: number }>
+  ): Promise<{ added: number }> => {
+    const response = await apiClient.post('/settings/models/add-offered', { models });
     return response.data;
   },
 

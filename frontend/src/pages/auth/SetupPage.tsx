@@ -46,7 +46,7 @@ const setupSchema = z
 type SetupFormData = z.infer<typeof setupSchema>;
 
 export function SetupPage() {
-  const { setup, isLoading, isAuthenticated, setupRequired } = useAuthStore();
+  const { setup, isLoading, isAuthenticated, setupRequired, webSetup } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -79,6 +79,21 @@ export function SetupPage() {
 
   if (!setupRequired) {
     return <Navigate to={isAuthenticated ? '/generate' : '/login'} replace />;
+  }
+
+  if (!webSetup) {
+    return (
+      <AuthCard>
+        <AuthHeader title="Set up Sketchmaker" description="This site has no account yet." />
+        <p className="text-sm text-muted-foreground">
+          On a public site, the account is created on the server, so nobody else can claim it first. Run this on the
+          server, then come back and sign in:
+        </p>
+        <pre className="mt-3 overflow-x-auto rounded-lg border border-border bg-muted p-3 font-mono text-xs">
+          sudo sketchmaker create-account
+        </pre>
+      </AuthCard>
+    );
   }
 
   return (

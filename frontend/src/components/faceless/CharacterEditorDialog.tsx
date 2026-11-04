@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { FileText, ImagePlus, Loader2, ShieldAlert, Trash2, Video, X } from 'lucide-react';
+import { FileText, ImagePlus, Loader2, ShieldAlert, Trash2, Video, Wand2, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { cn } from '@/lib/utils';
-import { getErrorMessage } from '@/utils/errors';
+import { errorSuffix, getErrorMessage } from '@/utils/errors';
 import {
   facelessApi,
+  isRunActive,
+  newIdempotencyKey,
   type CharacterBible,
   type ConsentRelationship,
   type FacelessCharacter,
@@ -19,6 +21,7 @@ import {
 import { useFacelessStore } from '@/stores/facelessStore';
 import { MultiUploadDropzone } from './MultiUploadDropzone';
 import { VoiceSelect } from './VoicePicker';
+import { QuoteConfirmDialog } from './QuoteConfirmDialog';
 import { ErrorNote, FieldLabel, Kicker, PillGroup } from './shared';
 
 type Source = 'images' | 'video' | 'text';
@@ -52,6 +55,20 @@ function ConsentForm({
   disabled?: boolean;
 }) {
   const consent = useFacelessStore((s) => s.config?.consent);
+  const catalogError = useFacelessStore((s) => s.catalogError);
+  const loadCatalog = useFacelessStore((s) => s.loadCatalog);
+  if (!consent && catalogError) {
+    return (
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p role="alert" className="text-xs text-destructive">
+          The consent statement could not be loaded, so a real person cannot be added right now.
+        </p>
+        <Button type="button" variant="outline" size="sm" onClick={() => loadCatalog(true)}>
+          Try again
+        </Button>
+      </div>
+    );
+  }
   if (!consent) {
     return (
       <p className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -155,11 +172,28 @@ export function CharacterEditorDialog({
   const [voiceId, setVoiceId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  // Characters with a sheet being made: it keeps going if another one is opened.
+  const [sheetsRunning, setSheetsRunning] = useState<number[]>([]);
   const [revokeOpen, setRevokeOpen] = useState(false);
 
+  // On every open, so a catalog that failed last time is asked for again.
   useEffect(() => {
-    loadCatalog();
-  }, [loadCatalog]);
+    if (open) loadCatalog();
+  }, [open, loadCatalog]);
+
+  // The character on screen, for replies that arrive after another was opened.
+  const shownId = useRef<number | null>(null);
+  useEffect(() => {
+    shownId.current = current?.id ?? null;
+  }, [current]);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const loadForm = (c: FacelessCharacter | null) => {
     setName(c?.name ?? '');
@@ -205,12 +239,17 @@ export function CharacterEditorDialog({
   const consentStatus = current?.consent.status;
   const needsAttestation = realPerson && (creating || consentStatus === 'missing' || consentStatus === 'outdated');
   const consentOk = !needsAttestation || (attested && !!consent);
-  const references = current?.media ?? [];
+  const references = (current?.media ?? []).filter((m) => m.role !== 'sheet');
+  const sheet = (current?.media ?? []).find((m) => m.role === 'sheet');
+  const hasImages = references.some((m) => m.kind === 'image');
   const canUpload = !current || current.consent.status === 'not_required' || current.consent.status === 'valid';
+  const sheetRunning = !!current && sheetsRunning.includes(current.id);
 
+  // A reply for any other character only updates the library: taking it as
+  // current would save this form's fields onto that character.
   const apply = (c: FacelessCharacter) => {
-    setCurrent(c);
     upsertCharacter(c);
+    setCurrent((shown) => (shown?.id === c.id ? c : shown));
   };
 
   const addFiles = (files: File[]) => {
@@ -223,12 +262,16 @@ export function CharacterEditorDialog({
   };
 
   const uploadAll = async (id: number): Promise<FacelessCharacter | null> => {
+    const files = pending;
     let latest: FacelessCharacter | null = null;
-    for (let i = 0; i < pending.length; i++) {
-      setBusy(`Uploading ${i + 1} of ${pending.length}`);
-      latest = await facelessApi.uploadCharacterMedia(id, pending[i].file);
+    for (let i = 0; i < files.length; i++) {
+      setBusy(`Uploading ${i + 1} of ${files.length}`);
+      latest = await facelessApi.uploadCharacterMedia(id, files[i].file);
+      // Off the list at once, so trying again after a failure does not send it twice.
+      const done = files[i];
+      setPending((list) => list.filter((p) => p !== done));
+      apply(latest);
     }
-    setPending([]);
     return latest;
   };
 
@@ -244,9 +287,10 @@ export function CharacterEditorDialog({
     if (!name.trim()) return setError('Give the character a name.');
     if (!consentOk || (realPerson && !consent)) return setError('Tick the likeness consent for a real person.');
     setError(null);
+    let c: FacelessCharacter;
     try {
       setBusy('Creating');
-      let c = await facelessApi.createCharacter({
+      c = await facelessApi.createCharacter({
         name: name.trim(),
         kind: realPerson ? 'real_person' : 'fictional',
         role: role.trim() || null,
@@ -254,21 +298,32 @@ export function CharacterEditorDialog({
         notes: notes.trim() || null,
         consent: realPerson && consent ? { accepted: attested, text_version: consent.version, relationship } : null,
       });
-      apply(c);
-      onSaved?.(c);
-      if (pending.length > 0) c = (await uploadAll(c.id)) ?? c;
-      apply(c);
-      try {
-        c = await writeBible(c.id);
-      } catch (err) {
-        setError(`Created. The AI bible is unavailable right now: ${getErrorMessage(err, 'try again later')}`);
-      }
-      loadForm(c);
     } catch (err) {
       setError(getErrorMessage(err, 'Could not create the character'));
-    } finally {
       setBusy(null);
+      return;
     }
+    // From here the character exists: the dialog is its editor, whatever happens next.
+    setCurrent(c);
+    upsertCharacter(c);
+    onSaved?.(c);
+    try {
+      if (pending.length > 0) c = (await uploadAll(c.id)) ?? c;
+    } catch (err) {
+      loadForm(c);
+      setError(
+        `${c.name} was created, but a reference did not upload. ${getErrorMessage(err, 'Please try again.')} Files still listed below were not saved; Save character tries them again.`,
+      );
+      setBusy(null);
+      return;
+    }
+    try {
+      c = await writeBible(c.id);
+    } catch (err) {
+      setError(`Created. The AI bible is unavailable right now: ${getErrorMessage(err, 'try again later')}`);
+    }
+    loadForm(c);
+    setBusy(null);
   };
 
   const regenerateBible = async () => {
@@ -331,9 +386,45 @@ export function CharacterEditorDialog({
     try {
       const c = await facelessApi.revokeConsent(current.id);
       apply(c);
-      loadForm(c);
+      if (shownId.current === c.id) loadForm(c);
     } catch (err) {
       setError(getErrorMessage(err, 'Could not revoke consent'));
+    }
+  };
+
+  // The sheet is a queued run: follow it, then reload the character.
+  const followSheet = async (runId: number, charId: number) => {
+    setSheetsRunning((ids) => [...ids, charId]);
+    try {
+      let finished = false;
+      for (let i = 0; i < 120 && !finished; i++) {
+        await new Promise((r) => setTimeout(r, Math.min(10000, 2000 + i * 500)));
+        if (!mounted.current) return;
+        let run;
+        try {
+          run = await facelessApi.run(runId);
+        } catch (err) {
+          // A 429, a 5xx or a dropped connection says nothing about the run: ask
+          // again next round. Any other refusal means there is nothing to follow.
+          const status = (err as { response?: { status?: number } }).response?.status;
+          if (status && status < 500 && status !== 408 && status !== 429) return;
+          continue;
+        }
+        if (isRunActive(run)) continue;
+        finished = true;
+        if ((run.status === 'failed' || run.status === 'cancelled') && shownId.current === charId) {
+          setError(`The reference sheet failed${errorSuffix(run.error, '.')}`);
+        }
+      }
+      if (!mounted.current) return;
+      if (!finished && shownId.current === charId) {
+        setError('The reference sheet is still being made. Open this character again later to see it.');
+      }
+      apply(await facelessApi.character(charId));
+    } catch {
+      // the library reload shows the sheet later
+    } finally {
+      setSheetsRunning((ids) => ids.filter((id) => id !== charId));
     }
   };
 
@@ -577,6 +668,23 @@ export function CharacterEditorDialog({
                 <FieldLabel htmlFor="fc-voice">Voice</FieldLabel>
                 <VoiceSelect id="fc-voice" voices={voices} value={voiceId} onChange={setVoiceId} label="Character voice" allowNone="Narrator voice" />
               </div>
+              {hasImages && (
+                <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
+                  {sheet?.url && (
+                    <a href={sheet.url} target="_blank" rel="noreferrer" className="block h-14 w-24 shrink-0 overflow-hidden rounded-md border border-border">
+                      <img src={sheet.url} alt="Reference sheet" className="h-full w-full object-cover" />
+                    </a>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm">Reference sheet</p>
+                    <p className="text-xs text-muted-foreground">One 16:9 turnaround made from your references, for steadier likeness.</p>
+                  </div>
+                  <Button type="button" variant="outline" size="sm" onClick={() => setSheetOpen(true)} disabled={!!busy || sheetRunning || !current?.can_generate}>
+                    {sheetRunning ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+                    {sheetRunning ? 'Making sheet' : sheet ? 'New sheet' : 'Make sheet'}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
@@ -611,6 +719,23 @@ export function CharacterEditorDialog({
           </div>
         </div>
 
+        {current && (
+          <QuoteConfirmDialog
+            open={sheetOpen}
+            onOpenChange={setSheetOpen}
+            title="Reference sheet"
+            description={`A turnaround sheet for ${current.name} from the references on file.`}
+            loadQuote={() => facelessApi.characterSheetQuote(current.id)}
+            onConfirm={async (quote) => {
+              const run = await facelessApi.characterSheet(
+                current.id,
+                newIdempotencyKey(`sheet-${current.id}`),
+                quote.usd,
+              );
+              followSheet(run.id, current.id);
+            }}
+          />
+        )}
         <ConfirmDialog
           open={revokeOpen}
           onOpenChange={setRevokeOpen}

@@ -15,10 +15,12 @@ from app.models.faceless import FacelessActivity
 from .errors import RateLimited
 
 
-def log_activity(db: Session, user_id: int, kind: str, *, character_id: int | None = None, **detail) -> None:
+def log_activity(db: Session, user_id: int, kind: str, *, project_id: int | None = None,
+                 character_id: int | None = None, **detail) -> None:
     """Append to the activity log. No commit."""
     db.add(FacelessActivity(
         user_id=user_id,
+        project_id=project_id,
         character_id=character_id,
         kind=kind,
         detail=detail or None,

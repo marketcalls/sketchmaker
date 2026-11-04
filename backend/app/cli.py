@@ -100,7 +100,7 @@ def _with_owner(action) -> int:
         db.commit()
         return 0
     except OperationalError:
-        print("The database is not ready. Start the app once with ./run.sh.", file=sys.stderr)
+        print("The database is not ready. Start the app once with: uv run run.py", file=sys.stderr)
         return 1
     finally:
         db.close()

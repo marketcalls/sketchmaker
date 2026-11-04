@@ -11,7 +11,14 @@ from app.models.content import (
     Video,
     VideoGenerationJob,
 )
-from app.models.faceless import FacelessActivity, FacelessCharacter
+from app.models.faceless import (
+    FacelessActivity,
+    FacelessCharacter,
+    FacelessProject,
+    FacelessScriptVersion,
+    FacelessSeries,
+    FacelessStepRun,
+)
 from app.models.llm_usage import LLMUsage
 from app.models.motion_graphics import MGActivity, MGBrandKit, MGJob, MGProject
 from app.models.notification import Notification, NotificationType
@@ -25,6 +32,10 @@ __all__ = [
     "APISettings",
     "FacelessActivity",
     "FacelessCharacter",
+    "FacelessProject",
+    "FacelessScriptVersion",
+    "FacelessSeries",
+    "FacelessStepRun",
     "GenerationJob",
     "Image",
     "LLMUsage",

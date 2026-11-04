@@ -97,8 +97,10 @@ def get_provider_base_url(provider_name: str, db: Session) -> str | None:
     return configured or OPENAI_COMPATIBLE_DEFAULTS.get(provider_name)
 
 # Model families that only accept the default temperature. Verified against a
-# live OpenAI 400 on gpt-5.6-luna; applies to the whole GPT-5 line.
-NO_TEMPERATURE_FAMILIES = ("gpt-5",)
+# live OpenAI 400 on gpt-5.6-luna; applies to the whole GPT-5 line. GPT-6 was checked
+# live and accepts it. Current Claude models answer a 400, and litellm only removes it for
+# the ones in its table, so a newer one added through Refresh models would otherwise fail.
+NO_TEMPERATURE_FAMILIES = ("gpt-5", "claude-")
 
 # Reasoning models that need special handling
 REASONING_MODELS = {

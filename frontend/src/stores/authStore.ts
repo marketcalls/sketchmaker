@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { authApi } from '../api/auth';
+import { onSessionExpired } from '../api/client';
 import type { User } from '../types';
 import { getErrorMessage } from '@/utils/errors';
 
@@ -11,6 +12,8 @@ interface AuthState {
   error: string | null;
   // No owner exists yet, so every protected page goes to /setup.
   setupRequired: boolean;
+  // False on a public site, where the account is created in the terminal.
+  webSetup: boolean;
 
   // Actions
   login: (username: string, password: string) => Promise<void>;
@@ -21,6 +24,9 @@ interface AuthState {
   setUser: (user: User | null) => void;
 }
 
+const statusOf = (error: unknown): number | undefined =>
+  (error as { response?: { status?: number } }).response?.status;
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -29,6 +35,7 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,  // Start true to wait for checkAuth
       error: null,
       setupRequired: false,
+      webSetup: true,
 
       login: async (username, password) => {
         set({ isLoading: true, error: null });
@@ -73,10 +80,19 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             setupRequired: false,
           });
-        } catch {
+        } catch (error: unknown) {
+          // Only the server saying so ends a session. A rate limit or a network blip must
+          // not send someone with a valid cookie to the login page.
+          if (statusOf(error) !== 401) {
+            set({ isLoading: false });
+            return;
+          }
           let setupRequired = false;
+          let webSetup = true;
           try {
-            setupRequired = (await authApi.settings()).setup_required;
+            const authSettings = await authApi.settings();
+            setupRequired = authSettings.setup_required;
+            webSetup = authSettings.web_setup;
           } catch {
             // Without an answer, the login page is the safe place to land.
           }
@@ -85,6 +101,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
             setupRequired,
+            webSetup,
           });
         }
       },
@@ -102,3 +119,6 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+// A session that has really ended, noticed during normal use: ProtectedRoute takes it from here.
+onSessionExpired(() => useAuthStore.setState({ user: null, isAuthenticated: false }));

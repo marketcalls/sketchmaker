@@ -111,7 +111,8 @@ INIT_HINT = "Run `python -m app.cli init` from backend/ to create it."
 def load_settings() -> Settings:
     """Read and check the configuration. Raises ConfigError with a readable message."""
     path = env_file_path()
-    if path.exists() and path.stat().st_mode & 0o007:
+    # Windows does not keep file modes: write_new_env_file limits the file with icacls there.
+    if os.name != "nt" and path.exists() and path.stat().st_mode & 0o007:
         raise ConfigError(f"{path} can be accessed by other users on this machine. Run: chmod 600 {path}")
 
     try:

@@ -19,7 +19,7 @@
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - [Node.js](https://nodejs.org/) 22 or newer
-- [ffmpeg](https://ffmpeg.org/), for video tools and renders
+- [ffmpeg](https://ffmpeg.org/), for video tools and renders (Windows: `winget install Gyan.FFmpeg`, Linux: `sudo apt install ffmpeg`, macOS: `brew install ffmpeg`)
 - A [fal](https://fal.ai/) key for images and video, and a key from any supported language model provider
 
 ### Setup
@@ -27,8 +27,10 @@
 ```bash
 git clone https://github.com/marketcalls/sketchmaker.git
 cd sketchmaker
-./run.sh
+uv run run.py
 ```
+
+The same command works on Windows, Linux and macOS. On Windows you can also double-click `run.bat`.
 
 That one command creates `backend/.env` with random secrets, builds the frontend, creates the database, and starts the app:
 
@@ -176,7 +178,8 @@ One process on one port: FastAPI serves the API, your files and the built React 
 
 ```
 sketchmaker/
-├── run.sh                      # One command to run locally
+├── run.py                      # One command to run locally: uv run run.py
+├── run.bat                     # The same, to double-click on Windows
 ├── Dockerfile                  # Non-root, read-only image
 ├── docker-compose.yml
 ├── server/                     # Publish on a domain
@@ -261,7 +264,7 @@ uv run python -m app.cli reset-password   # forgot your password
 uv run python -m app.cli unlock           # clear an account lock
 uv run python -m app.cli logout-all       # end every session
 uv run python -m app.cli backup           # back up the database now
-uv run python -m app.cli migrate          # upgrade the database (./run.sh does this for you)
+uv run python -m app.cli migrate          # upgrade the database (uv run run.py does this for you)
 uv run python -m app.cli create-account   # create the account from the terminal
 ```
 

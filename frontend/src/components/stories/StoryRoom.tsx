@@ -220,6 +220,7 @@ export function StoryRoom({
                 {panelTab === 'shots' && <ShotListTab story={story} disabled={locked} />}
                 {panelTab === 'video' && (
                   <MakeVideoTab
+                    thread={thread}
                     story={story}
                     disabled={locked}
                     onOpenClip={(source) => onOpenClip(thread.id, source)}

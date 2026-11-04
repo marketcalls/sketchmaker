@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Bot, Check, Eye, EyeOff, Key, KeyRound, Loader2, Palette, Plus, RefreshCw, Settings, Trash2, User, X } from 'lucide-react';
+import { RefreshModelsDialog } from '@/components/settings/RefreshModelsDialog';
 import { Alert } from '@/components/ui/alert';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -445,6 +446,13 @@ function LiteLLMModels({
   const [saving, setSaving] = useState(false);
   const [dialogError, setDialogError] = useState<string | null>(null);
   const [listError, setListError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [listNotice, setListNotice] = useState<string | null>(null);
+
+  const handleModelsAdded = async (count: number) => {
+    await onChanged();
+    setListNotice(`${count} ${count === 1 ? 'model' : 'models'} added.`);
+  };
 
   const handleCreateModel = async () => {
     setSaving(true);
@@ -507,17 +515,32 @@ function LiteLLMModels({
             Language models available to the app (<span className="tabular">{models.length}</span>).
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setDialogError(null);
-            setIsAddingModel(true);
-          }}
-        >
-          <Plus className="h-4 w-4" />
-          Add model
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setListNotice(null);
+              setIsRefreshing(true);
+            }}
+          >
+            <RefreshCw className="h-4 w-4" />
+            Refresh models
+          </Button>
+          <Button
+            onClick={() => {
+              setDialogError(null);
+              setIsAddingModel(true);
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            Add model
+          </Button>
+        </div>
       </div>
 
+      <RefreshModelsDialog open={isRefreshing} onOpenChange={setIsRefreshing} onAdded={handleModelsAdded} />
+
+      {listNotice && <p className="text-sm text-muted-foreground" role="status">{listNotice}</p>}
       {listError && <p className="text-sm text-destructive">{listError}</p>}
 
       {/* Group models by provider */}
@@ -617,9 +640,11 @@ function LiteLLMModels({
                 className="font-mono"
                 value={newModel.name}
                 onChange={(e) => setNewModel({ ...newModel, name: e.target.value })}
-                placeholder="openai/gpt-4o"
+                placeholder="gpt-6.1-sol"
               />
-              <p className="text-xs text-muted-foreground">In LiteLLM format: provider/model.</p>
+              <p className="text-xs text-muted-foreground">
+                The exact name the provider uses. OpenRouter names include the vendor, such as openai/gpt-6.1-sol.
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="new-model-display">Display name</Label>
@@ -627,7 +652,7 @@ function LiteLLMModels({
                 id="new-model-display"
                 value={newModel.display_name}
                 onChange={(e) => setNewModel({ ...newModel, display_name: e.target.value })}
-                placeholder="GPT-4o"
+                placeholder="GPT-6.1 Sol"
               />
             </div>
             <div className="space-y-2">

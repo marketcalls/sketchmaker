@@ -1,5 +1,5 @@
-"""Provider and file plumbing shared by Motion Graphics, My Assets, Story Room and
-characters.
+"""Provider and file plumbing shared by Faceless Studio, Motion Graphics, My Assets, Story
+Room and characters.
 
 fal is used through submit, status and result only (never the blocking
 subscribe), from scheduler threads. Results are downloaded through
@@ -152,6 +152,15 @@ async def delete_stored(asset: dict, user_id: int) -> None:
         await storage_service.delete_file(asset["file"], asset["storage"], user_id=user_id)
     except Exception as exc:
         logger.warning(f"Could not delete faceless asset {asset.get('file')}: {exc}")
+
+
+def local_path(asset: dict, user_id: int) -> str:
+    """Where a stored asset is on disk."""
+    from app.services.storage_service import storage_service
+
+    if is_private(asset):
+        return private_local_path(asset["file"], user_id)
+    return storage_service.get_local_path(asset["file"], asset["storage"], user_id=user_id)
 
 
 # ---------------------------------------------------------------------------

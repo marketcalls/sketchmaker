@@ -65,7 +65,7 @@ ROBOTS_TXT = "User-agent: *\nDisallow: /\n"
 def _prepare_database() -> None:
     """Seed an empty database, check the secrets and arrange first-run setup."""
     if not inspect(engine).has_table(User.__tablename__):
-        raise ConfigError("The database has no tables. Start with ./run.sh, or run `python -m app.cli migrate` first.")
+        raise ConfigError("The database has no tables. Start with: uv run run.py, or run `python -m app.cli migrate` first.")
     problem = schema_problem()
     if problem:
         raise ConfigError(problem)
@@ -213,7 +213,7 @@ def _spa_response(full_path: str, dist: Path):
         return FileResponse(candidate, headers={"Cache-Control": cache})
     index = root / "index.html"
     if not index.is_file():
-        return JSONResponse(status_code=404, content={"detail": "The frontend has not been built. Start with ./run.sh."})
+        return JSONResponse(status_code=404, content={"detail": "The frontend has not been built. Start with: uv run run.py"})
     return FileResponse(index, headers={"Cache-Control": "no-cache"})
 
 

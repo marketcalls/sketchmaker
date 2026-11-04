@@ -17,6 +17,8 @@ class AuthSettingsResponse(BaseModel):
     """What the login page needs to know before anyone is signed in."""
 
     setup_required: bool
+    # False on a public site, where the account is created in the terminal.
+    web_setup: bool
 
 
 class SetupRequest(BaseModel):

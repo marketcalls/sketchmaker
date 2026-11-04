@@ -1,4 +1,5 @@
 # Scripts run on Linux and in containers, where a CRLF checkout would stop them starting.
 *.sh text eol=lf
+*.bat text eol=crlf
 server/*.service text eol=lf
 server/*.conf text eol=lf

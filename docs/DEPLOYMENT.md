@@ -154,7 +154,7 @@ The `config` volume holds the secrets and the `data` volume everything else. **B
 
 ## Database migrations
 
-The schema is managed by Alembic, and every route into the app goes through one procedure, `python -m app.cli migrate`: `./run.sh`, the Docker entrypoint, `install.sh`, `update.sh` and `restore.sh` all call it.
+The schema is managed by Alembic, and every route into the app goes through one procedure, `python -m app.cli migrate`: `uv run run.py`, the Docker entrypoint, `install.sh`, `update.sh` and `restore.sh` all call it.
 
 1. If the schema is current, it does nothing.
 2. If the database comes from **newer** code, it refuses and changes nothing.
@@ -183,6 +183,19 @@ Then read the generated file, and:
 
 Downgrades are not used. Going back means restoring the backup, which is what the rollback does.
 
+### Changing data for existing installs
+
+A migration can change rows as well as tables. This matters for anything first created by `app/seed.py`, such as the language model list: the seed only runs on an empty database, so **changing the list alone never reaches existing installs**. Do both:
+
+1. Change `DEFAULT_MODELS` in `app/seed.py`, for new installs.
+2. Add a data migration for existing ones. Copy `alembic/versions/0002_latest_models.py`.
+
+A test fails if a new install and an upgraded one end up with different models or a different order.
+
+Data migrations must respect what the owner did. `0002_latest_models` adds models, marks older ones as no longer the latest, and switches off models that providers have retired. It never changes the default or fallback model. It never overwrites a model the owner added or edited, and never brings back one they deleted. A retired model stays on if the owner has it selected.
+
+The data in a migration is a frozen copy. Do not import `app/seed.py` into one: the migration must keep doing the same thing after that list changes again. A migration runs before the app starts, and the first run on a new install has no rows yet, so it must do nothing when the provider table is empty.
+
 ## Security
 
 No software can be promised unhackable. This is what is in place, how it was checked, and what is left to you.
@@ -194,7 +207,7 @@ No software can be promised unhackable. This is what is in place, how it was che
 | **Passwords** | bcrypt, at least 12 characters, never logged or echoed |
 | **Sessions** | httpOnly, SameSite=Lax cookie, Secure on HTTPS. Signing out, or changing the password, ends every session |
 | **Guessing** | 5 attempts a minute per address. 10 failures block that address for 15 minutes, with the same answer as a wrong password. 100 failures in 15 minutes lock the account, for attacks spread over many addresses |
-| **Rate limits** | Per address, and per /64 network on IPv6: 1,200 reads, 240 writes and 60 requests that cost money each minute, plus tighter limits on Story Room and Motion Graphics |
+| **Rate limits** | Per address, and per /64 network on IPv6: 1,200 reads, 240 writes and 60 requests that cost money each minute, plus tighter limits on Faceless Studio, Story Room and Motion Graphics |
 | **Uploads** | A stranger's large request is refused from its headers, before any of it is stored |
 | **Other websites** | Writes from other sites are refused by an Origin check. Locally, requests under other host names are refused, which stops DNS rebinding |
 | **Account creation** | Local: in the browser, from this computer only. Public: only in the terminal, because the web page is switched off |

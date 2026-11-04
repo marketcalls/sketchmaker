@@ -18,7 +18,10 @@ export function MainLayout() {
       {/* The tab title for pages that do not set their own. */}
       <SEO />
       <Navbar />
-      <MissingKeysBanner />
+      {/* Beside the sidebar, not under it, or the start of the message is hidden. */}
+      <div className={cn('transition-[margin] duration-200', sidebarCollapsed ? 'md:ml-16' : 'md:ml-64')}>
+        <MissingKeysBanner />
+      </div>
       <MediaNotice />
       <Sidebar />
       <main

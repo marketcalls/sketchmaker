@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   BookmarkPlus, Check, ChevronDown, ImagePlus, Library, Loader2, Plus, RefreshCw, Search, Trash2, Upload, Wand2, X,
 } from 'lucide-react';
@@ -104,7 +105,7 @@ function LibraryPicker({
         <DialogHeader>
           <DialogTitle>{kind === 'character' ? 'Use a character from your library' : 'Use an environment from your library'}</DialogTitle>
           <DialogDescription>
-            {kind === 'character' ? 'Your saved characters. Their likeness and wardrobe carry into this story.' : 'Places you saved from earlier stories.'}
+            {kind === 'character' ? 'Your Faceless Studio characters. Their likeness and wardrobe carry into this story.' : 'Places you saved from earlier stories.'}
           </DialogDescription>
         </DialogHeader>
         <div className="relative">
@@ -125,7 +126,7 @@ function LibraryPicker({
           {loaded && items.length === 0 && (
             <p className="py-6 text-center text-sm text-muted-foreground">
               {q ? 'Nothing matches that search.' : kind === 'character'
-                ? 'No characters yet. Save one from a story to reuse it.'
+                ? <>No characters yet. Save one from a story, or create one in <Link to="/faceless/characters" className="text-foreground underline underline-offset-4">Faceless Studio</Link>.</>
                 : 'No environments yet. Save one from a story to reuse it.'}
             </p>
           )}

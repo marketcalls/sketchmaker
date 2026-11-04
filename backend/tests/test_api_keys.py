@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 
+from app.seed import DEFAULT_MODELS
 from app.models.api import APIProvider, APISettings
 from conftest import make_app
 
@@ -97,9 +98,9 @@ def test_seed_provides_providers_models_and_defaults(owner_client, seeded):
     assert body["default_provider_id"] != body["fallback_provider_id"]
     providers = owner_client.get("/api/settings/providers").json()
     models = owner_client.get("/api/settings/models").json()
-    assert len(providers) == 9 and len(models) == 43
+    assert len(providers) == 9 and len(models) == len(DEFAULT_MODELS)
     assert all("base_url" not in p for p in providers)
-    opus = next(m for m in models if m["name"] == "claude-opus-5")
+    opus = next(m for m in models if m["name"] == "claude-opus-5-5")
     assert opus["description"] and opus["id"] == body["default_model_id"]
 
 
@@ -117,11 +118,11 @@ def test_deleted_model_is_not_seeded_back(owner_client, seeded):
     from app.seed import seed_defaults
 
     models = owner_client.get("/api/settings/models").json()
-    victim = next(m for m in models if m["name"] == "claude-opus-5")
+    victim = next(m for m in models if m["name"] == "claude-opus-5-5")
     assert owner_client.delete(f"/api/settings/models/{victim['id']}").status_code == 200
     assert seed_defaults(seeded) is False
     names = [m["name"] for m in owner_client.get("/api/settings/models").json()]
-    assert "claude-opus-5" not in names
+    assert "claude-opus-5-5" not in names
     assert owner_client.get("/api/settings/api-keys").json()["default_model_id"] is None
 
 

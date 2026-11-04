@@ -18,6 +18,8 @@ export interface TokenResponse {
 
 export interface AuthSettings {
   setup_required: boolean;
+  // False on a public site, where the account is created in the terminal.
+  web_setup: boolean;
 }
 
 // Transform snake_case user response to camelCase. /auth/me leaves out the

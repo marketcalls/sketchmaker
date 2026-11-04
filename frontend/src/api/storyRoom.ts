@@ -856,6 +856,11 @@ export const storyRoomApi = {
     };
   },
 
+  toFaceless: async (id: number, templateId?: string): Promise<{ projectId: number }> => {
+    const data = (await apiClient.post(`${BASE}/threads/${id}/to-faceless`, templateId ? { template_id: templateId } : {})).data as Raw;
+    return { projectId: data.project_id as number };
+  },
+
   // Environment library
   environments: async (): Promise<StoryEnvironment[]> => {
     const data = (await apiClient.get(`${BASE}/environments`)).data as Raw[] | { environments?: Raw[] };

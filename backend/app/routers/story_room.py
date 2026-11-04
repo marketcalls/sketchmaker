@@ -48,6 +48,10 @@ Threads
                                                      label, kind} | null, duration_seconds, aspect, shot_id,
                                                      scene_id}
   GET    /threads/{id}/treatment/clip             -> {prompt, references, duration_seconds, aspect}
+  POST   /threads/{id}/to-faceless      {template_id?} -> {project_id}. A scripted Faceless Studio
+                                        project from the shot list (no LLM, no provider cost). Unsaved
+                                        characters are saved to the library first and linked in the
+                                        story. 400 no shots yet or no template fits, 409 busy.
 
   Message = {id, role: user|assistant, content, story_version, can_restore, estimated_usd, created_at}
   Edits, restores, cast saves, links and image approvals answer 409 while a turn is running.
@@ -83,7 +87,7 @@ from app.dependencies import CurrentUser, DbSession
 from app.middleware.rate_limiter import limiter
 from app.models.story_room import StoryEnvironment, StoryMessage, StoryThread
 from app.services import pricing as cp
-from app.services.story_room import clip, director, keyframe, library
+from app.services.story_room import clip, director, faceless as handoff_service, keyframe, library
 from app.services.story_room.library import LibraryError
 from app.services.story_room.lint import apply_lint
 from app.services.story_room.models import (
@@ -163,6 +167,10 @@ class EnvironmentUpdate(BaseModel):
     mood: Optional[str] = Field(None, max_length=120)
     style_notes: Optional[str] = Field(None, max_length=2000)
     is_archived: Optional[bool] = None
+
+
+class HandoffIn(BaseModel):
+    template_id: Optional[str] = Field(None, max_length=60)
 
 
 # ---------------------------------------------------------------------------
@@ -963,6 +971,31 @@ async def treatment_clip(thread_id: int, current_user: CurrentUser, db: DbSessio
         raise _error(status.HTTP_400_BAD_REQUEST,
                      "The story has no treatment yet. Ask the director for a first draft.")
     return clip.treatment_clip(db, current_user.id, doc, video_model)
+
+
+@router.post("/threads/{thread_id}/to-faceless")
+@limiter.limit("10/minute")
+def to_faceless(request: Request, thread_id: int, body: HandoffIn, current_user: CurrentUser, db: DbSession):
+    """A scripted Faceless Studio project from the shot list (no LLM, no provider cost).
+    Unsaved characters are saved to the library first and linked in the story. A plain def:
+    it holds the write lock while it builds the script, on a pool thread."""
+    try:
+        thread = _thread(db, current_user, thread_id, lock=True)
+        _not_busy(thread)
+        doc = _doc(thread)
+        before = [(c.key, c.ref_id) for c in doc.characters]
+        project = handoff_service.handoff(db, current_user.id, doc, body.template_id)
+        if [(c.key, c.ref_id) for c in doc.characters] != before:
+            _store(thread, doc)
+        project_id = project.id
+        db.commit()
+    except LibraryError as exc:
+        db.rollback()
+        raise _library_error(exc)
+    except Exception:
+        db.rollback()
+        raise
+    return {"project_id": project_id}
 
 
 # ---------------------------------------------------------------------------

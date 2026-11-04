@@ -9,15 +9,18 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel, ConfigDict
+from fastapi import APIRouter, HTTPException, Request, status
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.dependencies import CurrentUser, DbSession
+from app.middleware.rate_limiter import limiter
 from app.models.api import LLM_KEY_BY_PROVIDER, AIModel, APIProvider, APISettings
 from app.models.user import User
 from app.schemas.common import MessageResponse
+from app.services import model_catalog
 from app.utils.secret_box import canary_status, looks_masked, make_canary, mask_key
 
 router = APIRouter()
@@ -87,6 +90,20 @@ class ModelCreate(BaseModel):
     is_latest: bool = False
     is_active: bool = True
     capabilities: Optional[Dict[str, Any]] = None
+
+
+class OfferedModelAdd(BaseModel):
+    """A model from Refresh models that the owner chose to add."""
+
+    provider_id: int
+    name: str
+    display_name: Optional[str] = None
+    description: Optional[str] = None
+    context_window: Optional[int] = None
+
+
+class OfferedModelsAdd(BaseModel):
+    models: list[OfferedModelAdd] = Field(max_length=200)
 
 
 class ModelUpdate(BaseModel):
@@ -218,6 +235,72 @@ def list_providers(_user: CurrentUser, db: DbSession):
 def list_models(_user: CurrentUser, db: DbSession):
     models = db.query(AIModel).order_by(AIModel.provider_id, AIModel.sort_order, AIModel.id).all()
     return [_model_response(m) for m in models]
+
+
+@router.post("/models/refresh")
+@limiter.limit("6/minute")
+def refresh_models(request: Request, _user: CurrentUser, db: DbSession):
+    """Ask each provider with a key what it offers now. Adds nothing: the owner chooses."""
+    row = db.query(APISettings).first()
+    keys = {}
+    for name in LLM_KEY_BY_PROVIDER:
+        key = row.get_provider_key(name) if row else None
+        if key:
+            keys[name] = key
+    provider_ids = {p.name: p.id for p in db.query(APIProvider).filter(APIProvider.name.in_(keys)).all()} if keys else {}
+    models = [(m.provider_id, m.name, bool(m.is_active)) for m in db.query(AIModel).all()]
+    # Nothing stays open across the network calls.
+    db.commit()
+
+    offers = model_catalog.fetch_offers({name: key for name, key in keys.items() if name in provider_ids})
+
+    providers = []
+    for name, offer in offers.items():
+        provider_id = provider_ids[name]
+        known = {model for pid, model, _active in models if pid == provider_id}
+        gone = sorted(model for pid, model, active in models
+                      if pid == provider_id and active and offer.status == model_catalog.STATUS_OK
+                      and model not in offer.listed)
+        providers.append({
+            "provider_id": provider_id,
+            "provider": name,
+            "status": offer.status,
+            "new_models": [m.as_dict() for m in model_catalog.new_models_for(offer, known)],
+            "no_longer_listed": gone,
+        })
+    return {"providers": providers}
+
+
+@router.post("/models/add-offered")
+def add_offered_models(payload: OfferedModelsAdd, _user: CurrentUser, db: DbSession):
+    """Add what the owner ticked in Refresh models. A model already there is left as it is."""
+    allowed = {p.id for p in db.query(APIProvider).filter(APIProvider.name.in_(LLM_KEY_BY_PROVIDER)).all()}
+    added = 0
+    # Backwards, each going above the last, so the top of the list stays in the order shown.
+    for item in reversed(payload.models):
+        name = item.name.strip()
+        if item.provider_id not in allowed:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Provider not found")
+        if not model_catalog.valid_model_name(name):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="That is not a valid model name")
+        exists = db.query(AIModel.id).filter(AIModel.provider_id == item.provider_id, AIModel.name == name).first()
+        if exists:
+            continue
+        lowest = db.query(func.min(AIModel.sort_order)).filter(AIModel.provider_id == item.provider_id).scalar() or 0
+        db.add(AIModel(
+            name=name,
+            display_name=(item.display_name or "").strip()[:model_catalog.MAX_DISPLAY_NAME] or None,
+            description=(item.description or "").strip()[:model_catalog.MAX_DESCRIPTION] or None,
+            provider_id=item.provider_id,
+            context_window=item.context_window if item.context_window and item.context_window > 0 else None,
+            is_latest=True,
+            is_active=True,
+            sort_order=lowest - 1,
+        ))
+        db.flush()
+        added += 1
+    db.commit()
+    return {"added": added}
 
 
 @router.post("/models")

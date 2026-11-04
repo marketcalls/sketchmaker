@@ -36,9 +36,9 @@ def set_cookie_header(response) -> str:
 
 
 def test_settings_reports_setup_required(api):
-    assert api.get("/api/auth/settings").json() == {"setup_required": True}
+    assert api.get("/api/auth/settings").json()["setup_required"] is True
     setup_owner(api)
-    assert api.get("/api/auth/settings").json() == {"setup_required": False}
+    assert api.get("/api/auth/settings").json()["setup_required"] is False
 
 
 def test_setup_works_once(api):
@@ -269,7 +269,7 @@ def test_other_host_names_are_refused_locally(api):
     response = api.post("/api/auth/setup", headers={"Host": "evil.example:8000", "Origin": "http://evil.example:8000"},
                         json={"username": USERNAME, "password": PASSWORD})
     assert response.status_code == 421
-    assert api.get("/api/auth/settings").json() == {"setup_required": True}
+    assert api.get("/api/auth/settings").json()["setup_required"] is True
     assert api.get("/api/auth/settings", headers={"Host": "evil.example"}).status_code == 421
 
 
@@ -289,7 +289,7 @@ def test_a_public_server_never_offers_web_setup(api, monkeypatch):
     assert response.status_code == 403
     assert "terminal" in response.json()["detail"]
     assert COOKIE not in api.cookies
-    assert api.get("/api/auth/settings").json() == {"setup_required": True}
+    assert api.get("/api/auth/settings").json()["setup_required"] is True
 
 
 def test_api_requests_have_a_ceiling_per_address(api, monkeypatch):
@@ -368,3 +368,15 @@ def test_ipv4_mapped_addresses_count_as_ipv4():
     assert client_key("203.0.113.9") == "203.0.113.9"
     assert client_key(None) == "unknown"
     assert client_key("testclient") == "testclient"
+
+
+def test_the_setup_page_knows_when_web_setup_is_off(api, monkeypatch):
+    assert api.get("/api/auth/settings").json() == {"setup_required": True, "web_setup": True}
+    monkeypatch.setattr(settings, "TRUSTED_PROXIES", "*")
+    assert api.get("/api/auth/settings").json() == {"setup_required": True, "web_setup": False}
+
+
+def test_autosaves_do_not_use_up_what_paid_work_is_allowed(api, monkeypatch):
+    monkeypatch.setattr(rate_limiter, "API_PAID_LIMIT", rate_limiter.parse("1/minute"))
+    codes = [api.put("/api/faceless/projects/1", json={}).status_code for _ in range(3)]
+    assert 429 not in codes

@@ -2,7 +2,7 @@
 
 Alembic runs non-transactional DDL on SQLite, so a migration that fails part way leaves
 a half-changed database, and the only safe recovery is the copy taken before it began.
-Every way of starting the app (run.sh, the Docker entrypoint, server/update.sh) goes
+Every way of starting the app (run.py, the Docker entrypoint, server/update.sh) goes
 through migrate(), and the app refuses to start on a schema that does not match its code.
 
 The app must be stopped while this runs: a restore replaces the database file.

@@ -1,6 +1,6 @@
 # Sketchmaker: working notes
 
-Single-user, self-hosted AI image and video app. `backend/` (Python, FastAPI, SQLAlchemy 2, SQLite), `frontend/` (React 19, Vite 8, TypeScript 7, Tailwind v4). One process on one port: FastAPI serves the built frontend. `./run.sh` starts everything locally; `server/install.sh` publishes it on a domain, and `docker-compose.yml` runs it in a container. See `docs/DEPLOYMENT.md`.
+Single-user, self-hosted AI image and video app. `backend/` (Python, FastAPI, SQLAlchemy 2, SQLite), `frontend/` (React 19, Vite 8, TypeScript 7, Tailwind v4). One process on one port: FastAPI serves the built frontend. `uv run run.py` starts everything locally, on Windows, Linux and macOS; `server/install.sh` publishes it on a domain, and `docker-compose.yml` runs it in a container. See `docs/DEPLOYMENT.md`.
 
 It is a strip-down of a multi-user SaaS at `/Users/openalgo/sketch-demo/sketch-react`, which remains the reference for removed code. Do not bring back accounts, roles, admin pages, payments, credits, subscriptions, presentations, the public gallery, S3, Redis or email. **Consult the owner before removing anything else.**
 
@@ -37,6 +37,8 @@ Neither the server scripts nor the Docker setup have been run on real Ubuntu or 
 - **Media uploads** are one control, `components/media/` (`MediaDropzone`, `useMediaPicker`). Do not add a second file input.
 - **Alembic:** after changing a model, run `uv run alembic revision --autogenerate`. `tests/` checks the migrations match the models. Migrations on SQLite are not transactional, so always upgrade through `python -m app.cli migrate` (`services/migration_service.py`), never `alembic upgrade head`: it backs up first and restores on failure. The app refuses to start if the schema does not match the code.
 - **Rate limits are in three layers** (`middleware/rate_limiter.py`): a per-address ceiling on all of `/api` with a tighter one for requests that cost money, slowapi decorators on sign-in and costly routes, and failed logins per address. A new router that spends money goes in `PAID_ROUTERS`. Do not lower the account-wide lock (`LOGIN_MAX_FAILED_ATTEMPTS`) back near ten: a stranger who knows the username could then lock everyone out.
+- **The language model list has two homes.** `app/seed.py` only reaches new installs. When it changes, add a data migration too (`alembic/versions/0002_latest_models.py` is the model), or existing installs never see it; `tests/test_migrations.py` fails if they disagree. Refresh models in Settings (`services/model_catalog.py`) reads each provider's live list and adds only what the owner ticks. Its addresses are constants: never read one from the database.
+- **Model rules live by name.** `litellm_client.NO_TEMPERATURE_FAMILIES` stops `temperature` going to GPT-5 and all Claude models, which answer a 400. Check a new family with a real call before assuming either way.
 - **Logging:** no `print()` in app code. It skips the key redaction filter, and prompts do not belong in production logs. Use `logger.debug`.
 - **`npm run lint` is broken** under TypeScript 7. `npm run build` typechecks.
 

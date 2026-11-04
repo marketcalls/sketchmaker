@@ -1,5 +1,5 @@
 """The in-process scheduler: fal job polls, the stuck-job sweep, quality checks, the
-Motion Graphics ticks and the nightly backup.
+Motion Graphics and Faceless Studio ticks and the nightly backup.
 
 Runs in one process (uvicorn --workers 1), started from the app's lifespan. fal is
 polled rather than called back: each poll finishes jobs whose page was closed. No
@@ -32,7 +32,7 @@ from app.services.usage import record_usage
 logger = logging.getLogger(__name__)
 
 # One thread for each tick that can run at once; a slow tick must not delay the rest.
-TICK_THREADS = 12
+TICK_THREADS = 15
 JOB_POLL_SECONDS = 30
 QUALITY_TICK_SECONDS = 10
 STUCK_SWEEP_MINUTES = 10
@@ -115,10 +115,12 @@ class JobScheduler:
 
     def schedule_job_processor(self):
         """Add the job polls, the stuck-job sweep, the quality checks and the Motion
-        Graphics ticks."""
+        Graphics and Faceless Studio ticks."""
+        from app.services.faceless import scheduler as fl_scheduler
         from app.services.motion_graphics import scheduler as mg_scheduler
         from app.services.quality_gate import run_image_tick
 
+        fl_scheduler.release_orphaned_claims()
         for job_id, func, seconds in (
             ("generation_job_processor", self._process_pending_jobs, JOB_POLL_SECONDS),
             ("video_job_processor", self._process_pending_video_jobs, JOB_POLL_SECONDS),
@@ -136,6 +138,11 @@ class JobScheduler:
             # slot (app/services/render_queue.py).
             ("motion_graphics_job_processor", mg_scheduler.run_tick, mg_scheduler.TICK_SECONDS),
             ("motion_graphics_render_processor", mg_scheduler.run_render_tick, mg_scheduler.RENDER_TICK_SECONDS),
+            # Faceless Studio: step runs (fal submit, poll, store), long-form script
+            # drafts, and one render at a time under the same slot.
+            ("faceless_step_processor", fl_scheduler.run_tick, fl_scheduler.TICK_SECONDS),
+            ("faceless_script_processor", fl_scheduler.run_script_tick, fl_scheduler.SCRIPT_TICK_SECONDS),
+            ("faceless_render_processor", fl_scheduler.run_render_tick, fl_scheduler.RENDER_TICK_SECONDS),
         ):
             self.scheduler.add_job(
                 func=func,

@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { sanitizeApiError } from '@/utils/errors';
 
+let sessionExpiredHandler: (() => void) | null = null;
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const apiClient = axios.create({
@@ -45,9 +47,12 @@ apiClient.interceptors.response.use(
       try {
         await apiClient.post('/auth/refresh');
         return apiClient(originalRequest);
-      } catch {
-        // Refresh failed - clear any stored auth state and let the app handle it
-        // Don't force redirect here, let the ProtectedRoute handle it
+      } catch (refreshError: unknown) {
+        // A refused refresh means the session has ended, say after signing out in another
+        // tab. Anything else, such as a network blip, leaves the person signed in.
+        if ((refreshError as { response?: { status?: number } }).response?.status === 401) {
+          sessionExpiredHandler?.();
+        }
         return Promise.reject(sanitizeApiError(error));
       }
     }
@@ -56,5 +61,10 @@ apiClient.interceptors.response.use(
     return Promise.reject(sanitizeApiError(error));
   }
 );
+
+// The auth store imports this file, so it registers here rather than being imported.
+export function onSessionExpired(handler: () => void): void {
+  sessionExpiredHandler = handler;
+}
 
 export default apiClient;

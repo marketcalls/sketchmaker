@@ -89,7 +89,7 @@ def _owner_exists(db: Session) -> bool:
 @router.get("/settings", response_model=AuthSettingsResponse)
 def get_auth_settings(db: DbSession):
     """Whether the app is waiting for first-run setup."""
-    return AuthSettingsResponse(setup_required=not _owner_exists(db))
+    return AuthSettingsResponse(setup_required=not _owner_exists(db), web_setup=not settings.TRUSTED_PROXIES)
 
 
 @router.post("/setup", response_model=TokenResponse)
