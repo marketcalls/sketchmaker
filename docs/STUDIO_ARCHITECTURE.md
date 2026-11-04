@@ -1,6 +1,6 @@
 # Faceless Studio and Motion Graphics: shared architecture
 
-> **Status note:** this document was written for the multi-user SaaS version. Credits, charges, refunds and plans no longer exist: wherever it mentions them, read "estimated USD" for prices and ignore the rest. The Faceless Studio pipeline described here is deferred; its code is in the reference repo.
+> **Status note:** this document was written for the multi-user SaaS version. Credits, charges, refunds and plans no longer exist: wherever it mentions them, read "estimated USD" for prices and ignore the rest. Faceless Studio and its pipeline are in this app. S3 is gone, so files live on local disk, and there are no webhooks: jobs are polled.
 
 
 Two features share one render engine:

@@ -4,7 +4,9 @@ Single-user, self-hosted AI image and video app. `backend/` (Python, FastAPI, SQ
 
 It is a strip-down of a multi-user SaaS at `/Users/openalgo/sketch-demo/sketch-react`, which remains the reference for removed code. Do not bring back accounts, roles, admin pages, payments, credits, subscriptions, presentations, the public gallery, S3, Redis or email. **Consult the owner before removing anything else.**
 
-**Faceless Studio is deferred, not abandoned.** Its video pipeline and pages are in the reference repo. `services/faceless/` keeps what other features use (catalog, consent, errors, media, scenes, views, activity), along with `FacelessCharacter`, `FacelessActivity` and the character routes. `services/faceless/prompts.py` and `components/faceless/CharacterEditorDialog.tsx` have no callers yet; they are kept for the return.
+**Faceless Studio** lives in `services/faceless/` (`orchestrator.py` is the core) and `pages/user/faceless/`. A run is claimed as a whole, not item by item, so `job_state.fail_claimed_job` only handles a broken claim: per-item errors go through `is_temporary_failure`, because its permanent path would fail neighbouring items. Script drafts and saves that change scene ids or order are refused while a step runs, or results land on the wrong scenes.
+
+**The home page** (`pages/LandingPage.tsx`) is public, and `/` never redirects. Its claims must stay true for this app. Check them when a feature changes.
 
 ## Configuration
 
@@ -16,7 +18,7 @@ It is a strip-down of a multi-user SaaS at `/Users/openalgo/sketch-demo/sketch-r
 
 `server/common.sh` holds every server step once, called from both `install.sh` and `update.sh`, so a new server and an existing one converge. Anything new goes there, idempotent, and never calls `exit`. nginx only terminates TLS and limits abuse; the app serves everything, including its own security headers. Run app commands on a server as `www-data` (`sudo sketchmaker <command>`, or `sm_as_app`), or files in the data folder end up owned by root.
 
-Neither the server scripts nor the Docker setup have been run on real Ubuntu or in Docker yet. They were only linted and rehearsed. Say so until someone has.
+Neither the server scripts nor the Docker setup have been run on real Ubuntu or in Docker yet, and `uv run run.py` has only been run on macOS. Windows and Linux were checked by reading the code and the lock file. Say so until someone has run them.
 
 ## Things that bite
 

@@ -6,4 +6,5 @@ director  the chat turn (platform LLM through storyscript.llm.complete_json)
 clip      director prompts for one shot or the whole piece in one take
 keyframe  "Make keyframe": a shot's first frame from the approved images (edit model)
 library   characters (faceless_character) and environments (story_environment)
+faceless  the hand-off: turn a story into a Faceless Studio project
 """

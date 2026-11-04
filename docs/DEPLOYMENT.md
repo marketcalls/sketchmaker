@@ -246,6 +246,6 @@ No software can be promised unhackable. This is what is in place, how it was che
 
 ### How it was checked
 
-The automated tests cover sign-in, sessions, rate limits, key handling, uploads and the migration procedure. The running app was also attacked locally: guessing, flooding, path traversal, cross-site writes and DNS rebinding were all tried and refused. This is not a professional penetration test.
+The automated tests cover sign-in, sessions, rate limits, key handling, uploads, Faceless Studio and the migration procedure. The running app was also attacked locally: guessing, flooding, path traversal, cross-site writes and DNS rebinding were all tried and refused. Independent reviews read the deployment scripts, the security code and the Faceless pipeline. This is not a professional penetration test.
 
 **The server scripts and the Docker configuration have not yet been run on a real Ubuntu server or in Docker.** They were checked with linters and config parsers, and each build step was rehearsed without containers. Try them on a throwaway server before relying on them.

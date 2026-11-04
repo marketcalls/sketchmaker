@@ -1,6 +1,6 @@
 # Story Room (`/stories`)
 
-> **Status note:** this document was written for the multi-user SaaS version. Credits, charges, refunds and plans no longer exist: wherever it mentions them, read "estimated USD" for prices and ignore the rest. The hand-off to Faceless Studio is removed until Faceless returns.
+> **Status note:** this document was written for the multi-user SaaS version. Credits, charges, refunds and plans no longer exist: wherever it mentions them, read "estimated USD" for prices and ignore the rest. The hand-off to Faceless Studio is in this app.
 
 
 A ChatGPT-style room where people develop a story or an ad with an AI

@@ -30,7 +30,7 @@ cd sketchmaker
 uv run run.py
 ```
 
-The same command works on Windows, Linux and macOS. On Windows you can also double-click `run.bat`.
+The same command is built to work on Windows, Linux and macOS, though so far it has only been run on macOS. On Windows you can also double-click `run.bat`.
 
 That one command creates `backend/.env` with random secrets, builds the frontend, creates the database, and starts the app:
 
@@ -301,6 +301,8 @@ After changing a model, add a migration. See [Writing a migration](docs/DEPLOYME
 
 ## ⚠️ Known Limits
 
+- **Faceless Studio** has been tested with stand-ins for the providers. Its full path, from a real script to a real video, has not been run yet.
+- **Refresh models and the new language models** have only been tested for real with OpenAI.
 - **Cancel on My Jobs** stops the app tracking a job and discards its result. It does not cancel the request at fal, so a job fal has already started can still be billed.
 - **Retry on My Jobs** is available for video and lip sync jobs only.
 - **Backups** have no screen in the app yet.
